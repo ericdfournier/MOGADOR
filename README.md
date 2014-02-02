@@ -1,6 +1,6 @@
 DESCRIPTION:
 
-- (MOGADOR) Multi-Objective Genetic Algorithm for Corridor Location Problems
+- (MOGADOR) Multiobjective Genetic Algorithm for Corridor Location Problems
 
 PLATFORM:
 
@@ -24,4 +24,4 @@ REFERENCES:
 
 DETAILS:
 
-- Corridor planning often falls into the domain of multiobjective evaluation. MOGADOR is a multi-objective genentic algorithm for corridor location problems which produces a wide range of feasible corridor alternatives to help decision makers understand tradeoffs among competing objectives.
+- Corridor planning often falls into the domain of multiobjective evaluation. MOGADOR is a multiobjective genentic algorithm for corridor location problems which produces a wide range of feasible corridor alternatives to help decision makers understand tradeoffs among competing objectives.
