@@ -1,0 +1,19 @@
+%% Preliminaries
+
+gridMask = zeros(1000);
+gridMask(1,:) = nan; 
+gridMask(:,1) = nan; 
+gridMask(end,:) = nan; 
+gridMask(:,end) = nan;
+sourceIndex = [20 20];
+destinIndex = [980 980];
+genomeLength = 5000;
+plot = 1;
+sigma1 = [1 0; 0 1];
+sigma2 = [10 0;0 10];
+sigma3 = [100 0;0 100];
+sigma4 = [1000 0; 0 1000];
+
+%% Using the Covariance Matrix to Tune the Randomness in the Walk
+
+individual = pseudoRandomWalkFnc(gridMask,genomeLength,sigma2,sourceIndex,destinIndex,plot);
