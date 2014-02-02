@@ -9,7 +9,7 @@ PLATFORM:
 - Operating System: Mac OS X  Version: 10.9.1 Build: 13B42 
 - Java Version: Java 1.6.0_65-b14-462-11M4609 with Apple Inc. Java HotSpot(TM) 64-Bit Server VM mixed mode
 
-DEPENDECIES:
+DEPENDENCIES:
 
 - Global Optimization Toolbox                           Version 3.2.3
 - Image Acquisition Toolbox                             Version 4.5
