@@ -1,17 +1,16 @@
-%% PRELIMINARIES %%
+%% Preliminaries
 
+cd ~/Repositories/MOGADOR
 load ./data/gridMask.mat
 
-%% Resize Gridmask %%
+%% Resize Gridmask
 
 scaleFactor = 1;
 gridMask = imresize(gridMask,scaleFactor,'nearest');
-gS = size(gridMask)
+gS = size(gridMask);
 objCount = 3;
 
 %% Simulate Objective Variables 
-
-% Only do this for gridMasks of size [100 100] or less...
 
 if scaleFactor == 1
 	objectiveVars = simObjectivesFnc(objCount,5,100,gridMask);
@@ -22,7 +21,7 @@ end
 %% Population Initialization Parameters
 
 objectiveFrac = 0.2;
-popSize = 5;
+popSize = 1;
 minClusterSize = 5.*scaleFactor;
 sourceIndex = scaleFactor.*[40 20];
 destinIndex = scaleFactor.*[110 100];
