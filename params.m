@@ -37,6 +37,10 @@ p.mutationCount = 1;
 
 p.crossoverType = 0;
 
+%% Genetic Algorithm Parameters
+
+p.maxGenerations = 100;
+
 %% Clear Variables
 
 clearvars -except p
