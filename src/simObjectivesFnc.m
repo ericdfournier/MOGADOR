@@ -33,16 +33,16 @@ function [ objectiveVars ] = simObjectivesFnc( simObjCount, simMean,...
 %                   used to generate the covariance structure used in the 
 %                   simulation process
 %
-%   gridMask =      [g x f] binary array with valid pathway grid cells 
+%   gridMask =      [m x n] binary array with valid pathway grid cells 
 %                   labeled as ones and invalid pathway grid cells labeled 
 %                   as NaN placeholders
 %
 % OUTPUTS:
 %
-%   objectiveVars = [r x s] array in which each column corresponds to a
-%                   decision variable (s) and in which each row (r) 
-%                   corresponds to a spatially referenced grid cell value 
-%                   (covering the entire search domain)
+%   objectiveVars = [m x n x g] array in which the first two dimensions 
+%                   [n x m] correspond to the two spatial dimensions of the
+%                   gridMask and in which the third dimension corresponds
+%                   to the index of the objective variable being simulated
 %
 % EXAMPLES:
 %
@@ -68,7 +68,7 @@ function [ objectiveVars ] = simObjectivesFnc( simObjCount, simMean,...
 %%%                          Eric Daniel Fournier                        %%
 %%%                  Bren School of Environmental Science                %%
 %%%               University of California Santa Barbara                 %%
-%%%                            September 2013                            %%
+%%%                            February 2014                             %%
 %%%                                                                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -87,14 +87,12 @@ parse(p,nargin,simObjCount,simMean,simRange,gridMask);
 
 %% Iteration Parameters
 
-n = size(gridMask,1);
-m = size(gridMask,2);
-p = n*m;
+gS = size(gridMask);
 xSize = 1;
 ySize = 1;
 xMin = 0.5;
 yMin = 0.5;
-gridSpecs = [n xMin xSize; m yMin ySize];
+gridSpecs = [gS(1,1) xMin xSize; gS(1,2) yMin ySize];
 xy = makegrid(gridSpecs);
 
 %% Build Covariance Model
@@ -103,15 +101,11 @@ c = exp(-3*squareform(pdist(xy))/simRange);
 
 %% Simulate Objective Realizations
 
-s = repmat(simMean, [n*m 1]);
+s = repmat(simMean, [gS(1,1)*gS(1,2) 1]);
 yy = mvnrnd(s,c,simObjCount)';
 
 %% Generate Final Outputs
 
-mask = reshape(gridMask,p,1);
-nanTest = ~isnan(mask);
-mask(nanTest) = 1;
-mask = repmat(mask,1,simObjCount);
-objectiveVars = yy.*mask;
+objectiveVars = reshape(yy,gS(1,1),gS(1,2),simObjCount);
 
 end

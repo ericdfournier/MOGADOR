@@ -1,11 +1,12 @@
-function [ topCentroidsMask ] = topCentroidsMaskFnc( objectiveVars,...
+function [ topCentroidsMask, topCentroidsCount ] = topCentroidsMaskFnc(...
+                                                        objectiveVars,...
                                                         objectiveFrac,...
                                                         minClusterSize,...
                                                         gridMask )
 %
-% topCentroidsFnc.m Generates a mask layer containg the centroids of contiguous
-% regions of grid cells whose aggregate objective scores are below some
-% user specified threshold level
+% topCentroidsFnc.m Generates a mask layer containg the centroids of 
+% contiguous regions of grid cells whose aggregate objective scores are 
+% below some user specified threshold level
 %
 % DESCRIPTION:
 %
@@ -26,10 +27,11 @@ function [ topCentroidsMask ] = topCentroidsMaskFnc( objectiveVars,...
 %
 % INPUTS:
 %
-%   objectiveVars =     [g x h] array in which each column corresponds to a
-%                       decision variable (s) and in which each row 
-%                       corresponds to a spatially referenced grid cell 
-%                       value (covering the entire search domain)
+%   objectiveVars =     [n x m x g] array in which the first two dimensions
+%                       correspond to the spatial dimensions of the grid
+%                       mask and the third dimension corresponds to the
+%                       number of objective variables.
+%
 %
 %   objectiveFrac =     [s] scalar value indicating the fraction of the
 %                       aggregated objective score values for which 
@@ -48,6 +50,8 @@ function [ topCentroidsMask ] = topCentroidsMaskFnc( objectiveVars,...
 %   topCentroidsMask =  [n x m] binary array masking out the location of
 %                       the top centroids of contiguous regions containing 
 %                       cells with low aggregate objective score values.
+%
+%   topCentroidsCount = [f] scalar value indicating the number of unique
 %
 % EXAMPLES:
 %   
@@ -85,8 +89,8 @@ function [ topCentroidsMask ] = topCentroidsMaskFnc( objectiveVars,...
 p = inputParser;
 
 addRequired(p,'nargin',@(x) x == 4);
-addRequired(p,'nargout',@(x) x == 1);
-addRequired(p,'objectiveVars',@(x) isnumeric(x) && ismatrix(x)...
+addRequired(p,'nargout',@(x) x == 2);
+addRequired(p,'objectiveVars',@(x) isnumeric(x) && numel(size(x)) >= 2  ...
     && ~isempty(x));
 addRequired(p,'objectiveFrac',@(x) isnumeric(x) && isscalar(x)...
     && rem(x,1) ~= 0 && x <= 1 && x >= 0 && ~isempty(x));
@@ -103,12 +107,14 @@ gS = size(gridMask);
 
 %% Compute Aggregate Objective Scores and Mask Out Top Fraction
 
-aggObjectiveVars = sum(objectiveVars,2);
-fracCount = objectiveFrac*(gS(1,1)*gS(1,2));
-[~, sortInd] = sort(aggObjectiveVars,'ascend');
-topFraction = sortInd(1:fracCount,1);
+aggObjectiveVars = reshape(sum(objectiveVars,3),...
+    gS(1,1)*gS(1,2),1);
+fracQuant = quantile(aggObjectiveVars,objectiveFrac,1);
+fracInd = aggObjectiveVars <= fracQuant;
+
 topFracMask = zeros(gS);
-topFracMask(topFraction) = 1;
+topFracMask(fracInd) = 1;
+topFracMask = topFracMask.*gridMask;
 
 %% Extract Clusters and Rank Centroids
 
@@ -128,6 +134,7 @@ topCentroidsInd = sub2ind(gS,topCentroids(:,1),topCentroids(:,2));
 
 %% Generate Output
 
+topCentroidsCount = numel(topCentroidsInd);
 topCentroidsMask(topCentroidsInd) = 1;
 
 end

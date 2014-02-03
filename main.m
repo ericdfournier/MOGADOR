@@ -1,21 +1,24 @@
-%% Preliminaries
+%% PRELIMINARIES %%
 
-cd(['/Users/ericfournier/Google Drive/PhD/Dissertation/Project/',...
-    'Genetic Algorithms/']);
-load gridMask.mat
+load ./data/gridMask.mat
+
+%% Resize Gridmask %%
+
 scaleFactor = 1;
 gridMask = imresize(gridMask,scaleFactor,'nearest');
-
-%% Randomly Generate Objective Variables
- 
-objectiveVars = randi([0 10],size(gridMask,1)*size(gridMask,2),3);
+gS = size(gridMask)
+objCount = 3;
 
 %% Simulate Objective Variables 
 
-%Only do this for gridMasks of size [100 100] or less...
+% Only do this for gridMasks of size [100 100] or less...
 
-%objectiveVars = simObjectivesFnc(3,5,100,gridMask);
-
+if scaleFactor == 1
+	objectiveVars = simObjectivesFnc(objCount,5,100,gridMask);
+else
+	objectiveVars = rand(gS(1,1)*gS(1,2),objCount);
+end
+	
 %% Population Initialization Parameters
 
 objectiveFrac = 0.2;

@@ -32,10 +32,12 @@ function [ initialPop, popParams ] = initPopFncDEV( popSize,...
 %                       genome length (which is itself based upon the
 %                       dimensions of the gridMask)
 %
-%   objectiveVars =     [g x h] array in which each column corresponds to a
-%                       decision variable (s) and in which each row 
-%                       corresponds to a spatially referenced grid cell 
-%                       value (covering the entire search domain)
+%   objectiveVars =     [m x n x g] array in which the first two dimensions
+%                       [n x m] correspond to the two spatial dimensions of
+%                       the gridMask and in which the third dimension [g]
+%                       corresponds to the index number of the objective
+%                       variable
+%
 %
 %   objectiveFrac =     [s] scalar value indicating the fraction of the
 %                       aggregated objective score values for which 
@@ -217,7 +219,7 @@ switch caseVar
         
         % Generate Top Centroids Mask
         
-        topCentroidsMask = topCentroidsMaskFnc(objectiveVars,...
+        [topCentroidsMask, ~] = topCentroidsMaskFnc(objectiveVars,...
             objectiveFrac,minClusterSize,gridMask);
         
         % Iteratively Generate Base Points Using Convex Area Masks
