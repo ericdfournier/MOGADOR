@@ -36,9 +36,9 @@ o{1,2} = popFitnessFnc(...
 %% Execute MOGADOR
 
 i = 1; 
-stop = 0;
+convergence = 0;
 
-while stop == 0
+while convergence == 0
     
     if i == p.maxGenerations
         
