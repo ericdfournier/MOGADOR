@@ -130,12 +130,8 @@ parse(p,nargin,nargout,popSize,objectiveVars,objectiveFrac,...
 %% Function Parameters
 
 pS = popSize;
-sD = pdist([sourceIndex; destinIndex]);
-gL = ceil(5*sD);
 gS = size(gridMask);
-plot = 0;
 bandWidth = 142;
-initialPop = zeros(pS,gL);
 
 %% Input Warnings
 
@@ -200,16 +196,11 @@ switch caseVar
 
         disp(walkMsg{1});
         
-        for i = 1:popSize
-            
-            initialPop(i,:) = pseudoRandomWalkFnc(gridMask,sourceIndex,...
-                destinIndex,plot);
-            disp(['Walk #', num2str(i), ' Completed']);
-            
-        end
-        
-        domainMorphology = 'Convex';
-        basePointsVisited = 0;
+        initialPop = singlePartConvexWalkFnc(...
+            popSize,...
+            sourceIndex,...
+            destinIndex,...
+            gridMask    );
         
         disp(walkMsg{2});
     
@@ -219,8 +210,11 @@ switch caseVar
         
         % Generate Top Centroids Mask
         
-        [topCentroidsMask, ~] = topCentroidsMaskFnc(objectiveVars,...
-            objectiveFrac,minClusterSize,gridMask);
+        [topCentroidsMask, ~] = topCentroidsMaskFnc(...
+            objectiveVars,...
+            objectiveFrac,...
+            minClusterSize,...
+            gridMask    );
         
         % Iteratively Generate Base Points Using Convex Area Masks
         
