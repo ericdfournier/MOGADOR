@@ -1,6 +1,5 @@
-function [ popFitnessSum, popFitnessVar, popFitnessRaw ] = ...
-                                                popFitnessFnc(...
-                                                inputPop, objectiveVars )
+function [ popFitness ] =  popFitnessFnc( inputPop, objectiveVars,...
+                                            gridMask )
                                             
 % popFitnessFnc.m This function computes the different components 
 % of the multi-objective function used to evaluate different proposed 
@@ -16,64 +15,32 @@ function [ popFitnessSum, popFitnessVar, popFitnessRaw ] = ...
 %
 % SYNTAX:
 %
-%   [ popFitnessSum, popFitnessRaw ] =  popFitnessFnc( inputPop, 
-%                                           objectiveVars )
+%   popFitness =  popFitnessFnc( inputPop, objectiveVars, gridMask )
 %
 % INPUTS:
 %
-%   inputPop =      [n x m] logical array indicating the locations of the
+%   inputPop =      [j x k] logical array indicating the locations of the
 %                   grid cells (m) positioned along each of the 
 %                   individually proposed candidate pathways (n)
 %
-%   objectiveVars = [r x s] array in which each column corresponds to a
+%   objectiveVars = [n x m x g] array in which each column corresponds to a
 %                   decision variable (s) and in which each row corresponds 
 %                   to a spatially referenced grid cell value (covering the
 %                   entire search domain)
 %
+%   gridMask =      [n x m] binary array with valid pathway grid cells 
+%                   labeled as ones and invalid pathway grid cells 
+%                   labeled as NaN placeholders
+%
 % OUTPUTS:
 %
-%   popFitnessSum = [n x 1] array in which each row contains the summed
-%                   fitness values for the individual accross all of the 
-%                   objectives upon which fitness is being evaluated
-%
-%   popFitnessVar = [n x 1] cell array in which each cell contains an 
-%                   [r x 1] array where each row value corresponds to
-%                   the sum total fitness score computed for each of the 
-%                   objectives upon which fitness is being evaluated
-%
-%   popFitnessRaw = [n x 1] cell array in which each cell contains an 
-%                   [1 x m] array where each row corresponds to the
-%                   individual fitness scores computed for each of the 
-%                   index locations referenced in the 'individual' input 
-%                   pathway
+%   popFitness =    [j x g] array in which each row corresponds to the
+%                   objective specific fitness score sums for each 
+%                   individual in the population
 %
 % EXAMPLES:
 %   
 %   Example 1:
-%   
-%                   gridMask = zeros(100);
-%                   gridMask(1,:) = nan;
-%                   gridMask(:,1) = nan;
-%                   gridMask(end,:) = nan;
-%                   gridMask(:,end) = nan;
-%                   sourceIndex = [20 20];
-%                   destinIndex = [80 80];
-%                   iterations = 1000;
-%                   sigma = [10 0; 0 10];
-%                   plot = 0;
-%                   [initialPop, genomeLength] = initializePopFnc(popSize,
-%                                                   gridMask,iterations,...
-%                                                   sigma,sourceIndex,...
-%                                                   destinIndex);
-%                   
-%                   objective1 = randi([0 10],10000,1);
-%                   objective2 = randi([0 10],10000,1);
-%                   objective3 = randi([0 10],10000,1);
-%                   objectiveVars = horzcat(objective1, objective2,...
-%                                       objective3);
-%                   
-%                   [popFitnessSum, popFitnessVar, popFitnessRaw] = ...
-%                           popFitnessFnc(inputPop, objectiveVars);
 %                   
 % CREDITS:
 %
@@ -90,29 +57,26 @@ function [ popFitnessSum, popFitnessVar, popFitnessRaw ] = ...
 
 p = inputParser;
 
-addRequired(p,'nargin', @(x) x == 2);
+addRequired(p,'nargin', @(x) x == 3);
 addRequired(p,'inputPop',@(x) isnumeric(x) && ismatrix(x) && ~isempty(x));
-addRequired(p,'objectiveVars',@(x) isnumeric(x) && ismatrix(x) &&...
-    ~isempty(x));
+addRequired(p,'objectiveVars',@(x) isnumeric(x) && numel(size(x)) >= 2 ...
+    && ~isempty(x));
+addRequired(p,'gridMask',@(x) isnumeric(x) && ismatrix(x) && ~isempty(x));
 
-parse(p,nargin,inputPop,objectiveVars);
+parse(p,nargin,inputPop,objectiveVars,gridMask);
 
 %% Iteration Parameters
 
-n = size(inputPop);
-popFitnessSum = zeros(n(1,1),1);
-popFitnessVar = cell(n(1,1),1);
-popFitnessRaw = cell(n(1,1),1);
+pS = size(inputPop);
+oC=  size(objectiveVars,3);
+popFitness = zeros(pS(1,1),oC);
 
 %% Compute Fitness
 
-for i = 1:n(1,1);
+for i = 1:pS(1,1);
     individual = inputPop(i,:);
-    [fitnessSum, fitnessRaw] = fitnessFnc(individual,...
-        objectiveVars);
-    popFitnessSum(i,1) = sum(fitnessSum);
-    popFitnessVar{i,1} = fitnessSum;
-    popFitnessRaw{i,1} = fitnessRaw;
+    fitness = fitnessFnc(individual,objectiveVars,gridMask);
+    popFitness(i,:) = fitness;
 end
 
 end

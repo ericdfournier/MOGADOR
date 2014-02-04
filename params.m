@@ -14,11 +14,12 @@ p.objectiveCount = 3;
 p.objectiveFraction = 0.2;
 p.objectiveSimulationMean = 5;
 p.objectiveSimulationRange = 100;
+p.objectiveNames = {'Var1','Var2','Var3'};
 
 %% Population Initialization Parameters
 
-p.populationSize = 1;
-p.minimumClusterSize = 5;
+p.populationSize = 2;
+p.minimumClusterSize = 2;
 p.sourceIndex = [40 20];
 p.destinIndex = [110 100];
 
