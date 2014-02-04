@@ -1,31 +1,28 @@
-function [ initialPop ] = initPopFncDEV(    popSize,...
-                                            sourceIndex,...
-                                            destinIndex,...
-                                            objectiveVars,...
-                                            objectiveFrac,...
-                                            minClusterSize,...
-                                            gridMask )
+function [ outputPop ] = multiPartConcaveWalkFnc(   popSize,...
+                                                    sourceIndex,...
+                                                    destinIndex,...
+                                                    objectiveVars,...
+                                                    objectiveFrac,...
+                                                    minClusterSize,...
+                                                    gridMask )
 %
-% initPopFunc.m Initializes sequences of two or more base points (each 
-% of which represents the centroid of low aggregate objective score 
-% clusters) to be used for the decomposition of a pseudoRandomWalk into 
-% three or more smaller sub sections
+% multiPartConcaveWalkFnc.m
 %
 % DESCRIPTION:
 %
-%   Function that initializes sequences of two or more base points which 
-%   are used to construct multipart pseudorandom walks. These sequences of
-%   base points are constrained to be ordered in such a way as to prevent
-%   backtracking within the path sections.
+%   Function to...
 %
 %   Warning: minimal error checking is performed.
 %
 % SYNTAX:
 %
-%   [ initialPop ] =    initPopFnc( popSize, sourceIndex,...
-%                                   destinIndex,objectiveVars,...
-%                                   objectiveFrac, minClusterSize,...
-%                                   gridMask )
+%   [ outputPop ] =     multiPartConcaveWalkFnc(    popSize,...
+%                                                   sourceIndex,...
+%                                                   destinIndex,...
+%                                                   objectiveVars,...
+%                                                   objectiveFrac,...
+%                                                   minClusterSize,...
+%                                                   gridMask )
 %
 % INPUTS:
 %
@@ -65,7 +62,7 @@ function [ initialPop ] = initPopFncDEV(    popSize,...
 %
 % OUTPUTS:
 %
-%   initialPop =        [j x k] double array containing the grid index 
+%   outputPop =         [j x k] double array containing the grid index 
 %                       values of the individuals within the population 
 %                       (Note: each individual corresponds to a connected 
 %                       pathway from the source to the destination grid 
@@ -75,23 +72,6 @@ function [ initialPop ] = initPopFncDEV(    popSize,...
 %   
 %   Example 1 =
 %
-%                       gridMask = zeros(100);
-%                       gridMask(:,1) = nan;
-%                       gridMask(1,:) = nan;
-%                       gridMask(end,:) = nan;
-%                       gridMask(:,end) = nan;
-%
-%                       sourceIndex = [20 20];
-%                       destinIndex = [80 80];
-%                       objectiveVars = randi([0 10],10000,3);
-%                       objectiveFrac = 0.10;
-%                       minClusterSize = 5;
-%                       popSize = 50;
-%
-%                       [initialPop] = initPopFnc(...
-%                                       popSize,sourceIndex,destinIndex,...
-%                                       objectiveVars,objectiveFrac,...
-%                                       minClusterSize,gridMask);
 %
 % CREDITS:
 %
@@ -155,83 +135,6 @@ parse(p,nargin,nargout,popSize,sourceIndex,destinIndex,objectiveVars,...
 
 %% Function Parameters
 
-gS = size(gridMask);
-bandWidth = 142;
-
-%% Progress Messages
-
-switchMsg = {   '**Single Part Walk Detected**',...
-                '**Multi-Part Walk Detected**',...
-                '**Convex Search Domain Detected**',...
-                '**Concave Search Domain Detected**'};
-
-walkMsg =   {   '**Initiating Walks**',...
-                '**Walks Completed**'};
-
-%% Switch Parameters
-
-euclPath = euclShortestWalkFnc(gridMask,sourceIndex,destinIndex);
-isConcave = any(gridMask(euclPath));
-basePointCount = floor(sqrt(gS(1,1)*gS(1,2))/bandWidth);
-isMultiPart = basePointCount > 1;
-
-if isMultiPart == 0 && isConcave == 0
-    
-    caseVar = 1;
-    disp(switchMsg{1});
-    disp(switchMsg{3});
-    
-elseif isMultiPart == 0 && isConcave == 1
-    
-    caseVar = 2;
-    disp(switchMsg{1});
-    disp(switchMsg{4});
-    
-elseif isMultiPart == 1 && isConcave == 0
-    
-    caseVar = 3;
-    disp(switchMsg{2});
-    disp(switchMsg{3});
-    
-elseif isMultiPart == 1 && isConcave == 1
-    
-    caseVar = 4;
-    disp(switchMsg{2});
-    disp(switchMsg{4});
-    
-end
-
-%% Switch Cases
-
-disp(walkMsg{1});
-
-switch caseVar
-    
-    case 1      % Single Part Walk & Convex Search Domain
-        
-        initialPop = singlePartConvexWalkFnc(...
-            popSize,...
-            sourceIndex,...
-            destinIndex,...
-            gridMask);
-    
-    case 2      % Single Part Walk & Concave Search Domain      
-        
-        initialPop = singlePartConcaveWalkFnc(...
-            popSize,...
-            sourceIndex,...
-            destinIndex,...
-            objectiveVars,...
-            objectiveFrac,...
-            minClusterSize,...
-            gridMask);
-        
-    case 3      % Multi-Part Walk & Convex Search Domain
-        
-    case 4      % Multi-Part Walk & Concave Search Domain
 
 end
 
-disp(walkMsg{2});
-        
-end

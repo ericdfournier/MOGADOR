@@ -85,6 +85,7 @@ end
 
 %% Write Output Data
 
+o = o(~isempty(o));
 cd ~/Repositories/MOGADOR/rslt
 save(['simResults_',datestr(now,30),'.mat'],'o');
 
