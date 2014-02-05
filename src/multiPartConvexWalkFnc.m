@@ -177,6 +177,20 @@ for i = 1:pS
     
     while basePointCheck == 0
         
+        % Check that the current number of base points is below the maximum
+        
+        basePointCount = basePointCount+1;
+        
+        if basePointCount == basePointLimit
+            
+            error(['Process Terminated: Unable to Reach Target',...
+                ' Destination due to Extreme Concavity of the',...
+                ' Search Domain']);
+            
+        end
+        
+        % Check if final destination is contained in convex area mask
+        
         currentBasePoint = basePoints(basePointCount,:);
         currentBasePointDist = sourceDistMask(currentBasePoint(1,1),...
             currentBasePoint(1,2));
@@ -193,11 +207,67 @@ for i = 1:pS
         
         end
             
-        currentDistBandMask = sourceDistMask > currentDistBandLim(1,1) &...
+        currentDistBandMask = ...
+            sourceDistMask > currentDistBandLim(1,1) &...
             sourceDistMask <= currentDistBandLim(1,2);
+        sourceShadowMask = sourceShadowMaskFnc(...
+            currentBasePoint,...
+            destinIndex,...
+            gridMask);
+        currentAreaMask = currentDistBandMask .* sourceShadowMask;
+        containsDestin = ...
+            currentAreaMask(destinIndex(1,1),destinIndex(1,2)) == 1;
         
-        % NEED TO CREATE SOURCE-DISTANCE ORIENTATION MASK
+        if containsDestin == 1
+            
+            break;
+            
+        end
+        
+        % Sort Elligible Top Centroids by Distance from Source
+        
+        eCentroidDistMask = topCentroidsMask .* currentAreaMask ...
+            .* gridMask;
+        [eCentroidRows, eCentroidCols, eCentroidVals] =...
+            find(eCentroidDistMask);
+        seCentroids = ...
+            flipud(...
+            sortrows([eCentroidRows eCentroidCols eCentroidVals],3));
+        eCentroidCount = size(eCentroidRows,1);
+        
+        if isempty(seCentroids) == 1
+            
+            disp(['Restarting Walk: No Elligible Cluster Centroids',...
+                ' Found from Current Base Point']);
+            
+            break
+            
+        elseif eCentroidCount == 1
+            
+            selection = 1;
+            
+        elseif eCentroidCount > 1
+            
+            selection = randi(eCentroidCount,1);
+            
+        end
+        
+        nextBasePoint = seCentroids(selection,1:2);
+        basePoints(basePointCount+1,:) = nextBasePoint;
+        
     end
+    
+    basePoints(basePointCount+1,:) = destinIndex;
+    basePoints = basePoints(any(basePoints,2),:);
+    
+    % Generate and Concatenate Path Sections Between Base Points
+    
+    individual = basePoints2WalkFnc(basePoints,gridMask);
+    sizeIndiv = size(individual,2);
+    outputPop(i,1:sizeIndiv) = individual;
+    
+    disp(['Walk ', num2str(i), ' of ', num2str(pS),...
+        ' Complete']);
 
 end
 

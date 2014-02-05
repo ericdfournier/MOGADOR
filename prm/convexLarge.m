@@ -5,23 +5,22 @@ p = struct();
 
 %% Load Grid Mask
 
-load ./data/gridMask.mat
+load ./data/gridMaskConvexLarge.mat
 p.gridMask = gridMask;
 
 %% Problem Initialization Parameters
 
 p.objectiveCount = 3;
 p.objectiveFraction = 0.2;
-p.objectiveSimulationMean = 5;
-p.objectiveSimulationRange = 100;
+p.objectiveMax = 10;
 p.objectiveNames = {'Var1','Var2','Var3'};
 
 %% Population Initialization Parameters
 
 p.populationSize = 20;
-p.minimumClusterSize = 2;
-p.sourceIndex = [40 20];
-p.destinIndex = [110 100];
+p.minimumClusterSize = 5;
+p.sourceIndex = [20 20];
+p.destinIndex = [280 280];
 
 %% Selection Parameters
 
@@ -42,13 +41,9 @@ p.crossoverType = 0;
 
 p.maxGenerations = 100;
 
-%% Simulate Objective Variables
+%% Randomly Generate Objective Variables
 
-p.objectiveVars = simObjectivesFnc(...
-    p.objectiveCount,...
-    p.objectiveSimulationMean,...
-	p.objectiveSimulationRange,...
-	p.gridMask          );
+p.objectiveVars = randi(p.objectiveMax,[size(gridMask) p.objectiveCount]);
 
 %% Clear Variables
 

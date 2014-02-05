@@ -1,4 +1,4 @@
-function [ sourceShadowMask ] = sourceShadowMaskFnc( sourceIndex,...
+function [ sourceShadowMask ] = sourceShadowMaskFnc(    sourceIndex,...
                                                         destinIndex,...
                                                         gridMask )
 % 
@@ -14,15 +14,11 @@ function [ sourceShadowMask ] = sourceShadowMaskFnc( sourceIndex,...
 %
 % SYNTAX:
 %
-%   [ sourceShadowMask ] =  sourceShadowMask( gridMask,...
+%   [ sourceShadowMask ] =      sourceShadowMask( gridMask,...
 %                               topCentroidsMask, sourceIndex,...
 %                               destinIndex, method )
 %
 % INPUTS:
-%
-%   gridMask =          [n x m] binary array with valid pathway grid cells
-%                       labeled as zeros and invalid pathway grid cells 
-%                       labeled as NaN placeholders
 %
 %   sourceIndex =       [i,j] index value of the source node for to be used
 %                       as the reference point for determining the convex 
@@ -31,6 +27,10 @@ function [ sourceShadowMask ] = sourceShadowMaskFnc( sourceIndex,...
 %   destinIndex =       [1 x 2] array with the subscript indices of the
 %                       destination location within the study area for 
 %                       which the paths are to be evaluated
+%
+%   gridMask =          [n x m] binary array with valid pathway grid cells
+%                       labeled as zeros and invalid pathway grid cells 
+%                       labeled as NaN placeholders
 %                   
 % OUTPUTS:
 %
@@ -65,7 +65,6 @@ function [ sourceShadowMask ] = sourceShadowMaskFnc( sourceIndex,...
 %%%                          Eric Daniel Fournier                        %%
 %%%                  Bren School of Environmental Science                %%
 %%%                University of California Santa Barbara                %%
-%%%                             January 2014                             %%
 %%%                                                                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -73,10 +72,20 @@ function [ sourceShadowMask ] = sourceShadowMaskFnc( sourceIndex,...
 
 p = inputParser;
 
-addRequired(p,'nargin', @(x) x == 3);
-addRequired(p,'sourceIndex', @(x) isnumeric(x) && isrow(x) && ~isempty(x));
-addRequired(p,'destinIndex', @(x) isnumeric(x) && isrow(x) && ~isempty(x));
-addRequired(p,'gridMask', @(x) isnumeric(x) && ismatrix(x) && ~isempty(x));
+addRequired(p,'nargin', @(x)...
+    x == 3);
+addRequired(p,'sourceIndex', @(x)...
+    isnumeric(x) &&...
+    isrow(x) &&...
+    ~isempty(x));
+addRequired(p,'destinIndex', @(x)...
+    isnumeric(x) &&...
+    isrow(x) &&...
+    ~isempty(x));
+addRequired(p,'gridMask', @(x)...
+    isnumeric(x) &&...
+    ismatrix(x) &&...
+    ~isempty(x));
 
 parse(p,nargin,sourceIndex,destinIndex,gridMask);
 

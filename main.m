@@ -1,7 +1,7 @@
 %% Preliminaries
 
-cd ~/Repositories/MOGADOR
-run params.m
+cd ~/Repositories/MOGADOR/prm
+run convexLarge.m
 
 %% Initialize Ouput Parameters
 
