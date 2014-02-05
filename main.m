@@ -90,3 +90,5 @@ cd ~/Repositories/MOGADOR/rslt
 save(['simResults_',datestr(now,30),'.mat'],'o');
 
 %% Generate Output Figures
+
+% Put sample figure here
