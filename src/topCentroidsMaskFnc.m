@@ -5,12 +5,12 @@ function [ topCentroidsMask, topCentroidsCount ] = topCentroidsMaskFnc(...
                                                         gridMask )
 %
 % topCentroidsFnc.m Generates a mask layer containg the centroids of 
-% contiguous regions of grid cells whose aggregate objective scores are 
-% below some user specified threshold level
+% contiguous regions of grid cells whose various objective scores are 
+% below some user specified threshold quantile
 %
 % DESCRIPTION:
 %
-%   Function that generates clusters of low valued aggregate objective
+%   Function that generates clusters of low valued objective
 %   scores and computes their centroids. These centroids are then delivered
 %   as a mask layer out for use in conjunction with other functions in the
 %   population initialization procedure. 
@@ -19,7 +19,7 @@ function [ topCentroidsMask, topCentroidsCount ] = topCentroidsMaskFnc(...
 %
 % SYNTAX:
 %
-%   [ topCentroidsMask, topCentroidsCount ] =  topCentroidsFnc(...
+%   [ topCentroidsMask, topCentroidsCount ] =   topCentroidsFnc(...
 %                                               objectiveVars,...
 %                                               objectiveFrac,...
 %                                               minClusterSize,...
@@ -49,7 +49,8 @@ function [ topCentroidsMask, topCentroidsCount ] = topCentroidsMaskFnc(...
 %
 %   topCentroidsMask =  [n x m] binary array masking out the location of
 %                       the top centroids of contiguous regions containing 
-%                       cells with low aggregate objective score values.
+%                       cells with low objective score values accross all 
+%                       of the different objectives.
 %
 %   topCentroidsCount = [f] scalar value indicating the number of unique
 %
@@ -80,7 +81,6 @@ function [ topCentroidsMask, topCentroidsCount ] = topCentroidsMaskFnc(...
 %%%                          Eric Daniel Fournier                        %%
 %%%                  Bren School of Environmental Science                %%
 %%%               University of California Santa Barbara                 %%
-%%%                             January 2014                             %%
 %%%                                                                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -88,52 +88,76 @@ function [ topCentroidsMask, topCentroidsCount ] = topCentroidsMaskFnc(...
 
 p = inputParser;
 
-addRequired(p,'nargin',@(x) x == 4);
-addRequired(p,'nargout',@(x) x == 2);
-addRequired(p,'objectiveVars',@(x) isnumeric(x) && numel(size(x)) >= 2  ...
-    && ~isempty(x));
-addRequired(p,'objectiveFrac',@(x) isnumeric(x) && isscalar(x)...
-    && rem(x,1) ~= 0 && x <= 1 && x >= 0 && ~isempty(x));
-addRequired(p,'minClusterSize',@(x) isnumeric(x) && isscalar(x)...
-    && rem(x,1) == 0 && x > 0 && ~isempty(x));
-addRequired(p,'gridMask',@(x) isnumeric(x) && ismatrix(x) && ~isempty(x));
+addRequired(p,'nargin',@(x)...
+    x == 4);
+addRequired(p,'nargout',@(x)...
+    x == 2);
+addRequired(p,'objectiveVars',@(x)...
+    isnumeric(x) &&...
+    numel(size(x)) >= 2 &&...
+    ~isempty(x));
+addRequired(p,'objectiveFrac',@(x)...
+    isnumeric(x) &&...
+    isscalar(x) &&...
+    rem(x,1) ~= 0 &&...
+    x <= 1 &&...
+    x >= 0 &&...
+    ~isempty(x));
+addRequired(p,'minClusterSize',@(x)...
+    isnumeric(x) &&...
+    isscalar(x) &&...
+    rem(x,1) == 0 &&...
+    x > 0 &&...
+    ~isempty(x));
+addRequired(p,'gridMask',@(x)...
+    isnumeric(x) &&...
+    ismatrix(x) &&...
+    ~isempty(x));
 
-parse(p,nargin,nargout,objectiveVars,objectiveFrac,...
-    minClusterSize,gridMask);
+parse(p,nargin,nargout,objectiveVars,objectiveFrac,minClusterSize,...
+    gridMask);
 
 %% Function Parameters
 
 gS = size(gridMask);
+oC = size(objectiveVars);
 
 %% Compute Aggregate Objective Scores and Mask Out Top Fraction
 
-aggObjectiveVars = reshape(sum(objectiveVars,3),...
-    gS(1,1)*gS(1,2),1);
-fracQuant = quantile(aggObjectiveVars,objectiveFrac,1);
-fracInd = aggObjectiveVars <= fracQuant;
+rowLen = gS(1,1).*gS(1,2);
+topCentroidsInd = cell(oC(1,3),1);
 
-topFracMask = zeros(gS);
-topFracMask(fracInd) = 1;
-topFracMask = topFracMask.*gridMask;
+for i = 1:oC(1,3)
+    
+    % Extract Top Objective Variable Fraction Mask
+    
+    objVars = reshape(objectiveVars(:,:,i),rowLen,1);
+    fracQuant = quantile(objVars,objectiveFrac,1);
+    fracInd = objVars <= fracQuant;
+    topFracMask = reshape(fracInd,gS(1,1),gS(1,2));
+    
+    % Compute Connected Area Centroids for Each Objective Variable
+    
+    bw = bwconncomp(topFracMask);
+    rg = regionprops(bw,'centroid','area');
+    rgCell = struct2cell(rg)';
+    rgArea = cell2mat(rgCell(2:end,1));
+    rgCentroid = fliplr(floor(cell2mat(rgCell(2:end,2))));
+    rgAreaCentroid = horzcat(rgArea,rgCentroid);
+    
+    % Sort Centroids by Connected Area Size
+    
+    rgSort = flipud(sortrows(rgAreaCentroid,1));
+    topCentroids = rgSort(rgSort(:,1) >= minClusterSize,2:3);
+    topCentroidsInd{i,1} = sub2ind(gS,topCentroids(:,1),topCentroids(:,2));
+    
+end
 
-%% Extract Clusters and Rank Centroids
-
-bw = bwconncomp(topFracMask);
-rg = regionprops(bw,'centroid','area');
-rgCell = struct2cell(rg)';
-rgArea = cell2mat(rgCell(2:end,1));
-rgCentroid = fliplr(floor(cell2mat(rgCell(2:end,2))));
-rgAreaCentroid = horzcat(rgArea,rgCentroid);
-rgSort = flipud(sortrows(rgAreaCentroid,1));
-
-%% Extract Top Centroid Clusters
-
-topCentroids = rgSort(rgSort(:,1) >= minClusterSize,2:3);
-topCentroidsMask = zeros(gS);
-topCentroidsInd = sub2ind(gS,topCentroids(:,1),topCentroids(:,2));
+topCentroidsInd = unique(cell2mat(topCentroidsInd));
 
 %% Generate Output
 
+topCentroidsMask = zeros(gS);
 topCentroidsCount = numel(topCentroidsInd);
 topCentroidsMask(topCentroidsInd) = 1;
 

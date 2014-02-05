@@ -154,7 +154,7 @@ outputPop = zeros(pS,gL);
 
 if topCentroidsCount <= 10
     
-    warning(['Fewer than 10 candidate base point centroids generated',...
+    warning(['Fewer than 10 candidate base point centroids generated ',...
         'from input objectiveVars, consider reducing minimumClusterSize']);
     
 end
@@ -222,7 +222,7 @@ for i = 1:pS
         if isempty(seCentroids) == 1
             
             disp(['Restarting Walk: No Elligible Cluster Centroids',...
-                'Found from Current Base Point']);
+                ' Found from Current Base Point']);
             
             break
             
