@@ -1,4 +1,4 @@
-function [individualOut] = simplifyWalkFnc_DEV( individual, tolerance,...
+function [individualOut] = simplifyWalkFncDEV( individual, tolerance,...
                                                 gridMask)
 
 % simplifyWalkFnc.m Function which recursively executes the Douglas-Peucker
@@ -72,7 +72,6 @@ function [individualOut] = simplifyWalkFnc_DEV( individual, tolerance,...
 %%%                          Eric Daniel Fournier                        %%
 %%%                  Bren School of Environmental Science                %%
 %%%               University of California Santa Barbara                 %%
-%%%                            September 2013                            %%
 %%%                                                                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%                                                                      %%
