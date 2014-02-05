@@ -1,7 +1,6 @@
 %% Add Directory Tree to MATLAB Path
 
 addpath(genpath('./MOGODOR'));
-cd ./MOGODOR
 
 %% Initialize Input Parameters
 
