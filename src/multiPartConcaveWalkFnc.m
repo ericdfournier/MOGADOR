@@ -135,6 +135,64 @@ parse(p,nargin,nargout,popSize,sourceIndex,destinIndex,objectiveVars,...
 
 %% Function Parameters
 
+pS = popSize;
+gS = size(gridMask);
+sD = pdist([sourceIndex; destinIndex]);
+gL = ceil(5*sD);
+outputPop = zeros(pS,gL);
+bandWidth = 142;
 
+%% Generate Top Centroids Mask
+
+[topCentroidsMask, topCentroidsCount] = topCentroidsMaskFnc(...
+    objectiveVars,...
+    objectiveFrac,...
+    minClusterSize,...
+    gridMask);
+
+% Throw warning if insufficient candidate centroids found
+
+if topCentroidsCount <= 10
+    
+    warning(['Fewer than 10 candidate base point centroids generated',...
+        'from input objectiveVars, consider reducing minimumClusterSize']);
+    
 end
 
+%% Generate Walks from Base Points Selected Using Distance Band Masks
+
+basePointLimit = floor(sqrt(gS(1,1)*gS(1,2)));
+
+for i = 1:pS
+    
+    disp(['Walk ',num2str(i),' of ',num2str(pS),' Initiated']);
+    
+    basePointCount = 0;
+    basePointCheck = 0;
+    basePoints = zeros(basePointLimit,2);
+    basePoints(1,:) = sourceIndex;
+    visitedAreaMask = ones(gS);
+    
+    while basePointCheck == 0
+        
+        % Check that the current number of base points is below the maximum
+        
+        basePointCount = basePointCount+1;
+        
+        if basePointCount == basePointLimit
+            
+            error(['Process Terminated: Unable to Reach Target',...
+                ' Destination due to Extreme Concavity of the',...
+                ' Search Domain']);
+            
+        end
+        
+        % Check if final destination is contained in convex area mask
+        
+        currentBasePoint = basePoints(basePointCount,:);
+        currentBasePointDist = bwdist(currentBasePoint(1,1),...
+            currentBasePoint(1,2));
+        maxSourceDist = max(max(sourceDistMask));
+        testDistLimMax = currentBasePointDist + bandWidth;
+
+end
