@@ -11,11 +11,8 @@ PLATFORM:
 
 DEPENDENCIES:
 
-- Global Optimization Toolbox                           Version 3.2.3
-- Image Acquisition Toolbox                             Version 4.5
 - Image Processing Toolbox                              Version 8.2
 - Mapping Toolbox                                       Version 3.7
-- Optimization Toolbox                                  Version 6.3
 - Statistics Toolbox                                    Version 8.2
 
 REFERENCES: 
