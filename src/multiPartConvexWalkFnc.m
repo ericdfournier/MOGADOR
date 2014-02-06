@@ -147,12 +147,18 @@ bandWidth = 142;
     minClusterSize,...
     gridMask);
 
-% Throw warning if insufficient candidate centroids found
+% Throw warning based on top centroid count
 
-if topCentroidsCount <= 10
+if topCentroidsCount <= 0.01*numel(gridMask == 1)
     
-    warning(['Fewer than 10 candidate base point centroids generated',...
-        'from input objectiveVars, consider reducing minimumClusterSize']);
+    warning(['Top centroid count less than 1% of total search domain ',...
+        'for input objectiveVars, consider reducing minimumClusterSize']);
+
+elseif topCentroidsCount >= 0.5*numel(gridMask == 1)
+    
+    warning(['Top centroid count greater than 50% of total search ',...
+        'domain for input objectiveVars, consider increasing ',...
+        'minimumClusterSize']);
     
 end
 
@@ -165,10 +171,9 @@ sourceDistMask = bwdist(sourceMask);
 %% Generate Walks from Base Points Selected Using Distance Band Masks
 
 basePointLimit = floor(sqrt(gS(1,1)*gS(1,2)));
+w = waitbar('Generating Walks');
 
 for i = 1:pS
-    
-    disp(['Walk ',num2str(i),' of ',num2str(pS),' Initiated']);
     
     basePointCount = 0;
     basePointCheck = 0;
@@ -266,9 +271,13 @@ for i = 1:pS
     sizeIndiv = size(individual,2);
     outputPop(i,1:sizeIndiv) = individual;
     
-    disp(['Walk ', num2str(i), ' of ', num2str(pS),...
-        ' Complete']);
+    % Display Function Progress
+
+    perc = i/pS;
+    waitbar(perc,w,[num2str(perc*100),'% Completed...']);
 
 end
+
+close(w);
 
 end

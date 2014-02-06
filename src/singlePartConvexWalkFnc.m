@@ -99,18 +99,27 @@ parse(p,nargin,nargout,popSize,sourceIndex,destinIndex,gridMask);
 %% Function Parameters
 
 plot = 0;
+pS = popSize;
 sD = pdist([sourceIndex; destinIndex]);
 gL = ceil(5*sD);
 outputPop = zeros(pS,gL);
 
 %% Generate Output
 
-for i = 1:popSize
+w = waitbar('Generating Walks');
+
+for i = 1:pS
     
     outputPop(i,:) = pseudoRandomWalkFnc(gridMask,sourceIndex,...
         destinIndex,plot);
-    disp(['Walk #', num2str(i),' Completed']);
+    
+    % Display Function Progress
+
+    perc = i/pS;
+    waitbar(perc,w,[num2str(perc*100),'% Completed...']);
     
 end
+
+close(w);
 
 end

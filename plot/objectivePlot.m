@@ -1,4 +1,4 @@
-function [ plotHandle ] = objectivePlot( objectiveVars )
+function [ plotHandle ] = objectivePlot( objectiveVars, gridMask )
 %
 % objectiveVarsPlot.m Function to create a 3-D image stack of the
 % objective variable input used for a given problem paramterization
@@ -13,7 +13,8 @@ function [ plotHandle ] = objectivePlot( objectiveVars )
 %
 % SYNTAX:
 %
-%   [ plotHandle ] =    singlePartConcaveWalkFnc( objectiveVars );
+%   [ plotHandle ] =    singlePartConcaveWalkFnc(   objectiveVars,...
+%                                                   gridMask );
 %
 % INPUTS:
 %
@@ -22,6 +23,10 @@ function [ plotHandle ] = objectivePlot( objectiveVars )
 %                       the gridMask and in which the third dimension [g]
 %                       corresponds to the index number of the objective
 %                       variable
+%
+%   gridMask =          [n x m] binary array with valid pathway grid cells 
+%                       labeled as ones and invalid pathway grid cells 
+%                       labeled as zeros
 %
 % OUTPUTS:
 %
@@ -48,6 +53,7 @@ function [ plotHandle ] = objectivePlot( objectiveVars )
 %% Function Parameters
 
 oS = size(objectiveVars);
+cam = [1035.5 759.1 12.7];
 
 %% Generate Plot
 
@@ -58,11 +64,14 @@ plotHandle = figure();
 set(plotHandle,'position',[0 0 1000 1000]);
 
 for i = 1:oS(1,3)
+    
     surface('XData',X-0.5, 'YData',Y-0.5, 'ZData', Z.*i, ...
-        'CData',objectiveVars(:,:,i), 'CDataMapping','scaled', ...
-        'EdgeColor','none','FaceColor','texturemap');
+        'CData',(objectiveVars(:,:,i) .* gridMask), 'CDataMapping',...
+        'scaled','EdgeColor','none','FaceColor','texturemap');
+    
 end
 
+campos(cam);
 colormap(jet);
 view(3), box on, axis tight square
 set(gca, 'YDir','reverse','ZLim',[0 oS(1,3)+1]);

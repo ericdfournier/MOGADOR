@@ -156,12 +156,12 @@ bandWidth = 142;
 
 % Throw warning based on top centroid count
 
-if topCentroidsCount <= 0.01*numel(gridMask)
+if topCentroidsCount <= 0.01*numel(gridMask == 1)
     
     warning(['Top centroid count less than 1% of total search domain ',...
         'for input objectiveVars, consider reducing minimumClusterSize']);
 
-elseif topCentroidsCount >= 0.5*numel(gridMask)
+elseif topCentroidsCount >= 0.5*numel(gridMask == 1)
     
     warning(['Top centroid count greater than 50% of total search ',...
         'domain for input objectiveVars, consider increasing ',...
@@ -172,10 +172,9 @@ end
 %% Generate Walks from Base Points Selected Using Distance Band Masks
 
 basePointLimit = floor(sqrt(gS(1,1)*gS(1,2)));
+w = waitbar(0,'Generating Walks');
 
 for i = 1:pS
-    
-    disp(['Walk ',num2str(i),' of ',num2str(pS),' Initiated']);
     
     basePointCount = 0;
     basePointCheck = 0;
@@ -263,13 +262,11 @@ for i = 1:pS
         
         if isempty(seCentroids) == 1
             
-            disp(['Base Point Eliminated: No Elligible Cluster ',...
-                'Centroids Found from Current Base Point']);
+%             disp(['Walk Reinitiated: No Elligible Cluster ',...
+%                 'Centroids Found from Current Base Point']);
             
-            basePointCount = basePointCount - 1;
-            
-            visitedAreaMask(...
-                currentBasePoint(1,1),currentBasePoint(1,2)) = 0;
+            basePointCount = 1;
+            visitedAreaMask = ones(gS);
             
             continue
             
@@ -312,9 +309,11 @@ for i = 1:pS
     sizeIndiv = size(individual,2);
     outputPop(i,1:sizeIndiv) = individual;
     
-    disp(['Walk ', num2str(i), ' of ', num2str(pS),...
-        ' Completed']);
-
+    perc = i/popSize;
+    waitbar(perc,w,[num2str(perc*100),'% Completed...']);
+    
 end
+
+close(w);
 
 end
