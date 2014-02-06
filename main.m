@@ -5,7 +5,7 @@ cd ~/Repositories/MOGADOR
 
 %% Initialize Input Parameters
 
-run ./prm/concaveLarge.m
+run ./prm/concaveSmall.m
 
 %% Initialize Ouput Parameters
 

@@ -173,7 +173,7 @@ walkMsg =   {   '**Initiating Walks**',...
 euclPath = euclShortestWalkFnc(gridMask,sourceIndex,destinIndex);
 isConcave = ~all(gridMask(euclPath));
 basePointCount = floor(sqrt(gS(1,1)*gS(1,2))/bandWidth);
-isMultiPart = basePointCount > 1;
+isMultiPart = basePointCount >= 1;
 
 if isMultiPart == 0 && isConcave == 0
     
@@ -246,7 +246,7 @@ switch caseVar
             objectiveVars,...
             objectiveFrac,...
             minClusterSize,...
-            gridmask);
+            gridMask);
 
 end
 

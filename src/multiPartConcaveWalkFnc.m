@@ -197,8 +197,6 @@ for i = 1:pS
             
         end
         
-        % Check if final destination is contained in convex area mask
-        
         currentBasePoint = basePoints(basePointCount,:);
         currentBasePointMask = zeros(gS);
         currentBasePointMask(currentBasePoint(1,1),...
@@ -226,10 +224,32 @@ for i = 1:pS
         convexAreaMask = convexAreaMaskFnc(currentBasePoint,...
             gridMask);
         
-        % Find elligible centroids within current area
+        % Generate Current Area
         
-        currentAreaMask = convexAreaMask .* visitedAreaMask .* ...
-            currentDistBandMask .* gridMask;
+        currentAreaRaw = currentDistBandMask .* gridMask .* ...
+            convexAreaMask .* visitedAreaMask;
+        
+        % Clean Current Area
+        
+        currentAreaConn = bwconncomp(currentAreaRaw);
+        currentAreaProps = regionprops(currentAreaConn);
+        [~, Ind] = sort([currentAreaProps.Area],'descend');
+        currentAreaMask = zeros(gS);
+        currentAreaMask(currentAreaConn.PixelIdxList{1,Ind(1,1)}) = 1;
+        
+        % Stop Base Point Search if Destination is within Current Area
+        
+        containsDestin = ...
+            currentAreaMask(destinIndex(1,1),destinIndex(1,2));
+        
+        if containsDestin == 1
+            
+            break
+            
+        end
+        
+        % Locate Elligible Centroids within current Area
+        
         eCentroidDistMask = topCentroidsMask .* currentAreaMask .* ...
             currentBasePointDistMask;
         [eCentroidRows, eCentroidCols, eCentroidVals] =...
@@ -239,12 +259,19 @@ for i = 1:pS
             sortrows([eCentroidRows eCentroidCols eCentroidVals],3));
         eCentroidCount = size(eCentroidRows,1);
         
+        % Perform distance weighted selection of elligible centroids
+        
         if isempty(seCentroids) == 1
             
-            disp(['Restarting Walk: No Elligible Cluster Centroids',...
-                ' Found from Current Base Point']);
+            disp(['Base Point Eliminated: No Elligible Cluster ',...
+                'Centroids Found from Current Base Point']);
             
-            break
+            basePointCount = basePointCount - 1;
+            
+            visitedAreaMask(...
+                currentBasePoint(1,1),currentBasePoint(1,2)) = 0;
+            
+            continue
             
         elseif eCentroidCount == 1
             
@@ -286,7 +313,7 @@ for i = 1:pS
     outputPop(i,1:sizeIndiv) = individual;
     
     disp(['Walk ', num2str(i), ' of ', num2str(pS),...
-        ' Complete']);
+        ' Completed']);
 
 end
 
