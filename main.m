@@ -1,10 +1,11 @@
 %% Add Directory Tree to MATLAB Path
 
-addpath(genpath('./MOGODOR'));
+addpath(genpath('~/Repositories/MOGADOR'));
+cd ~/Repositories/MOGADOR
 
 %% Initialize Input Parameters
 
-run ./prm/convexLarge.m
+run ./prm/concaveLarge.m
 
 %% Initialize Ouput Parameters
 
