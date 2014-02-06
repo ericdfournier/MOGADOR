@@ -6,11 +6,16 @@ function [ outputPop ] = multiPartConcaveWalkFnc(   popSize,...
                                                     minClusterSize,...
                                                     gridMask )
 %
-% multiPartConcaveWalkFnc.m
+% multiPartConcaveWalkFnc.m Creates a population of walks for a search
+% domain that is sufficiently large that multiple pseudorandom walk
+% sections are necessary and for which the relationship between the source
+% index the destination index causes the problem to be concave
 %
 % DESCRIPTION:
 %
-%   Function to...
+%   Function that creates a population of walks within a large search
+%   domain that is concave with respect to the relative position of the
+%   source and the destination locations.
 %
 %   Warning: minimal error checking is performed.
 %
@@ -71,7 +76,6 @@ function [ outputPop ] = multiPartConcaveWalkFnc(   popSize,...
 % EXAMPLES:
 %   
 %   Example 1 =
-%
 %
 % CREDITS:
 %
@@ -150,12 +154,18 @@ bandWidth = 142;
     minClusterSize,...
     gridMask);
 
-% Throw warning if insufficient candidate centroids found
+% Throw warning based on top centroid count
 
-if topCentroidsCount <= 10
+if topCentroidsCount <= 0.01*numel(gridMask)
     
-    warning(['Fewer than 10 candidate base point centroids generated',...
-        'from input objectiveVars, consider reducing minimumClusterSize']);
+    warning(['Top centroid count less than 1% of total search domain ',...
+        'for input objectiveVars, consider reducing minimumClusterSize']);
+
+elseif topCentroidsCount >= 0.5*numel(gridMask)
+    
+    warning(['Top centroid count greater than 50% of total search ',...
+        'domain for input objectiveVars, consider increasing ',...
+        'minimumClusterSize']);
     
 end
 
@@ -190,9 +200,94 @@ for i = 1:pS
         % Check if final destination is contained in convex area mask
         
         currentBasePoint = basePoints(basePointCount,:);
-        currentBasePointDist = bwdist(currentBasePoint(1,1),...
-            currentBasePoint(1,2));
-        maxSourceDist = max(max(sourceDistMask));
-        testDistLimMax = currentBasePointDist + bandWidth;
+        currentBasePointMask = zeros(gS);
+        currentBasePointMask(currentBasePoint(1,1),...
+            currentBasePoint(1,2)) = 1;
+        currentBasePointDistMask = bwdist(currentBasePointMask);
+        maxSourceDist = max(max(currentBasePointDistMask));
+        testDistLimMax = bandWidth;
+        
+        if testDistLimMax > maxSourceDist
+            
+            currentDistBandLim = [0 maxSourceDist];
+        
+        else
+            
+            currentDistBandLim = [0 testDistLimMax];
+            
+        end
+        
+        currentDistBandMask = ...
+            double(currentBasePointDistMask > currentDistBandLim(1,1) &...
+            currentBasePointDistMask <= currentDistBandLim(1,2));
+        
+        % Compute Convex Area within Current Distance Band
+        
+        convexAreaMask = convexAreaMaskFnc(currentBasePoint,...
+            gridMask);
+        
+        % Find elligible centroids within current area
+        
+        currentAreaMask = convexAreaMask .* visitedAreaMask .* ...
+            currentDistBandMask .* gridMask;
+        eCentroidDistMask = topCentroidsMask .* currentAreaMask .* ...
+            currentBasePointDistMask;
+        [eCentroidRows, eCentroidCols, eCentroidVals] =...
+            find(eCentroidDistMask);
+        seCentroids = ...
+            flipud(...
+            sortrows([eCentroidRows eCentroidCols eCentroidVals],3));
+        eCentroidCount = size(eCentroidRows,1);
+        
+        if isempty(seCentroids) == 1
+            
+            disp(['Restarting Walk: No Elligible Cluster Centroids',...
+                ' Found from Current Base Point']);
+            
+            break
+            
+        elseif eCentroidCount == 1
+            
+            selection = 1;
+            
+        elseif eCentroidCount > 1
+            
+            sC = size(seCentroids,1);
+            P = 0.1;    % This value controls the randomness...
+            selection = 0;
+            
+            while selection == 0;
+                
+                selection = geornd(P);
+                
+                if selection >= sC
+                    
+                    selection = 0;
+                    
+                end
+                
+            end
+            
+        end
+        
+        nextBasePoint = seCentroids(selection,1:2);
+        basePoints(basePointCount+1,:) = nextBasePoint;
+        visitedAreaMask(logical(currentAreaMask)) = 0;
+        
+    end
+        
+    basePoints(basePointCount+1,:) = destinIndex;
+    basePoints = basePoints(any(basePoints,2),:);
+    
+    % Generate and Concatenate Path Sections Between Base Points
+    
+    individual = basePoints2WalkFnc(basePoints,gridMask);
+    sizeIndiv = size(individual,2);
+    outputPop(i,1:sizeIndiv) = individual;
+    
+    disp(['Walk ', num2str(i), ' of ', num2str(pS),...
+        ' Complete']);
+
+end
 
 end

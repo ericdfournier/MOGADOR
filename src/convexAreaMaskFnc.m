@@ -54,7 +54,6 @@ function [ convexAreaMask ] = convexAreaMaskFnc( sourceIndex, gridMask )
 %%%                          Eric Daniel Fournier                        %%
 %%%                  Bren School of Environmental Science                %%
 %%%                University of California Santa Barbara                %%
-%%%                             January 2014                             %%
 %%%                                                                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -70,9 +69,16 @@ function [ convexAreaMask ] = convexAreaMaskFnc( sourceIndex, gridMask )
 
 p = inputParser;
 
-addRequired(p,'nargin', @(x) x == 2);
-addRequired(p,'sourceIndex', @(x) isnumeric(x) && isrow(x) && ~isempty(x));
-addRequired(p,'gridMask', @(x) isnumeric(x) && ismatrix(x) && ~isempty(x));
+addRequired(p,'nargin', @(x)...
+    x == 2);
+addRequired(p,'sourceIndex', @(x)...
+    isnumeric(x) &&...
+    isrow(x) &&...
+    ~isempty(x));
+addRequired(p,'gridMask', @(x)...
+    isnumeric(x) &&...
+    ismatrix(x) &&...
+    ~isempty(x));
 
 parse(p,nargin,sourceIndex,gridMask);
 

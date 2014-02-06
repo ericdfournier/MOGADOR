@@ -1,12 +1,8 @@
 INSTALLATION:
 
-- Clone Git Repository: cd into a working directory of choice and clone the git repository via the following shell commands (on mac)
+- Clone Git Repository: cd into a working directory of choice and clone the git repository via the following shell commands (on mac) --> $ git clone https://github.com/ericdfournier/MOGADOR.git
 
-$ git clone https://github.com/ericdfournier/MOGADOR.git
-
-- Download and Unpack Zipped Git Repository: cd into a working directory of choice and unzip the zipped version of the repository downloaded from the project github page via the following shell commands (on mac)
-
-$ unzip MOGADOR.zip
+- Download and Unpack Zipped Git Repository: cd into a working directory of choice and unzip the zipped version of the repository downloaded from the project github page via the following shell commands (on mac) --> $ unzip MOGADOR.zip
 
 DESCRIPTION:
 

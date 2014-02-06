@@ -1,4 +1,4 @@
-function [ outputPop ] = singlePartConcaveWalkFnc(  popSize,...
+function [ outputPop ] = multiPartConcaveWalkFnc(   popSize,...
                                                     sourceIndex,...
                                                     destinIndex,...
                                                     objectiveVars,...
@@ -6,14 +6,14 @@ function [ outputPop ] = singlePartConcaveWalkFnc(  popSize,...
                                                     minClusterSize,...
                                                     gridMask )
 %
-% singlePartConcaveWalkFnc.m Creates a population of walks for a search
-% domain that is sufficiently small that only a single part is neccessary
-% but for which the relationship between the source index and the
-% destination index causes the problem to be concave
+% multiPartConcaveWalkFnc.m Creates a population of walks for a search
+% domain that is sufficiently large that multiple pseudorandom walk
+% sections are necessary and for which the relationship between the source
+% index the destination index causes the problem to be concave
 %
 % DESCRIPTION:
 %
-%   Function that creates a population of walks within a small search
+%   Function that creates a population of walks within a large search
 %   domain that is concave with respect to the relative position of the
 %   source and the destination locations.
 %
@@ -21,13 +21,13 @@ function [ outputPop ] = singlePartConcaveWalkFnc(  popSize,...
 %
 % SYNTAX:
 %
-%   [ outputPop ] =     singlePartConcaveWalkFnc(   popSize,...
+%   [ outputPop ] =     multiPartConcaveWalkFnc(    popSize,...
 %                                                   sourceIndex,...
 %                                                   destinIndex,...
 %                                                   objectiveVars,...
 %                                                   objectiveFrac,...
 %                                                   minClusterSize,...
-%                                                   gridMask );
+%                                                   gridMask )
 %
 % INPUTS:
 %
@@ -38,17 +38,6 @@ function [ outputPop ] = singlePartConcaveWalkFnc(  popSize,...
 %                       genome length (which is itself based upon the
 %                       dimensions of the gridMask)
 %
-%   objectiveVars =     [m x n x g] array in which the first two dimensions
-%                       [n x m] correspond to the two spatial dimensions of
-%                       the gridMask and in which the third dimension [g]
-%                       corresponds to the index number of the objective
-%                       variable
-%
-%
-%   objectiveFrac =     [s] scalar value indicating the fraction of the
-%                       aggregated objective score values for which 
-%                       clusters will be evaluated
-%
 %   sourceIndex =       [1 x 2] array with the subscript indices of the
 %                       source location within the study area for which the 
 %                       paths are to be evaluated
@@ -57,9 +46,20 @@ function [ outputPop ] = singlePartConcaveWalkFnc(  popSize,...
 %                       destination location within the study area for 
 %                       which the paths are to be evaluated
 %
+%   objectiveVars =     [m x n x g] array in which the first two dimensions
+%                       [n x m] correspond to the two spatial dimensions of
+%                       the gridMask and in which the third dimension [g]
+%                       corresponds to the index number of the objective
+%                       variable
+%
+%   objectiveFrac =     [s] scalar value indicating the fraction of the
+%                       aggregated objective score values for which 
+%                       clusters will be evaluated
+%
 %   minClusterSize =    [r] scalar value indicating the minimum number of
 %                       connected cells (assuming queen's connectivity) 
 %                       that are required to consititute a viable cluster
+%
 %
 %   gridMask =          [n x m] binary array with valid pathway grid cells 
 %                       labeled as ones and invalid pathway grid cells 
@@ -137,7 +137,6 @@ addRequired(p,'gridMask',@(x)...
 parse(p,nargin,nargout,popSize,sourceIndex,destinIndex,objectiveVars,...
     objectiveFrac,minClusterSize,gridMask);
 
-
 %% Function Parameters
 
 pS = popSize;
@@ -145,6 +144,7 @@ gS = size(gridMask);
 sD = pdist([sourceIndex; destinIndex]);
 gL = ceil(5*sD);
 outputPop = zeros(pS,gL);
+bandWidth = 142;
 
 %% Generate Top Centroids Mask
 
@@ -169,7 +169,7 @@ elseif topCentroidsCount >= 0.5*numel(gridMask)
     
 end
 
-%% Generate Walks from Base Points Selected Using Convex Area Masks
+%% Generate Walks from Base Points Selected Using Distance Band Masks
 
 basePointLimit = floor(sqrt(gS(1,1)*gS(1,2)));
 
@@ -200,27 +200,38 @@ for i = 1:pS
         % Check if final destination is contained in convex area mask
         
         currentBasePoint = basePoints(basePointCount,:);
-        convexAreaMask = convexAreaMaskFnc(currentBasePoint,gridMask);
-        currentAreaMask = convexAreaMask .* visitedAreaMask;
-        containsDestin = ...
-            currentAreaMask(destinIndex(1,1),destinIndex(1,2)) == 1;
+        currentBasePointMask = zeros(gS);
+        currentBasePointMask(currentBasePoint(1,1),...
+            currentBasePoint(1,2)) = 1;
+        currentBasePointDistMask = bwdist(currentBasePointMask);
+        maxSourceDist = max(max(currentBasePointDistMask));
+        testDistLimMax = bandWidth;
         
-        if containsDestin == 1
+        if testDistLimMax > maxSourceDist
             
-            break;
+            currentDistBandLim = [0 maxSourceDist];
+        
+        else
+            
+            currentDistBandLim = [0 testDistLimMax];
             
         end
         
-        % Sort Elligible Top Centroids by Distance from Current Source
+        currentDistBandMask = ...
+            currentBasePointDistMask > currentDistBandLim(1,1) &...
+            currentBasePointDistMask <= currentDistBandLim(1,2);
         
-        sourceMask = zeros(gS);
-        sourceMask(currentBasePoint(1,1),currentBasePoint(1,2)) = 1;
-        sourceDistMask = bwdist(sourceMask);
+        % Compute Convex Area within Current Distance Band
         
-        % Find elligible centroids within current area mask
+        convexAreaMask = convexAreaMaskFnc(currentBasePoint,...
+            currentDistBandMask);
         
+        % Find elligible centroids within current area
+        
+        currentAreaMask = convexAreaMask .* visitedAreaMask .* ...
+            gridMask;
         eCentroidDistMask = topCentroidsMask .* currentAreaMask .* ...
-            gridMask .* sourceDistMask;
+            currentBasePointDistMask;
         [eCentroidRows, eCentroidCols, eCentroidVals] =...
             find(eCentroidDistMask);
         seCentroids = ...
@@ -264,7 +275,7 @@ for i = 1:pS
         visitedAreaMask(logical(currentAreaMask)) = 0;
         
     end
-    
+        
     basePoints(basePointCount+1,:) = destinIndex;
     basePoints = basePoints(any(basePoints,2),:);
     
@@ -276,7 +287,7 @@ for i = 1:pS
     
     disp(['Walk ', num2str(i), ' of ', num2str(pS),...
         ' Complete']);
-    
+
 end
 
 end
