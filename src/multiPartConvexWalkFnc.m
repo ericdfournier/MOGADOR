@@ -171,7 +171,7 @@ sourceDistMask = bwdist(sourceMask);
 %% Generate Walks from Base Points Selected Using Distance Band Masks
 
 basePointLimit = floor(sqrt(gS(1,1)*gS(1,2)));
-w = waitbar('Generating Walks');
+w = waitbar(0,'Generating Walks');
 
 for i = 1:pS
     

@@ -1,4 +1,4 @@
-cd('/Users/ericfournier/Google Drive/PhD/Dissertation/Project/Genetic Algorithms/');
+cd ~/Repositories/MOGADOR/fig/
 
 %% Simulate Grid Mask
 
@@ -9,95 +9,25 @@ gridMask(1,:) = nan;
 gridMask(end,:) = nan;
 gridMask(:,end) = nan;
 
-%% Generate Objective Variables
+%% Parameters
 
-objectiveVars = simObjectivesFnc(3,5,100,gridMask);
+gS = size(gridMask);
+simObjCount = 1;
+simMean = 5;
+simRange = [1 1 1 10 10 10 100 100 100];
+obj = zeros([gS 9]);
 
-%% Generate Plot Data
-
-obj1 = reshape(objectiveVars(:,1),100,100);
-obj2 = reshape(objectiveVars(:,2),100,100);
-obj3 = reshape(objectiveVars(:,3),100,100);
-
-%% Generate Plot 1
+%% Perform Simulations and Generate Plot
 
 figure();
 
-subplot(1,3,1);
-imagesc(obj1);
-colorbar
-axis square
-
-subplot(1,3,2);
-imagesc(obj2);
-colorbar
-axis square
-
-subplot(1,3,3);
-imagesc(obj3);
-colorbar
-axis square
-
-%% Randomly Generate Objective Variables
-
-objectiveVars = simObjectivesFnc(3,5,10,gridMask);
-
-%% Generate Plot Data
-
-obj1 = reshape(objectiveVars(:,1),100,100);
-obj2 = reshape(objectiveVars(:,2),100,100);
-obj3 = reshape(objectiveVars(:,3),100,100);
-
-%% Generate Plot 2
-
-figure();
-
-subplot(1,3,1);
-imagesc(obj1);
-colorbar
-axis square
-
-subplot(1,3,2);
-imagesc(obj2);
-colorbar
-axis square
-
-subplot(1,3,3);
-imagesc(obj3);
-colorbar
-axis square
-
-%% Randomly Generate Objective Variables
-
-objectiveVars = simObjectivesFnc(3,5,1,gridMask);
-
-%% Generate Plot Data
-
-obj1 = reshape(objectiveVars(:,1),100,100);
-obj2 = reshape(objectiveVars(:,2),100,100);
-obj3 = reshape(objectiveVars(:,3),100,100);
-
-%% Generate Plot 3
-
-figure();
-
-subplot(1,3,1);
-imagesc(obj1);
-colorbar
-axis square
-
-subplot(1,3,2);
-imagesc(obj2);
-colorbar
-axis square
-
-subplot(1,3,3);
-imagesc(obj3);
-colorbar
-axis square
-
-
-
-
-
-
+for i = 1:size(obj,3)
+    
+    obj(:,:,i) = ...
+        simObjectivesFnc(simObjCount,simMean,simRange(1,i),gridMask);
+    subplot(3,3,i);
+    imagesc(obj(:,:,i));
+    colorbar
+    axis square
+    
+end

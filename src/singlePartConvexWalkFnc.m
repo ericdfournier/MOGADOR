@@ -106,7 +106,7 @@ outputPop = zeros(pS,gL);
 
 %% Generate Output
 
-w = waitbar('Generating Walks');
+w = waitbar(0,'Generating Walks');
 
 for i = 1:pS
     

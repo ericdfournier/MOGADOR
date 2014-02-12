@@ -18,7 +18,7 @@ p.objectiveNames = {'Var1','Var2','Var3'};
 
 %% Population Initialization Parameters
 
-p.populationSize = 20;
+p.populationSize = 500;
 p.minimumClusterSize = 3;
 p.sourceIndex = [20 20];
 p.destinIndex = [80 80];

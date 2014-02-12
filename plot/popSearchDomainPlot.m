@@ -74,11 +74,12 @@ parse(p,nargin,inputPop,gridMask);
 
 %% Iteration Parameters
 
+gS = size(gridMask);
 pS = size(inputPop,1);
 
 %% Find Unique Points
 
-visited = gridMask;
+visited = zeros(gS);
 
 for i = 1:pS
     individual = inputPop(i,:);
@@ -87,10 +88,8 @@ for i = 1:pS
     visited(individual) = visits+1;
 end
 
-maxVisits = max(max(visited)); 
-
-visited(sourceIndex(1,1),sourceIndex(1,2)) = maxVisits+1;
-visited(destinIndex(1,1),destinIndex(1,2)) = maxVisits+2;
+visited(sourceIndex(1,1),sourceIndex(1,2)) = 0;
+visited(destinIndex(1,1),destinIndex(1,2)) = 0;
 
 %% Generate Plot
 
