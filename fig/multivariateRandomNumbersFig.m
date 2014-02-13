@@ -1,6 +1,6 @@
 %% Preliminaries
 
-cd('/Users/ericfournier/Google Drive/PhD/Dissertation/Project/Genetic Algorithms/');
+cd ~/Repositories/MOGADOR/fig/
 
 %% Generate Distribution Parameters
 
@@ -18,8 +18,8 @@ mu(8,:) = [1 1];
 sigma = cell(1,3);
 
 sigma{1,1} = [1 0; 0 1];
-sigma{1,2} = [10 0; 0 10];
-sigma{1,3} = [100 0; 0 100];
+sigma{1,2} = [1.5 0; 0 1.5];
+sigma{1,3} = [2 0; 0 2];
 
 x1 = -1:0.1:1;
 x2 = -1:0.1:1;
@@ -46,35 +46,60 @@ F1 = F(:,1);
 F2 = F(:,2);
 F3 = F(:,3);
 
-figure();
+ind = [3 5 8 2 7 1 4 6];
 
-for i = 1:8
+figure(1);
+
+for i = 1:9
     
-    subplot(8,1,i);
-    imagesc(F1{i,1});
-    colorbar
-    axis square
+    if i < 5
+    
+        subplot(3,3,i);
+        pcolor(F1{ind(i),1});
+        shading interp
+        axis square off
+        
+    elseif i == 5
+        
+        subplot(3,3,i);
+        axis off
+        
+    elseif i > 5
+        
+        subplot(3,3,i);
+        pcolor(F1{ind(i-1),1});
+        shading interp
+        axis square off
+        
+    end
         
 end
 
-figure();
+cmap = colormap;
 
-for i = 1:8
-    
-    subplot(8,1,i);
-    imagesc(F2{i,1});
-    colorbar
-    axis square
-        
-end
+%% Plot
 
-figure();
+figure(2);
 
-for i = 1:8
-    
-    subplot(8,1,i);
-    imagesc(F3{i,1});
-    colorbar
-    axis square
-        
-end
+subplot(1,3,1);
+surfc(F1{3,1});
+axis tight square
+color = caxis;
+zlimit = zlim;
+shading interp
+
+subplot(1,3,2);
+surfc(F2{3,1});
+axis tight square
+caxis(color);
+zlim(zlimit);
+shading interp
+
+subplot(1,3,3);
+surfc(F3{3,1});
+axis square tight
+caxis(color);
+zlim(zlimit);
+shading interp
+
+
