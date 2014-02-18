@@ -5,11 +5,11 @@ cd ~/Repositories/MOGADOR
 
 %% Initialize Input Parameters
 
-run ./prm/convexLarge.m
+run ./prm/convexSmall.m
 
 %% Initialize Ouput Parameters
 
-o = cell(p.maxGenerations,2);
+o = cell(p.maxGenerations,3);
 
 %% Initialize Population
 
@@ -68,15 +68,15 @@ while convergence == 0
         mutation,...
         p.objetiveVars      );
     
+    discreteLaplacian = fix(del2(o{1:i,2}));
+    
+    convergence = discreteLaplacian(i) == 0 ;
+    
     o{i+1,1} = mutation;
     o{i+1,2} = fitness;
     
-    averageFitness
-    
     i = i+1;
-    
-    % Insert Convergence IF/THEN Stopping Condition Here
-    
+        
 end
 
 %% Write Output Data
