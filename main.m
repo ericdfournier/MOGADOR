@@ -22,9 +22,16 @@ o{1,1} = initPopFnc(...
 	p.minimumClusterSize,...
 	p.gridMask          );
 
-%% Evaluate Initial Population Fitness
+%% Evaluate Initial Population Individual Fitness
 
 o{1,2} = popFitnessFnc(...
+    o{1,1},...
+    p.objectiveVars,...
+    p.gridMask          );
+
+%% Evaluate Initial Population Average Fitness
+
+o{1,3} = popAvgFitnessFnc(...
     o{1,1},...
     p.objectiveVars,...
     p.gridMask          );
@@ -36,20 +43,36 @@ convergence = 0;
 
 while convergence == 0
     
+    currentPopulation = o{i,1};
+    averageFitnessHistory = o{1:i,3};
+    
     if i == p.maxGenerations
         
         break;
         
     end
+        
+    if i <= 2
+        
+        convergenceCriteria = [];
+        convergence = 0;
     
-    currentPopulation = o{i,1};
+    else
+        
+        convergenceCriteria = fix(diff(averageFitnessHistory,2));
+        convergence = convergenceCriteria(i-2) == 0 ;
+        
+    end
 
     selection = popTournamentSelectionFnc(...
         currentPopulation,...
         p.tournamentSize,...
         p.selectionProbability,...
         p.selectionType,...
-        p.objectiveVars     );
+        p.objectiveVars,...
+        p.gridMask          );
+    
+    % WORK POINT
 
     crossover = popCrossoverFnc(...
         selection,...
@@ -67,10 +90,6 @@ while convergence == 0
     fitness = popFitnessFnc(...
         mutation,...
         p.objetiveVars      );
-    
-    discreteLaplacian = fix(del2(o{1:i,2}));
-    
-    convergence = discreteLaplacian(i) == 0 ;
     
     o{i+1,1} = mutation;
     o{i+1,2} = fitness;

@@ -1,4 +1,6 @@
-function [ fitness ] = fitnessFnc( individual, objectiveVars, gridMask )
+function [ fitness ] = fitnessFnc(  individual,...
+                                    objectiveVars,...
+                                    gridMask )
 
 % fitnessFnc.m This function computes the different components of the
 % multi-objective function used to evaluate different proposed pathways
@@ -13,7 +15,7 @@ function [ fitness ] = fitnessFnc( individual, objectiveVars, gridMask )
 %
 % SYNTAX:
 %
-%   fitness =  fitnessFnc( individual, objectiveVars )
+%   fitness =  fitnessFnc( individual, objectiveVars, gridMask )
 %
 % INPUTS:
 %
@@ -25,6 +27,11 @@ function [ fitness ] = fitnessFnc( individual, objectiveVars, gridMask )
 %                   dimensions correspond to the dimensions of the grid 
 %                   mask and the third dimension corresponds to the various
 %                   objective variables
+%
+%   gridMask =      [n x m] binary array in which grid cells with a value
+%                   of 1 correspond to locations that are within the search
+%                   domain and grid cells with a value of 0 correspond to
+%                   locations which are excluded from the search domain
 %
 % OUTPUTS:
 %
@@ -44,23 +51,31 @@ function [ fitness ] = fitnessFnc( individual, objectiveVars, gridMask )
 %%%                          Eric Daniel Fournier                        %%
 %%%                  Bren School of Environmental Science                %%
 %%%               University of California Santa Barbara                 %%
-%%%                            February 2014                             %%
 %%%                                                                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Parse Inputs
 
-p = inputParser;
+P = inputParser;
 
-addRequired(p,'nargin',@(x) x == 3);
-addRequired(p,'individual',@(x) isnumeric(x) && ismatrix(x) && ...
+addRequired(P,'nargin',@(x)...
+    x == 3);
+addRequired(P,'nargout',@(x)...
+    x == 1);
+addRequired(P,'individual',@(x)...
+    isnumeric(x) &&...
+    ismatrix(x) &&...
     ~isempty(x));
-addRequired(p,'objectiveVars',@(x) isnumeric(x) && numel(size(x)) >= 2 ...
-    && ~isempty(x));
-addRequired(p,'gridMask',@(x) isnumeric(x) && ismatrix(x) && ...
+addRequired(P,'objectiveVars',@(x)...
+    isnumeric(x) &&...
+    numel(size(x)) >= 2 &&...
+    ~isempty(x));
+addRequired(P,'gridMask',@(x)...
+    isnumeric(x) &&...
+    ismatrix(x) &&...
     ~isempty(x));
 
-parse(p,nargin,individual,objectiveVars,gridMask);
+parse(P,nargin,nargout,individual,objectiveVars,gridMask);
 
 %% Iteration Parameters
 

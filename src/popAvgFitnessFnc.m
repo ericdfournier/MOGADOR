@@ -1,6 +1,7 @@
-function [ popFitness ] =  popFitnessFnc( inputPop, objectiveVars,...
-                                            gridMask )
-                                            
+function [ popAvgFitness ] = popAvgFitnessFnc(      inputPop,...
+                                                    objectiveVars,...
+                                                    gridMask)
+%
 % popFitnessFnc.m This function computes the different components 
 % of the multi-objective function used to evaluate different proposed 
 % pathways between the source and destination locations
@@ -34,9 +35,9 @@ function [ popFitness ] =  popFitnessFnc( inputPop, objectiveVars,...
 %
 % OUTPUTS:
 %
-%   popFitness =    [j x g] array in which each row corresponds to the
-%                   objective specific fitness score sums for each 
-%                   individual in the population
+%   popAvgFitness = scalar value indicating the average fitness for the
+%                   entire population across all individuals and all 
+%                    xobjective variables
 %
 % EXAMPLES:
 %   
@@ -64,18 +65,8 @@ addRequired(p,'gridMask',@(x) isnumeric(x) && ismatrix(x) && ~isempty(x));
 
 parse(p,nargin,inputPop,objectiveVars,gridMask);
 
-%% Iteration Parameters
+%% Compute Average Fitness Across Individuals and Objectives
 
-pS = size(inputPop);
-oC=  size(objectiveVars,3);
-popFitness = zeros(pS(1,1),oC);
-
-%% Compute Fitness
-
-for i = 1:pS(1,1);
-    individual = inputPop(i,:);
-    fitness = fitnessFnc(individual,objectiveVars,gridMask);
-    popFitness(i,:) = fitness;
-end
+popAvgFitness = mean(mean(inputPop,2),1);
 
 end

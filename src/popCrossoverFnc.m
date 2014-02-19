@@ -1,5 +1,7 @@
-function [ outputPop ] = popCrossoverFnc( inputPop, sourceIndex,...
-                                            destinIndex, crossoverType,...
+function [ outputPop ] = popCrossoverFnc(   inputPop,...
+                                            sourceIndex,...
+                                            destinIndex,...
+                                            crossoverType,...
                                             gridMask )
 
 % crossoverFnc Generates a child pathway from the single or double point 
@@ -79,32 +81,49 @@ function [ outputPop ] = popCrossoverFnc( inputPop, sourceIndex,...
 %%%                          Eric Daniel Fournier                        %%
 %%%                  Bren School of Environmental Science                %%
 %%%               University of California Santa Barbara                 %%
-%%%                            August 2013                               %%
 %%%                                                                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Fixed Parameters
+%% Function Parameters
 
-popSize = size(inputPop,1);
+pS = size(inputPop,1);
 gL = size(inputPop,2);
 
 %% Parse Inputs
 
-p = inputParser;
+P = inputParser;
 
-addRequired(p,'nargin',@(x) x == 5);
-addRequired(p,'inputPop',@(x) isnumeric(x) && ismatrix(x) && ~isempty(x));
-addRequired(p,'sourceIndex',@(x) isnumeric(x) && isrow(x) && ~isempty(x));
-addRequired(p,'destinIndex',@(x) isnumeric(x) && isrow(x) && ~isempty(x));
-addRequired(p,'crossoverType',@(x) isnumeric(x) && isscalar(x) &&...
+addRequired(P,'nargin',@(x)...
+    x == 5);
+addRequired(P,'nargout',@(x)...
+    x == 1);
+addRequired(P,'inputPop',@(x)...
+    isnumeric(x) &&...
+    ismatrix(x) &&...
     ~isempty(x));
-addRequired(p,'gridMask',@(x) isnumeric(x) && ismatrix(x) && ~isempty(x));
+addRequired(P,'sourceIndex',@(x)...
+    isnumeric(x) &&...
+    isrow(x) &&...
+    ~isempty(x));
+addRequired(P,'destinIndex',@(x)...
+    isnumeric(x) &&...
+    isrow(x) &&...
+    ~isempty(x));
+addRequired(P,'crossoverType',@(x)...
+    isnumeric(x) &&...
+    isscalar(x) &&...
+    ~isempty(x));
+addRequired(P,'gridMask',@(x)...
+    isnumeric(x) &&...
+    ismatrix(x) &&...
+    ~isempty(x));
 
-parse(p,nargin,inputPop,sourceIndex,destinIndex,crossoverType,gridMask);
+parse(P,nargin,nargout,inputPop,sourceIndex,destinIndex,crossoverType,...
+    gridMask);
 
 %% Error Checking
 
-if mod(popSize,2) ~= 0
+if mod(pS,2) ~= 0
     tit='Number of Individuals in inputPop Must be Even';
     disp(tit);
     error('Number of Individuals in inputPop Must be Even');
@@ -112,15 +131,15 @@ end
 
 %% Iteration Parameters
 
-h = popSize/2;
-parent1Ind = reshape(randomsample(1:1:popSize,popSize),[h 2]);
-parent2Ind = reshape(randomsample(1:1:popSize,popSize),[h 2]);
+h = pS/2;
+parent1Ind = reshape(randomsample(1:1:pS,pS),[h 2]);
+parent2Ind = reshape(randomsample(1:1:pS,pS),[h 2]);
 parentInd = vertcat(parent1Ind,parent2Ind);
-outputPop = zeros(popSize,gL);
+outputPop = zeros(pS,gL);
 
 %% Compute Crossover
 
-for i = 1:popSize
+for i = 1:pS
     parent1 = inputPop(parentInd(i,1),:);
     parent2 = inputPop(parentInd(i,2),:);
     outputPop(i,:) = crossoverFnc(parent1,parent2,sourceIndex,...
