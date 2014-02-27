@@ -1,6 +1,8 @@
 function [ individual, indivParams ] = pseudoRandomWalkFnc(...
-                                        gridMask, sourceIndex,...
-                                        destinIndex, plot )
+                                        gridMask,...
+                                        sourceIndex,...
+                                        destinIndex,...
+                                        plot )
 
 % pseudoRandomWalkFnc.m Generates pathway index values for one or more  
 % pseudo random walks between a given source and destination on a 2D grid. 
@@ -25,11 +27,7 @@ function [ individual, indivParams ] = pseudoRandomWalkFnc(...
 %
 %   gridMask =      [n x m] binary array with valid pathway grid cells 
 %                   labeled as ones and invalid pathway grid cells labeled 
-%                   as NaN placeholders
-%
-%   genomeLength =  [s] scalar with the maximum number of genomeLength that 
-%                   the random walk function will undergo before automatic 
-%                   termination
+%                   as zero placeholders
 %
 %   sourceIndex =   [i j] index value of the source node for the
 %                   start of the pseudo random walk
@@ -76,22 +74,35 @@ function [ individual, indivParams ] = pseudoRandomWalkFnc(...
 %%%                          Eric Daniel Fournier                        %%
 %%%                  Bren School of Environmental Science                %%
 %%%               University of California Santa Barbara                 %%
-%%%                            September 2013                            %%
 %%%                                                                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Parse Inputs
 
-p = inputParser;
+P = inputParser;
 
-addRequired(p,'nargin',@(x) x == 4);
-addRequired(p,'nargout',@(x) x >= 1);
-addRequired(p,'gridMask',@(x) isnumeric(x) && ismatrix(x) && ~isempty(x));
-addRequired(p,'sourceIndex',@(x) isnumeric(x) && isrow(x) && ~isempty(x));
-addRequired(p,'destinIndex',@(x) isnumeric(x) && isrow(x) && ~isempty(x));
-addRequired(p,'plot',@(x) isnumeric(x) && isscalar(x) && ~isempty(x));
+addRequired(P,'nargin',@(x)...
+    x == 4);
+addRequired(P,'nargout',@(x)...
+    x >= 1);
+addRequired(P,'gridMask',@(x)...
+    isnumeric(x) &&...
+    ismatrix(x) &&...
+    ~isempty(x));
+addRequired(P,'sourceIndex',@(x)...
+    isnumeric(x) &&...
+    isrow(x) &&...
+    ~isempty(x));
+addRequired(P,'destinIndex',@(x)...
+    isnumeric(x) &&...
+    isrow(x) &&...
+    ~isempty(x));
+addRequired(P,'plot',@(x)...
+    isnumeric(x) &&...
+    isscalar(x) &&...
+    ~isempty(x));
 
-parse(p,nargin,nargout,gridMask,sourceIndex,destinIndex,plot);
+parse(P,nargin,nargout,gridMask,sourceIndex,destinIndex,plot);
 
 %% Error Checking
 
@@ -105,8 +116,6 @@ end
 
 %% Iteration Parameters
 
-gridMask(gridMask == 0) = NaN; % Temporary Fix...need to modify code to 
-                               % accept pure binary gridMasks
 gS = size(gridMask);
 sF = nthroot((gS(1,1)*gS(1,2)),10);      % This controls the randomness          
 sI = sourceIndex;
@@ -199,7 +208,7 @@ while walkCheck == 0
         % Check Current Neighborhood Against the Grid Mask
         
         rawNeighbors = gridMask(neighborhoodInd);
-        openNeighborCheck = ~isnan(rawNeighbors);
+        openNeighborCheck = rawNeighbors == 1;
         openNeighbors = neighborhoodInd(openNeighborCheck);
         
         if sum(openNeighborCheck) == 0
@@ -325,7 +334,7 @@ switch plot
             tmp4 = individual(r,any(individual(r,:),1));
             subplot(ceil(sqrt(u(1,1))),ceil(sqrt(u(1,1))),r);
             tmp5 = gridMask;
-            tmp5(isnan(tmp5)) = 5;
+            tmp5(tmp5 == 0) = 5;
             tmp5(tmp4') = 1;
             tmp5(sI(1,1),sI(1,2)) = 2;
             tmp5(dI(1,1),dI(1,2)) = 3;

@@ -1,4 +1,5 @@
-function [ outputPop ] = popCrossoverFnc(   inputPop,...
+function [ outputPop ] = popCrossoverFnc(   inputSelection,...
+                                            popSize,...
                                             sourceIndex,...
                                             destinIndex,...
                                             crossoverType,...
@@ -27,6 +28,9 @@ function [ outputPop ] = popCrossoverFnc(   inputPop,...
 %                   pathway from a specified source to a specified target 
 %                   destination given the constraints of a specified study 
 %                   region
+%
+%   popSize =       [f] scalar value indicating the desired number of
+%                   individuals in the output population
 %
 %   sourceIndex =   [i j] index value of the source node for each parent
 %
@@ -84,22 +88,21 @@ function [ outputPop ] = popCrossoverFnc(   inputPop,...
 %%%                                                                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Function Parameters
-
-pS = size(inputPop,1);
-gL = size(inputPop,2);
-
 %% Parse Inputs
 
 P = inputParser;
 
 addRequired(P,'nargin',@(x)...
-    x == 5);
+    x == 6);
 addRequired(P,'nargout',@(x)...
     x == 1);
 addRequired(P,'inputPop',@(x)...
     isnumeric(x) &&...
     ismatrix(x) &&...
+    ~isempty(x));
+addRequired(P,'popSize',@(x)...
+    isnumeric(x) &&...
+    isscalar(x) &&...
     ~isempty(x));
 addRequired(P,'sourceIndex',@(x)...
     isnumeric(x) &&...
@@ -118,12 +121,18 @@ addRequired(P,'gridMask',@(x)...
     ismatrix(x) &&...
     ~isempty(x));
 
-parse(P,nargin,nargout,inputPop,sourceIndex,destinIndex,crossoverType,...
-    gridMask);
+parse(P,nargin,nargout,inputSelection,popSize,sourceIndex,destinIndex,...
+    crossoverType,gridMask);
+
+%% Function Parameters
+
+pS = popSize;
+sS = size(inputSelection,1);
+gL = size(inputSelection,2);
 
 %% Error Checking
 
-if mod(pS,2) ~= 0
+if mod(sS,2) ~= 0
     tit='Number of Individuals in inputPop Must be Even';
     disp(tit);
     error('Number of Individuals in inputPop Must be Even');
@@ -132,18 +141,24 @@ end
 %% Iteration Parameters
 
 h = pS/2;
-parent1Ind = reshape(randomsample(1:1:pS,pS),[h 2]);
-parent2Ind = reshape(randomsample(1:1:pS,pS),[h 2]);
+parent1Ind = reshape(datasample(1:1:sS,pS),[h 2]);
+parent2Ind = reshape(datasample(1:1:sS,pS),[h 2]);
 parentInd = vertcat(parent1Ind,parent2Ind);
-outputPop = zeros(pS,gL);
 
 %% Compute Crossover
 
-for i = 1:pS
-    parent1 = inputPop(parentInd(i,1),:);
-    parent2 = inputPop(parentInd(i,2),:);
-    outputPop(i,:) = crossoverFnc(parent1,parent2,sourceIndex,...
+outputPop = zeros(pS,gL);
+popCount = 0;
+
+while popCount < popSize
+    
+    popCount = popCount + 1;
+    
+    parent1 = inputSelection(parentInd(popCount,1),:);
+    parent2 = inputSelection(parentInd(popCount,2),:);
+    outputPop(popCount,:) = crossoverFnc(parent1,parent2,sourceIndex,...
         destinIndex,crossoverType,gridMask);
+    
 end
 
 end

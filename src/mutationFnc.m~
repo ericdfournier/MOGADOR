@@ -99,54 +99,194 @@ indivMask = zeros(gS);
 indivMask(indiv) = 1;
 
 %% Select Mutation Sites and Generate Mutations
+
+% THERE IS A PROBLEM WITH THE SEQUENCING OF THE MUTATION 
+
+% YOU NEED TO GENERATE THE NEIGHBORHOOD ON THE BASIS OF THE INPUT PATH
+% SEQUENCE. SELECT SOME NUMBER OF THE PREVIOUS AND SUBSEQUENT CELLS
+% VISITED. TURN THESE CELLS INTO THE FORBIDDEN AREAS OF A GRID MASK. MAKE 
+% MUTATION CELL FORBIDDEN AS WELL. THEN MAKE PREVIOUS CELL THE SOURCE INDEX
+% AND THE SUBSEQUENT CELL THE DESTINATION INDEX. 
+% RUN THE PSEUDORANDOM WALK FUNCTION TO CONNECT THE SOURCE TO THE
+% DESTINATION INDEX THEN INSERT THIS PATH SEGMENT INTO THE LARGER PATHWAY
+% AS A MUTATION. THIS ENSURES THAT ALL MUTATIONS ARE VIABLE PATHWAYS.
+
+for i = 1: 
     
-mutSel = randsample(2:1:gL-1,1);
-mutInd = indiv(1,mutSel);
-mutRange = indiv((mutSel-1):(mutSel+1));
-
-neighSub = zeros(9,2);
-newMut = cell(1,1);
-
-[j,k] = ind2sub(gS,mutInd);
-neighSub(1,:) = [j-1,k-1];
-neighSub(2,:) = [j-1,k];
-neighSub(3,:) = [j-1,k+1];
-neighSub(4,:) = [j,k-1];
-neighSub(5,:) = [j,k];
-neighSub(6,:) = [j,k+1];
-neighSub(7,:) = [j+1,k-1];
-neighSub(8,:) = [j+1,k];
-neighSub(9,:) = [j+1,k+1];
-neighInd = sub2ind(gS,neighSub(:,1),neighSub(:,2));
-
-[~, B, C] = intersect(mutRange, neighInd);
-sdMask = zeros(3);
-sdMask(C(B == 1)) = 1;
-sdMask(C(B == 3)) = 1;
-
-allMask =  reshape(indivMask(neighInd),[3 3]);
-choices = find(allMask == 0);
-
-viableMut = 0;
-mutCount = 0;
-
-while viableMut == 0
+    mutSel = randsample(2:1:gL-1,1);
+    mutInd = indiv(1,mutSel);
+    mutRange = indiv((mutSel-1):(mutSel+1));
     
-    mutCount = mutCount + 1;
-    mutChoice = randomsample(choices,1);
-    sdMask(mutChoice) = 1;
-    mutTest = bwconncomp(sdMask);
+    neighSub = zeros(9,2);
+    newMut = cell(1,1);
     
-    if mutTest.NumObjects == 1
+    [j,k] = ind2sub(gS,mutInd);
+    neighSub(1,:) = [j-1,k-1];
+    neighSub(2,:) = [j-1,k];
+    neighSub(3,:) = [j-1,k+1];
+    neighSub(4,:) = [j,k-1];
+    neighSub(5,:) = [j,k];
+    neighSub(6,:) = [j,k+1];
+    neighSub(7,:) = [j+1,k-1];
+    neighSub(8,:) = [j+1,k];
+    neighSub(9,:) = [j+1,k+1];
+    neighInd = sub2ind(gS,neighSub(:,1),neighSub(:,2));
+    
+    [~, B, C] = intersect(mutRange, neighInd);
+    sdMask = zeros(3);
+    sdMask(C(B == 1)) = 1;
+    sdMask(C(B == 3)) = 1;
+    
+    allMask =  reshape(indivMask(neighInd),[3 3]);
+    choices = find(allMask == 0);
+    
+    viableMut = 0;
+    mutCount = 0;
+    
+    while viableMut == 0
         
-        viableMut = 1;
+        mutCount = mutCount + 1;
+        mutChoice = randomsample(choices,1);
+        sdMask(mutChoice) = 1;
+        mutTest = bwconncomp(sdMask);
         
-    elseif mutCount =
+        if mutTest.NumObjects == 1
+            
+            viableMut = 1;
+           
+        elseif mutCount =
+            
+        end
+        
+    end
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    allChoices = allcomb([choices' 5], [choices' 5], [choices' 5]);
+    allChoices(end,:) = [];
+    
+    nC = size(allChoices,1);
+    randList = randomsample(1:1:nC,nC);
+    
+
+    
+    while viableMut == 0 
+        
+        mutChoice = allChoices(randList(i),:);
+        testMask = sdMask;
+        testMask(mutChoice) = 1;
+        testMaskConn = bwconncomp(testMask,8);
+        
+        if testMaskConn.NumObjects == 1
+            
+            break
+        
+        elseif i == nC
+            
+            disp('No viable mutations found at this locus');
+            
+        end
+    
+    end
+  
+        
+        
+        
+        
+        
+    
+    
+            
+            
+        
+    
+        
+        
+    
+    
+    
+    
+    
+    c = intersect(neighInd,indiv);
+    u = size(c);
+    d = setdiff(neighInd,c);
+    
+    P = 0;
+    e = 0;
+    
+    if u(1,2) < 3
+        
+        error('Input path connectivity rule violated.')
+    
+    elseif u(1,2) == 3
+        
+        while P == 0
+                        
+            tmp = gridMask;
+            tmp(c) = 1;
+            tmp(mutInd) = 0;
+            tryMut = datasample(d,2,2);
+            tmp(tryMut) = 1;
+            bw = reshape(tmp(neighInd),[3,3]);
+            result = bwconncomp(bw,8);
+            
+            if result.NumObjects > 1
+                P = 0;
+            else
+                P = 1;
+            end
+            
+            e = e+1;
+            
+            if e == 50
+                P = 1;
+                validMut = 0;
+            else
+                validMut = 1;
+            end
+            
+        end
+        
+    elseif u(1,2) > 3
+        
+        while P == 0
+            
+            tmp = gridMask;
+            tmp(c) = 1;
+            tmp(mutInd) = 0;
+            tryMut = datasample(d,1,2);
+            tmp(tryMut) = 1;
+            bw = reshape(tmp(neighInd),[3,3]);
+            result = bwconncomp(bw,8);
+            
+            if result.NumObjects > 1
+                P = 0;
+            else
+                P = 1;
+            end
+            
+            e = e+1;
+            
+            if e == 50
+                P = 1;
+                validMut = 0;
+            else
+                validMut = 1;
+            end
+            
+        end
         
     end
     
 end
-    
 
 newMut{1,1} = tryMut;
 
