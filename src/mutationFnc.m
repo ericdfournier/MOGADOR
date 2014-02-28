@@ -99,61 +99,92 @@ indivMask = zeros(gS);
 indivMask(indiv) = 1;
 
 %% Select Mutation Sites and Generate Mutations
+
+validMutSite = 1;
+
+while validMutSite == 1
     
-mutSel = randsample(2:1:gL-1,1);
-mutInd = indiv(1,mutSel);
-mutRange = indiv((mutSel-1):(mutSel+1));
-
-neighSub = zeros(9,2);
-newMut = cell(1,1);
-
-[j,k] = ind2sub(gS,mutInd);
-neighSub(1,:) = [j-1,k-1];
-neighSub(2,:) = [j-1,k];
-neighSub(3,:) = [j-1,k+1];
-neighSub(4,:) = [j,k-1];
-neighSub(5,:) = [j,k];
-neighSub(6,:) = [j,k+1];
-neighSub(7,:) = [j+1,k-1];
-neighSub(8,:) = [j+1,k];
-neighSub(9,:) = [j+1,k+1];
-neighInd = sub2ind(gS,neighSub(:,1),neighSub(:,2));
-
-[~, B, C] = intersect(mutRange, neighInd);
-sdMask = zeros(3);
-sdMask(C(B == 1)) = 1;
-sdMask(C(B == 3)) = 1;
-
-allMask =  reshape(indivMask(neighInd),[3 3]);
-choices = find(allMask == 0);
-
-viableMut = 0;
-mutCount = 0;
-
-while viableMut == 0
+    mutSel = randsample(2:1:gL-1,1);
+    mutInd = indiv(1,mutSel);
+    mutRange = indiv((mutSel-1):(mutSel+1));
     
-    mutCount = mutCount + 1;
-    mutChoice = randomsample(choices,1);
-    sdMask(mutChoice) = 1;
-    mutTest = bwconncomp(sdMask);
+    neighSub = zeros(9,2);
+    newMut = cell(1,1);
     
-    if mutTest.NumObjects == 1
+    [j,k] = ind2sub(gS,mutInd);
+    neighSub(1,:) = [j-1,k-1];
+    neighSub(2,:) = [j-1,k];
+    neighSub(3,:) = [j-1,k+1];
+    neighSub(4,:) = [j,k-1];
+    neighSub(5,:) = [j,k];
+    neighSub(6,:) = [j,k+1];
+    neighSub(7,:) = [j+1,k-1];
+    neighSub(8,:) = [j+1,k];
+    neighSub(9,:) = [j+1,k+1];
+    neighInd = sub2ind(gS,neighSub(:,1),neighSub(:,2));
+    
+    [~, B, C] = intersect(mutRange, neighInd);
+    sdMask = zeros(3);
+    sdMask(C(B == 1)) = 1;
+    sdMask(C(B == 3)) = 1;
+    
+    % Check for Deletion Mutation Validity
+    
+    sdConn = bwconncomp(sdMask,8);
+    
+    if sdConn.NumObjects == 1
         
-        viableMut = 1;
-        
-    elseif mutCount =
+        newMut = [];
+        break
         
     end
     
-end
+    % Eliminate Invalid Mutation Sites and Iteratively Select Candidates
     
+    allMask =  reshape(indivMask(neighInd),[3 3]);
+    choices = find(allMask == 0);
+    
+    viableMut = 0;
+    mutCount = 0;
+    mutSDMask = sdMask;
+    
+    while viableMut == 0
+        
+        if nnz(sdMask) == numel(sdMask)
+            
+            disp('Unable to mutate at selected locus');
+            validMutSite = 0;
+            
+            break
+            
+        end
+        
+        mutCount = mutCount + 1;
+        mutChoice = randomsample(choices,1);
+        mutSDMask(mutChoice) = 1;
+        mutTest = bwconncomp(mutSDMask);
+        
+        if mutTest.NumObjects == 1
+            
+            viableMut = 1;
+            
+        end
+        
+    end
+    
+    % Generate Mutation Site Indices
+    
+    newMutSite = reshape(sdMask == 0 & mutSDMask == 1,[9 1]);
+    tryMut = neighInd(newMutSite);
 
-newMut{1,1} = tryMut;
+end 
+
+newMut{1,1} = tryMut';
 
 %% Insert New Mutations into Individual
 
 sections = cell(2,2);
-z = vertcat(1,mutSel,gL(1,2));
+z = vertcat(1,mutSel,gL);
 
 sections{1,1} = indiv(1,z(1):z(2)-1);
 tmp = size(sections{1,1});
