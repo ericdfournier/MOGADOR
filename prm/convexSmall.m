@@ -18,14 +18,14 @@ p.objectiveNames = {'Var1','Var2','Var3'};
 
 %% Population Initialization Parameters
 
-p.populationSize = 200;
+p.populationSize = 1000;
 p.minimumClusterSize = 3;
 p.sourceIndex = [20 20];
 p.destinIndex = [80 80];
 
 %% Selection Parameters
 
-p.tournamentSize = 100;
+p.tournamentSize = 200;
 p.selectionType = 0;
 p.selectionProbability = 1; 
 

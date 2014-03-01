@@ -1,19 +1,18 @@
-function [ mutant, mutationInd ] = mutationFnc(     individual,...
-                                                    gridMask )
+function [ mutant ] = mutationFnc( individual, gridMask )
 
 % mutationFnc function to generate a single or multi-point mutation of an
 % of an individual pathway
 %
 % DESCRIPTION:
 %
-%   Function to generate a single or multi-point mutation which obeys the
-%   queens connectivity rule for individual pathways from some population
+%   Function to generate a single point mutation which obeys the 8 way
+%   connectivity rule for individual pathways from some population
 % 
 %   Warning: minimal error checking is performed.
 %
 % SYNTAX:
 %
-%   [ mutant, mutationInd ] =  mutationFnc( individual, mutationCount, gridMask )
+%   mutant =  mutationFnc( individual, gridMask )
 %
 % INPUTS:
 %
@@ -32,9 +31,6 @@ function [ mutant, mutationInd ] = mutationFnc(     individual,...
 %                   grid cells forming a pathway from a specified source to
 %                   a specified target destination given the constraints of
 %                   a specified study region
-%
-%   mutationInd =   [r] scalar value indicating the index number of the
-%                   locus grid cell at which the mutation occcurred
 %
 % EXAMPLES:
 %   
@@ -59,7 +55,7 @@ function [ mutant, mutationInd ] = mutationFnc(     individual,...
 %                                       objectiveFrac,minClusterSize,...
 %                                       sourceIndex,destinIndex, gridMask);
 %
-%                   [mutant, mutantInd] = mutationFnc(individual,gridMask);
+%                   mutant = mutationFnc(individual,gridMask);
 %
 % CREDITS:
 %
@@ -78,7 +74,7 @@ P = inputParser;
 addRequired(P,'nargin',@(x)...
     x == 2);
 addRequired(P,'nargout',@(x)...
-    x == 2);
+    x == 1);
 addRequired(P,'individual',@(x)...
     isnumeric(x) &&...
     isrow(x) &&...
@@ -134,7 +130,7 @@ while validMutSite == 1
     
     if sdConn.NumObjects == 1
         
-        newMut = [];
+        tryMut = [];
         break
         
     end
@@ -148,11 +144,26 @@ while validMutSite == 1
     mutCount = 0;
     mutSDMask = sdMask;
     
+    s = 0;
+    
     while viableMut == 0
         
-        if nnz(sdMask) == numel(sdMask)
+        s = s + 1;
+        
+        if s == 10;
             
-            disp('Unable to mutate at selected locus');
+            validMutSite = 0;
+            
+            break
+        
+        elseif nnz(sdMask) == numel(sdMask)
+            
+            validMutSite = 0;
+            
+            break
+            
+        elseif isempty(choices) == 1
+            
             validMutSite = 0;
             
             break
@@ -202,6 +213,5 @@ x = size(individual);
 mutant = zeros(x);
 v = size(mutantRaw);
 mutant(1,1:v(1,2)) = mutantRaw;
-mutationInd = mutInd;
 
 end

@@ -1,7 +1,7 @@
-function [ outputPop, mutationInd ] = popMutationFnc(   inputPop,...
-                                                        gridMask,...
-                                                        fraction,...
-                                                        mutations )
+function [ outputPop ] = popMutationFnc(    inputPop,...
+                                            gridMask,...
+                                            fraction,...
+                                            mutations )
 
 % popMutationFnc function to generate a child pathway from the 
 % single point crossover of two previously selected parent pathways.
@@ -16,7 +16,7 @@ function [ outputPop, mutationInd ] = popMutationFnc(   inputPop,...
 %
 % SYNTAX:
 %
-%   [ outputPop, mutationInd ] =  popMutationFnc( inputPop,...
+%   [ outputPop ] =  popMutationFnc( inputPop,...
 %                   fraction, gridMask )
 %
 % INPUTS:
@@ -43,12 +43,7 @@ function [ outputPop, mutationInd ] = popMutationFnc(   inputPop,...
 %   ouputPop =      [1 x m] array of index values listing the connected 
 %                   grid cells forming a pathway from a specified source to
 %                   a specified target destination given the constraints of
-%                   a specified study region
-%
-%   mutationInd =   [r*n x 1] cell array in which each cell contains a 
-%                   [s x 1] array with the index values of the sites at 
-%                   which point mutations were performed upon each 
-%                   corresponding input individual     
+%                   a specified study region    
 %   
 % EXAMPLES:
 %   
@@ -72,9 +67,7 @@ function [ outputPop, mutationInd ] = popMutationFnc(   inputPop,...
 %                   fraction = 0.25;
 %                   mutations = 1;
 %
-%                   [ouputPop, mutationCount] = mutationFnc(inputPop,...
-%                                               gridMask,fraction,...
-%                                               mutations);
+%                   ouputPop = mutationFnc(inputPop,gridMask,mutations);
 %
 % CREDITS:
 %
@@ -93,7 +86,7 @@ P = inputParser;
 addRequired(P,'nargin',@(x)...
     x == 4);
 addRequired(P,'nargout',@(x)...
-    x == 2);
+    x == 1);
 addRequired(P,'inputPop',@(x)...
     isnumeric(x) &&...
     ismatrix(x) &&...
@@ -116,17 +109,18 @@ parse(P,nargin,nargout,inputPop,gridMask,fraction,mutations);
 
 popSize = size(inputPop,1);
 gL = size(inputPop,2);
-f = floor(fraction*popSize);
-s = randomsample(1:1:popSize,f);
-mutPop = inputPop(s,:);
-outputPop = zeros(f,gL);
-mutationInd = zeros(f,popSize);
+mF = floor(fraction*popSize);
+mS = randomsample(1:1:popSize,mF);
+mutPop = inputPop(mS,:);
+outputPop = zeros(mF,gL);
 
 %% Compute Mutations
 
-for i = 1:f
-    [outputPop(i,:), mutationInd(i,1)] = multiMutationFnc(mutPop(i,:),...
+for i = 1:mF
+    
+    outputPop(i,:) = multiMutationFnc(mutPop(i,:),...
         gridMask,mutations);
+    
 end
 
 end

@@ -17,14 +17,14 @@ p.objectiveNames = {'Var1','Var2','Var3'};
 
 %% Population Initialization Parameters
 
-p.populationSize = 20;
+p.populationSize = 100;
 p.minimumClusterSize = 5;
 p.sourceIndex = [20 20];
 p.destinIndex = [280 280];
 
 %% Selection Parameters
 
-p.tournamentSize = 10; % Must be an even integer <= p.populationSize/2
+p.tournamentSize = 20;
 p.selectionType = 0;
 p.selectionProbability = 1; 
 

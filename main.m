@@ -44,23 +44,21 @@ convergence = 0;
 while convergence == 0
     
     currentPopulation = o{i,1};
-    averageFitnessHistory = o{1:i,3};
-    
-    if i == p.maxGenerations
-        
-        break;
-        
-    end
+    averageFitnessHistory = [o{1:i,3}];
         
     if i <= 2
         
-        convergenceCriteria = [];
+        convergenceCriteria = 0;
         convergence = 0;
+        
+    elseif i == p.maxGenerations
+        
+        break;
     
     else
         
         convergenceCriteria = fix(diff(averageFitnessHistory,2));
-        convergence = convergenceCriteria(i-2) == 0 ;
+        convergence = convergenceCriteria(i-2) <= 0.001 ;
         
     end
 
@@ -79,6 +77,8 @@ while convergence == 0
         p.destinIndex,...
         p.crossoverType,...
         p.gridMask          );
+    
+    % NEED TO FIX CROSSOVER FUNCTION FOR SMALL CONVEX CASE
 
     mutation = popMutationFnc(...
         crossover,...
@@ -88,10 +88,17 @@ while convergence == 0
     
     fitness = popFitnessFnc(...
         mutation,...
-        p.objetiveVars      );
+        p.objectiveVars,...
+        p.gridMask);
+    
+    avgfitness = popAvgFitnessFnc(...
+        mutation,...
+        p.objectiveVars,...
+        p.gridMask);
     
     o{i+1,1} = mutation;
     o{i+1,2} = fitness;
+    o{i+1,3} = avgfitness;
     
     i = i+1;
         
