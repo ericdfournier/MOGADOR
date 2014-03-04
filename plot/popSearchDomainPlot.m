@@ -1,5 +1,6 @@
-function [ plotHandle ] = popSearchDomainPlot( inputPop, sourceIndex,...
-                            destinIndex, gridMask )
+function [ plotHandle ] = popSearchDomainPlot(  popCell,...
+                                                popIndex,...
+                                                paramsStruct )
 % popSearchDomainPlot.m Function to provide a high level visual overview of
 % the range of grid cells visited by the set of the individuals contained
 % within a given population. 
@@ -18,27 +19,20 @@ function [ plotHandle ] = popSearchDomainPlot( inputPop, sourceIndex,...
 %
 % SYNTAX:
 %
-%   [ plotHandle ] = popSearchDomainPlot( inputPop, sourceIndex,...
-%                                           destinIndex, gridMask );
+%   [ plotHandle ] = popSearchDomainPlot(popCell, popIndex, paramsStruct);
 %
 % INPUTS:
 %
-%   inputPop =      [p x r] array in which each row [p] corresponds to an
+%   popCell =      [p x r] array in which each row [p] corresponds to an
 %                   individual within the population and each column [r] 
 %                   corresponds to the sequential index numbers of the grid
 %                   cells visited by each individual.
 %
-%   sourceIndex =   [1 x 2] array with the row and column subscript indices
-%                   of the source grid cell for each individual in the
-%                   input population.
+%   sourceIndex =   [q] scalar value indicating the index number of the
+%                   popualation within the popCell to be used for plotting
 %
-%   destinIndex =   [1 x 2] array with the row and column subscript indices
-%                   of the destination grid cell for each individual in the
-%                   input population.
-%
-%   gridMask =      [n x m] binary array with valid pathway grid cells 
-%                   labeled as ones and invalid pathway grid cells labeled 
-%                   with zeros as placeholders
+%   paramsStruct =  Structure object containing the parameter settings used
+%                   to generate the popCell input. 
 %
 % OUTPUTS:
 %
@@ -57,7 +51,6 @@ function [ plotHandle ] = popSearchDomainPlot( inputPop, sourceIndex,...
 %%%                          Eric Daniel Fournier                        %%
 %%%                  Bren School of Environmental Science                %%
 %%%               University of California Santa Barbara                 %%
-%%%                            September 2013                            %%
 %%%                                                                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -66,14 +59,26 @@ function [ plotHandle ] = popSearchDomainPlot( inputPop, sourceIndex,...
 
 p = inputParser;
 
-addRequired(p,'nargin',@(x) x == 4);
-addRequired(p,'inputPop',@(x) isnumeric(x) && ismatrix(x) && ~isempty(x));
-addRequired(p,'gridMask',@(x) isnumeric(x) && ismatrix(x) && ~isempty(x));
+addRequired(p,'nargin',@(x)...
+    x == 3);
+addRequired(p,'popCell',@(x)...
+    iscell(x) &&...
+    ~isempty(x));
+addRequired(p,'popIndex',@(x)...
+    isscalar(x) &&...
+    ~isempty(x));
+addRequired(p,'paramsStruct',@(x)...
+    isstruct(x) &&...
+    ~isempty(x));
 
-parse(p,nargin,inputPop,gridMask);
+parse(p,nargin,popCell,popIndex,paramsStruct);
 
-%% Iteration Parameters
+%% Function Parameters
 
+inputPop = popCell{popIndex,1};
+sourceIndex = paramsStruct.sourceIndex;
+destinIndex = paramsStruct.destinIndex;
+gridMask = paramsStruct.gridMask;
 gS = size(gridMask);
 pS = size(inputPop,1);
 
