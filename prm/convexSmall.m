@@ -25,8 +25,7 @@ p.destinIndex = [80 80];
 
 %% Selection Parameters
 
-p.tournamentSize = 200;
-p.selectionType = 0;
+p.selectionFraction = 0.5;
 p.selectionProbability = 1; 
 
 %% Mutation Parameters
