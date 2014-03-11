@@ -1,4 +1,4 @@
-function [ outputPop ] = popCrossoverFnc(   inputSelection,...
+function [ outputPop ] = popCrossoverFnc(   selection,...
                                             popSize,...
                                             sourceIndex,...
                                             destinIndex,...
@@ -18,8 +18,9 @@ function [ outputPop ] = popCrossoverFnc(   inputSelection,...
 %
 % SYNTAX:
 %
-%   [ outputPop ] =  popCrossoverFnc( inputPop, sourceIndex,...
-%                                       destinIndex, crossoverType )
+%   [ outputPop ] =  popCrossoverFnc( selection, popSize,
+%                                       sourceIndex, destinIndex,...
+%                                       crossoverType, gridMask )
 %
 % INPUTS:
 %
@@ -66,12 +67,14 @@ function [ outputPop ] = popCrossoverFnc(   inputSelection,...
 %                   sourceIndex = [20 20];
 %                   destinIndex = [80 80];
 %                   plot = 0;
-%                   [initialPop, genomeLength] = initializePopFnc(popSize,
+%                   [initialPop, genomeLength] = initializePopFnc(...
+%                                                   popSize,
 %                                                   objectiveVars,...
 %                                                   objectievFrac,...
 %                                                   minClusterSize,...
 %                                                   sourceIndex,...
-%                                                   destinIndex, gridMask);
+%                                                   destinIndex,...
+%                                                   gridMask);
 %
 %                   crossoverType = 1;
 %
@@ -96,9 +99,10 @@ addRequired(P,'nargin',@(x)...
     x == 6);
 addRequired(P,'nargout',@(x)...
     x == 1);
-addRequired(P,'inputPop',@(x)...
+addRequired(P,'selection',@(x)...
     isnumeric(x) &&...
     ismatrix(x) &&...
+    mod(size(x,1),2) == 0 &&...
     ~isempty(x));
 addRequired(P,'popSize',@(x)...
     isnumeric(x) &&...
@@ -121,43 +125,39 @@ addRequired(P,'gridMask',@(x)...
     ismatrix(x) &&...
     ~isempty(x));
 
-parse(P,nargin,nargout,inputSelection,popSize,sourceIndex,destinIndex,...
+parse(P,nargin,nargout,selection,popSize,sourceIndex,destinIndex,...
     crossoverType,gridMask);
 
 %% Function Parameters
 
 pS = popSize;
-sS = size(inputSelection,1);
-gL = size(inputSelection,2);
-
-%% Error Checking
-
-if mod(sS,2) ~= 0
-    tit='Number of Individuals in inputPop Must be Even';
-    disp(tit);
-    error('Number of Individuals in inputPop Must be Even');
-end
-
-%% Iteration Parameters
-
-h = pS/2;
-parent1Ind = reshape(datasample(1:1:sS,pS),[h 2]);
-parent2Ind = reshape(datasample(1:1:sS,pS),[h 2]);
-parentInd = vertcat(parent1Ind,parent2Ind);
-
-%% Compute Crossover
-
+sS = size(selection,1);
+gL = size(selection,2);
 outputPop = zeros(pS,gL);
 popCount = 0;
+h = pS/2;
+
+%% Generate Parent Couplings and Compute Crossover
 
 while popCount < popSize
     
     popCount = popCount + 1;
     
-    parent1 = inputSelection(parentInd(popCount,1),:);
-    parent2 = inputSelection(parentInd(popCount,2),:);
-    outputPop(popCount,:) = crossoverFnc(parent1,parent2,sourceIndex,...
+    parentInd = datasample(1:1:sS,2);
+    parent1 = selection(parentInd(1,1),:);
+    parent2 = selection(parentInd(1,2),:);
+    child = crossoverFnc(parent1,parent2,sourceIndex,...
         destinIndex,crossoverType,gridMask);
+    
+    if isempty(child) == 1
+        
+        popCount = popCount - 1;
+        
+    else
+        
+        outputPop(popCount,:) = child;
+        
+    end
     
 end
 

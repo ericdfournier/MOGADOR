@@ -1,13 +1,17 @@
-function [ outputPop ] = popTournamentSelectionFnc( inputPop,...
-                                                    tournamentSize,...
-                                                    selectionProb,...
-                                                    selectionType,...
-                                                    objectiveVars,...
-                                                    gridMask)
+function [ selection ] = popSelectionFnc(   inputPop,...
+                                            selectionFrac,...
+                                            selectionProb,...
+                                            objectiveVars,...
+                                            gridMask)
 
-% popTournamentSelectionFnc selects individuals from an input population 
+% popSelectionFnc selects individuals from an input population 
 % for transferral to the output population on the basis of a tournament
-% selection process. 
+% selection process. First the top and the bottom ten percent of the 
+% population (20% total), as measured in terms of fitness, are selected.
+% Then, a tournament selection procedure is implemented wherein pairs of
+% individuals are randomly selected from the population, their fitness
+% compared, and the more individual is retained according to the 
+% propability specified in the input variable selectionProb.
 %
 % DESCRIPTION:
 %
@@ -22,12 +26,11 @@ function [ outputPop ] = popTournamentSelectionFnc( inputPop,...
 %
 % SYNTAX:
 %
-%   [ ouputPop ] =  popTournamentSelectionFnc(  inputPop,...
-%                                               tournamentSize,...
-%                                               selectionProb,...
-%                                               selectionType,...
-%                                               objectiveVars,...
-%                                               gridMask )
+%   [ ouputPop ] =  popSelectionFnc(    inputPop,...
+%                                       selectionFrac,...
+%                                       selectionProb,...
+%                                       objectiveVars,...
+%                                       gridMask )
 %
 % INPUTS:
 %
@@ -37,22 +40,17 @@ function [ outputPop ] = popTournamentSelectionFnc( inputPop,...
 %                       specified target destination given the constraints
 %                       of a specified study region
 %
-%   tournamentSize =    [g] an even numbered scalar value with the number
-%                       of individuals from the input population desired to 
-%                       participate in the tournament process. With larger 
-%                       tournament sizes, weaker individuals have a smaller 
-%                       chance of being selected for crossover
+%   selectionFrac =     [g] scalar value ranging from 0 to 1, indicating
+%                       the fraction of the total number of individuals 
+%                       within the population that will be selected to 
+%                       participate in crossover and the production of
+%                       the next generation of individuals
 %
 %   selectionProb =     [r] scalar value ranging from 0 to 1, indicating 
 %                       the probability that an individual will be selected
 %                       if it is determined to be more fit than its 
 %                       tournament opponent during each phase of the 
 %                       tournament
-%
-%   selectionType =     [0|1] a binary scalar value with the following two
-%                       case definitions:
-%                           Case 0: Selection with removal
-%                           Case 1: Selection without removal
 %
 %   objectiveVars =     [n x m x g] array in which the first two spatial
 %                       dimensions correspond to the dimensions of the grid 
@@ -85,33 +83,26 @@ function [ outputPop ] = popTournamentSelectionFnc( inputPop,...
 %%%                                                                      %%
 %%%                          Eric Daniel Fournier                        %%
 %%%                  Bren School of Environmental Science                %%
-%%%               University of California Santa Barbara                 %%
+%%%                 University of California Santa Barbara               %%
 %%%                                                                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% Fixed Parameters 
-
-pS = size(inputPop);
 
 %% Parse Inputs
 
 P = inputParser;
 
 addRequired(P,'nargin', @(x)...
-    x == 6);
+    x == 5);
 addRequired(P,'nargout', @(x)...
     x == 1); 
 addRequired(P,'inputPop',@(x)...
     isnumeric(x) &&...
     ismatrix(x) &&...
     ~isempty(x));
-addRequired(P,'tournamentSize',@(x)...
+addRequired(P,'selectionFrac',@(x)...
     isnumeric(x) &&...
-    isscalar(x) &&...
-    ~isempty(x));
-addRequired(P,'selectionType',@(x)...
-    isnumeric(x) &&...
-    isscalar(x) &&...
+    x >= 0 &&...
+    x <= 1 &&...
     ~isempty(x));
 addRequired(P,'selectionProb',@(x)...
     isnumeric(x) &&...
@@ -123,68 +114,44 @@ addRequired(P,'objectiveVars',@(x)...
     numel(size(x)) >= 2 &&...
     ~isempty(x));
 
-parse(P,nargin,nargout,inputPop,tournamentSize,selectionType,...
-    selectionProb,objectiveVars);
+parse(P,nargin,nargout,inputPop,selectionFrac,selectionProb,objectiveVars);
 
-%% Error Checking 
+%% Function Parameters 
 
-if selectionType == 0 && tournamentSize > pS(1,1)/2
-    
-    warning(['For selection with replacement {selectionType = 0) ',...
-        'the tournament size must less than or equal to 1/2 the ',...
-        'total number of individuals in the input population']);
-    
-end 
-
-%% Function Parameters
-
-m = 1:1:pS(1,1);
-outputPop = zeros(tournamentSize,pS(1,2));
-individuals = zeros(2,pS(1,2));
+pS = size(inputPop,1);
+gL = size(inputPop,2);
+tS = floor(selectionFrac.*pS);
+if mod(tS,2) == 1
+    tS = tS+1;
+end
+tF = floor(tS.*0.1);
+bF = floor(tS.*0.1);
+mF = tS - tF - bF;
+selection = zeros(tS,gL);
+individuals = zeros(2,gL);
 fitness = zeros(2,1);
 
-%% Switch Case
+%% Sort Individuals by Fitness
 
-switch selectionType
-    
-    case 0      % With Removal
-        
-        pairs = reshape(datasample(m,tournamentSize*2,'Replace',false),...
-            [tournamentSize,2]);
-        
-    case 1      % Without Removal
-        
-        h = 0;
-        
-        while h == 0
-            
-            pairs = reshape(datasample(m,tournamentSize*2,'Replace',...
-                true),[tournamentSize,2]);
-            
-            for i = 1:2
-                
-                if pairs(i,1) == pairs(i,2)
-                    
-                    h = 0;
-                    
-                else
-                    
-                    h = 1;
-                    
-                end
-                
-            end
-            
-        end
-        
-end
+popFitness = popFitnessFnc(inputPop,objectiveVars,gridMask);
+[~, sortedPopInd] = sort(sum(popFitness,2),'descend');
+
+%% Retain Top and Bottom Fractions
+
+selection(1:tF,:) = inputPop(sortedPopInd <= tF,:);
+selection((tF+1):(tF+bF),:) = inputPop(sortedPopInd > pS-bF,:);
+
+%% Generate Pairs Via Selection with Removal
+
+list = sortedPopInd(sortedPopInd > tF & sortedPopInd <= pS-bF);
+pairs = reshape(datasample(list,mF.*2,'Replace',false),[mF,2]);
 
 %% Perform Tournament Selection
 
-for i = 1:tournamentSize
+for i = tF+1:tS-bF
     
-    individuals(1,:) = inputPop(pairs(i,1),:);
-    individuals(2,:) = inputPop(pairs(i,2),:);
+    individuals(1,:) = inputPop(pairs(i-bF,1),:);
+    individuals(2,:) = inputPop(pairs(i-bF,2),:);
     fitness(1,1) = sum(fitnessFnc(individuals(1,:),...
         objectiveVars,...
         gridMask));
@@ -196,11 +163,11 @@ for i = 1:tournamentSize
     
     if val <= selectionProb
         
-        outputPop(i,:) = individuals(index(1),:);
+        selection(i,:) = individuals(index(1),:);
         
     elseif val > selectionProb
         
-        outputPop(i,:) = individuals(index(2),:);
+        selection(i,:) = individuals(index(2),:);
         
     end
     

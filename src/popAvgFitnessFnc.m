@@ -37,7 +37,7 @@ function [ popAvgFitness ] = popAvgFitnessFnc(      inputPop,...
 %
 %   popAvgFitness = scalar value indicating the average fitness for the
 %                   entire population across all individuals and all 
-%                    xobjective variables
+%                   objective variables
 %
 % EXAMPLES:
 %   
