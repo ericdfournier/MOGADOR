@@ -101,6 +101,10 @@ while convergence == 0
         
 end
 
+%% Display MOGADOR Results
+
+
+
 %% Write Output Data
 
 o = o(~isempty(o));

@@ -35,7 +35,7 @@ function [ plotHandle ] = popParetoFrontierPlot(    popCell,...
 %                       [r] corresponds to the sequential index numbers of
 %                       the grid cells visited by each individual.
 %
-%   sourceIndex =       [q] scalar value indicating the index number of the
+%   popIndex =          [q] scalar value indicating the index number of the
 %                       popualation within the popCell to be used for
 %                       plotting
 %
