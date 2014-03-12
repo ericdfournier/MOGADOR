@@ -58,7 +58,7 @@ while convergence == 0
     else
         
         convergenceCriteria = fix(diff(averageFitnessHistory,2));
-        convergence = convergenceCriteria(i-2) <= 0.001 ;
+        convergence = convergenceCriteria(i-2) <= 0.0001 ;
         
     end
 
@@ -101,16 +101,32 @@ while convergence == 0
         
 end
 
+%% Epigenetic Smoothing
+
+
+
 %% Display MOGADOR Results
 
+subplot(2,3,1);
+popConvergencePlot(o,p);
 
+subplot(2,3,2);
+popParetoFrontierPlot(o,i,p);
+
+subplot(2,3,2);
+
+
+subplot(2,3,4);
+pop
+
+subplot(2,3,5);
+popSearchDomainPlot(o,1,p);
+
+subplot(2,3,6);
+popSearchDomainPlot(o,i,p);
 
 %% Write Output Data
 
 o = o(~isempty(o));
 cd ~/Repositories/MOGADOR/rslt
 save(['simResults_',datestr(now,30),'.mat'],'o');
-
-%% Generate Output Figures
-
-% Put sample figure here

@@ -1,6 +1,5 @@
 function [ plotHandle ] = popConvergencePlot(   popCell,...
-                                                paramsStruct,...
-                                                modelFit )
+                                                paramsStruct )
 % popConvergencePlot.m Function to plot the convergence characteristics of
 % a set of populations over successive generations of evolutionary
 % operations
@@ -16,9 +15,7 @@ function [ plotHandle ] = popConvergencePlot(   popCell,...
 %
 % SYNTAX:
 %
-%   [ plotHandle ] = popConvergencePlot(    popCell,...
-%                                           paramsStruct,...
-%                                           modelFit );
+%   [ plotHandle ] = popConvergencePlot( popCell, paramsStruct );
 %
 % INPUTS:
 %
@@ -29,10 +26,6 @@ function [ plotHandle ] = popConvergencePlot(   popCell,...
 %
 %   paramsStruct =      Structure object containing the parameter settings
 %                       used to generate the popCell input.
-%   
-%   modelFit =          [0 | 1] binary value indicating whether or not the
-%                       user would like to fit a polynomial function to the 
-%                       data using a least square error fitting procedure.
 %
 % OUTPUTS:
 %
@@ -51,7 +44,7 @@ function [ plotHandle ] = popConvergencePlot(   popCell,...
 %%%                                                                      %%
 %%%                          Eric Daniel Fournier                        %%
 %%%                  Bren School of Environmental Science                %%
-%%%               University of California Santa Barbara                 %%
+%%%                 University of California Santa Barbara               %%
 %%%                                                                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -60,24 +53,21 @@ function [ plotHandle ] = popConvergencePlot(   popCell,...
 P = inputParser;
 
 addRequired(P,'nargin',@(x)...
-    x == 3);
+    x == 2);
 addRequired(P,'popCell',@(x)...
     iscell(x) &&...
     ~isempty(x));
 addRequired(P,'paramsStruct',@(x)...
     isstruct(x) &&...
     ~isempty(x));
-addRequired(P,'modelFit',@(x)...
-    isnumeric(x) &&...
-    ~isempty(x) &&...
-    isscalar(x));
     
-parse(P,nargin,popCell,paramsStruct,modelFit);
+parse(P,nargin,popCell,paramsStruct);
 
 %% Function Parameters
 
+modelFit = paramsStruct.modelFit;
 avgFitness = [popCell{:,3}]';
-gN = 1:size(popCell,1);
+gN = (1:size(avgFitness,1))';
 
 %% Switch Case
 
@@ -85,16 +75,27 @@ switch modelFit
     
     case 0
         
-        plotHandle = scatter(gN,gN,avgFitness);
+        plotHandle = scatter(gN, avgFitness);
+        axis tight square
+        grid on
+        title(' Convergence Plot');
+        xlabel('Population Generation #');
+        ylabel('Population Mean Fitness');
         
     case 1
         
-        [fitObject, goodnessParams] = fit(gN, gN, avgFitness,'poly1');
+        [fitObject, goodnessParams] = fit(gN, avgFitness,'poly2');
         
         hold on
-        scatter(gN,gN,avgFitness)
+        scatter(gN,avgFitness)
         plot(fitObject);
         hold off
+        axis tight square
+        grid on
+        title(' Convergence Plot');
+        xlabel('Population Generation #');
+        ylabel('Population Mean Fitness');
+
         
         disp('Fit Parameters:');
         disp(fitObject);

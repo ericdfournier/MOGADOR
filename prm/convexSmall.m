@@ -49,6 +49,11 @@ p.objectiveVars = simObjectivesFnc(...
 	p.objectiveSimulationRange,...
 	p.gridMask          );
 
+%% Plotting Function Optional Arguments
+
+p.modelFit = 1;
+p.objectiveIndices = [1 2 3];
+
 %% Clear Variables
 
 clearvars -except p

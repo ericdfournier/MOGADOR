@@ -28,7 +28,7 @@ function [ plotHandle ] = popSearchDomainPlot(  popCell,...
 %                   corresponds to the sequential index numbers of the grid
 %                   cells visited by each individual.
 %
-%   sourceIndex =   [q] scalar value indicating the index number of the
+%   popIndex =   [q] scalar value indicating the index number of the
 %                   popualation within the popCell to be used for plotting
 %
 %   paramsStruct =  Structure object containing the parameter settings used
@@ -98,5 +98,10 @@ visited(destinIndex(1,1),destinIndex(1,2)) = 0;
 %% Generate Plot
 
 plotHandle = imagesc(visited);
+title(['Population #',num2str(popIndex),' Search Domain']);
+xlabel('X Dimension');
+ylabel('Y Dimension');
+colorbar();
+axis tight square
 
 end

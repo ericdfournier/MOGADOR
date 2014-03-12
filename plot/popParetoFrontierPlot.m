@@ -1,8 +1,6 @@
 function [ plotHandle ] = popParetoFrontierPlot(    popCell,...
                                                     popIndex,...
-                                                    paramsStruct,...
-                                                    objectiveIndices,...
-                                                    modelFit )
+                                                    paramsStruct)
 % popParetoFrontierPlot.m Function to plot the pareto frontier of a given
 % input population for two or three objectives. If two objectives are
 % provided then the plot returned is a line plot in two dimensions. If
@@ -24,9 +22,7 @@ function [ plotHandle ] = popParetoFrontierPlot(    popCell,...
 %
 %   [ plotHandle ] = popParetoFrontierPlot( popCell,...
 %                                           popIndex,...
-%                                           paramsStruct,...
-%                                           objectiveIndices,...
-%                                           modelFit );
+%                                           paramsStruct );
 %
 % INPUTS:
 %
@@ -41,17 +37,6 @@ function [ plotHandle ] = popParetoFrontierPlot(    popCell,...
 %
 %   paramsStruct =      Structure object containing the parameter settings
 %                       used to generate the popCell input.
-%
-%   objectiveIndices =  [1 x f] array in which each column [f] corresponds
-%                       to the index value of an objective variable that
-%                       will be used to generate the pareto frontier plot
-%                       (3 <= numel(f) >= 2)
-%   
-%   modelFit =          [0 | 1] binary value indicating whether or not the
-%                       user would like to fit a 2 or 3 dimensional 
-%                       polynomial to the data using a least square error
-%                       fitting procedure. The model fit will be included
-%                       in the plot with calculated parameter estimates.
 %
 % OUTPUTS:
 %
@@ -79,7 +64,7 @@ function [ plotHandle ] = popParetoFrontierPlot(    popCell,...
 P = inputParser;
 
 addRequired(P,'nargin',@(x)...
-    x == 5);
+    x == 3);
 addRequired(P,'popCell',@(x)...
     iscell(x) &&...
     ~isempty(x));
@@ -89,15 +74,13 @@ addRequired(P,'popIndex',@(x)...
 addRequired(P,'paramsStruct',@(x)...
     isstruct(x) &&...
     ~isempty(x));
-addRequired(P,'objectiveIndices',@(x)...
-    isnumeric(x) &&...
-    ~isempty(x));
-addRequired(P,'modelFit',@(x)...
-    isnumeric(x) &&...
-    ~isempty(x) &&...
-    isscalar(x));
     
-parse(P,nargin,popCell,popIndex,paramsStruct,objectiveIndices,modelFit);
+parse(P,nargin,popCell,popIndex,paramsStruct);
+
+%% Function Parameters
+
+modelFit = paramsStruct.modelFit;
+objectiveIndices = paramsStruct.objectiveIndices;
 
 %% Switch Case
 
@@ -134,6 +117,8 @@ switch switchCase
         plotHandle = scatter(...
             popCell{popIndex,2}(:,objectiveIndices(1,1)),...
             popCell{popIndex,2}(:,objectiveIndices(1,2)));
+        axis tight square
+        grid on
         xlabel(paramsStruct.objectiveNames(1,1));
         ylabel(paramsStruct.objectiveNames(1,2));
         title('Pareto Frontier Plot');
@@ -151,6 +136,8 @@ switch switchCase
             popCell{popIndex,2}(:,objectiveIndices(1,2)));
         plot(fitObject);
         hold off
+        axis tight square
+        grid on
         xlabel(paramsStruct.objectiveNames(1,1));
         ylabel(paramsStruct.objectiveNames(1,2));
         title('Pareto Frontier Plot');
@@ -166,6 +153,8 @@ switch switchCase
             popCell{popIndex,2}(:,objectiveIndices(1,1)),...
             popCell{popIndex,2}(:,objectiveIndices(1,2)),...
             popCell{popIndex,2}(:,objectiveIndices(1,3)));
+        axis tight square
+        grid on
         xlabel(paramsStruct.objectiveNames(1,1));
         ylabel(paramsStruct.objectiveNames(1,2));
         zlabel(paramsStruct.objectiveNames(1,3));
@@ -186,6 +175,9 @@ switch switchCase
             popCell{popIndex,2}(:,objectiveIndices(1,3)));
         plot(fitObject);
         hold off
+        axis tight square
+        grid on
+        legend('Observed Data','Fit Curve');
         xlabel(paramsStruct.objectiveNames(1,1));
         ylabel(paramsStruct.objectiveNames(1,2));
         zlabel(paramsStruct.objectiveNames(1,3));
