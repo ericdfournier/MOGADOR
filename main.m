@@ -22,14 +22,10 @@ o{1,1} = initPopFnc(...
 	p.minimumClusterSize,...
 	p.gridMask          );
 
-%% Evaluate Initial Population Individual Fitness
-
 o{1,2} = popFitnessFnc(...
     o{1,1},...
     p.objectiveVars,...
     p.gridMask          );
-
-%% Evaluate Initial Population Average Fitness
 
 o{1,3} = popAvgFitnessFnc(...
     o{1,1},...
@@ -48,7 +44,8 @@ while convergence == 0
         
     if i <= 2
         
-        convergenceCriteria = 0;
+        convergenceAbsolute = 0;
+        convergenceRate = 0;
         convergence = 0;
         
     elseif i == p.maxGenerations
@@ -57,8 +54,11 @@ while convergence == 0
     
     else
         
-        convergenceCriteria = fix(diff(averageFitnessHistory,2));
-        convergence = convergenceCriteria(i-2) <= 0.0001 ;
+        convergenceAbsolute = fix(diff(averageFitnessHistory,1));
+        convergenceRate = fix(diff(averageFitnessHistory,2));
+        convergence = ...
+            convergenceAbsolute(i-1) <= 0.00001 ||...
+            convergenceRate(i-2) <= 0.00001 ;
         
     end
 
@@ -101,28 +101,18 @@ while convergence == 0
         
 end
 
-%% Epigenetic Smoothing
+%% Display Output Results
 
-
-
-%% Display MOGADOR Results
-
-subplot(2,3,1);
+subplot(2,2,1);
 popConvergencePlot(o,p);
 
-subplot(2,3,2);
+subplot(2,2,2);
 popParetoFrontierPlot(o,i,p);
 
-subplot(2,3,2);
-
-
-subplot(2,3,4);
-pop
-
-subplot(2,3,5);
+subplot(2,2,3);
 popSearchDomainPlot(o,1,p);
 
-subplot(2,3,6);
+subplot(2,2,4);
 popSearchDomainPlot(o,i,p);
 
 %% Write Output Data

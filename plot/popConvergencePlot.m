@@ -69,35 +69,52 @@ modelFit = paramsStruct.modelFit;
 avgFitness = [popCell{:,3}]';
 gN = (1:size(avgFitness,1))';
 
+%% Compute Basis Fitness
+
+basisSolution = euclShortestWalkFnc(...
+    paramsStruct.gridMask,...
+    paramsStruct.sourceIndex,...
+    paramsStruct.destinIndex);
+
+basisAverageFitness = sum(fitnessFnc(...
+    basisSolution,...
+    paramsStruct.objectiveVars,...
+    paramsStruct.gridMask),2);
+
 %% Switch Case
 
 switch modelFit
     
     case 0
         
-        plotHandle = scatter(gN, avgFitness);
+        hold on
+        plotHandle = scatter(gN, avgFitness,'ko');
+        plot(gN,repmat(basisAverageFitness, [size(gN,1), 1]),'co-');
         axis tight square
         grid on
         title(' Convergence Plot');
         xlabel('Population Generation #');
         ylabel('Population Mean Fitness');
+        legend('Populations','Basis Solution');
         
     case 1
         
         [fitObject, goodnessParams] = fit(gN, avgFitness,'poly2');
         
         hold on
-        scatter(gN,avgFitness)
+        scatter(gN,avgFitness,'ko')
         plot(fitObject);
+        plot(gN,repmat(basisAverageFitness, [size(gN,1), 1]),'co-');
         hold off
         axis tight square
         grid on
         title(' Convergence Plot');
         xlabel('Population Generation #');
         ylabel('Population Mean Fitness');
+        legend('Populations','Fitted Curve','Basis Solution');
 
         
-        disp('Fit Parameters:');
+        disp('Convergence Fit Parameters:');
         disp(fitObject);
         disp('Goodness of Fit Parameters:');
         disp(goodnessParams);
