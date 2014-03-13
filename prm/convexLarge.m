@@ -44,6 +44,11 @@ p.maxGenerations = 100;
 
 p.objectiveVars = randi(p.objectiveMax,[size(gridMask) p.objectiveCount]);
 
+%% Plot Parameters
+
+p.modelFit = 1;
+p.objectiveIndices = [1 2 3];
+
 %% Clear Variables
 
 clearvars -except p

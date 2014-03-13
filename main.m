@@ -5,13 +5,12 @@ cd ~/Repositories/MOGADOR
 
 %% Initialize Input Parameters
 
-run ./prm/convexSmall.m
-
-%% Initialize Ouput Parameters
-
-o = cell(p.maxGenerations,3);
+run ./prm/convexLarge.m
+load ./data/samplePopConvexLarge.mat
 
 %% Initialize Population
+
+o = cell(p.maxGenerations,3);
 
 o{1,1} = initPopFnc(...
     p.populationSize,...
@@ -57,8 +56,8 @@ while convergence == 0
         convergenceAbsolute = fix(diff(averageFitnessHistory,1));
         convergenceRate = fix(diff(averageFitnessHistory,2));
         convergence = ...
-            convergenceAbsolute(i-1) <= 0.00001 ||...
-            convergenceRate(i-2) <= 0.00001 ;
+            convergenceAbsolute(i-1) <= 0.000000001 ||...
+            convergenceRate(i-2) <= 0.0000000001 ;
         
     end
 
@@ -103,17 +102,23 @@ end
 
 %% Display Output Results
 
-subplot(2,2,1);
+subplot(2,3,1);
 popConvergencePlot(o,p);
 
-subplot(2,2,2);
-popParetoFrontierPlot(o,i,p);
-
-subplot(2,2,3);
+subplot(2,3,2);
 popSearchDomainPlot(o,1,p);
 
-subplot(2,2,4);
+subplot(2,3,3);
+fitnessTradeoffPlot(o{i,1}(1,:),p);
+
+subplot(2,3,4);
+popParetoFrontierPlot(o,i,p);
+
+subplot(2,3,5);
 popSearchDomainPlot(o,i,p);
+
+subplot(2,3,6);
+individualPlot(o{i,1}(1,:),p.gridMask);
 
 %% Write Output Data
 

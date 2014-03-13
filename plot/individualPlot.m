@@ -1,5 +1,5 @@
-function [ plotHandle ] = individualPlot( individual, gridMask )
-
+function [ plotHandle ] = individualPlot(   individual,...
+                                            gridMask )
 % individualPlot is a function that is used to plot the pathway of a single
 % individual pathway through a given study domain given by gridMask
 %
@@ -47,29 +47,41 @@ function [ plotHandle ] = individualPlot( individual, gridMask )
 %%%                                                                      %%
 %%%                          Eric Daniel Fournier                        %%
 %%%                  Bren School of Environmental Science                %%
-%%%               University of California Santa Barbara                 %%
-%%%                            August 2013                               %%
+%%%                 University of California Santa Barbara               %%
 %%%                                                                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Parse Inputs
 
-p = inputParser;
+P = inputParser;
 
-addRequired(p,'nargin',@(x) x == 2);
-addRequired(p,'individual',@(x) isnumeric(x) && isrow(x) && ~isempty(x));
-addRequired(p,'gridMask',@(x) isnumeric(x) && ismatrix(x) && ~isempty(x));
+addRequired(P,'nargin',@(x)...
+    x == 2);
+addRequired(P,'individual',@(x)...
+    isnumeric(x) &&...
+    isrow(x) &&...
+    ~isempty(x));
+addRequired(P,'gridMask',@(x)...
+    isnumeric(x) &&...
+    ismatrix(x) &&...
+    ~isempty(x));
 
-parse(p,nargin,individual,gridMask);
+parse(P,nargin,individual,gridMask);
 
-%% Generate Plot
+%% Prepare Data for Plotting
 
 individualRaw = individual(any(individual,1));
 individualMask = gridMask;
 individualMask(individualRaw) = 2;
 individualMask(individualRaw(1)) = 3;
 individualMask(individualRaw(end)) = 4;
+
+%% Generate Output Plot
+
 plotHandle = imagesc(individualMask);
 axis square
+xlabel('X Dimension');
+ylabel('Y Dimension');
+title('Individual Plot');
 
 end

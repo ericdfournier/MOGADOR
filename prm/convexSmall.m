@@ -12,7 +12,7 @@ p.gridMask = gridMask;
 
 p.objectiveCount = 3;
 p.objectiveFraction = 0.2;
-p.objectiveSimulationMean = 5;
+p.objectiveSimulationMean = 100;
 p.objectiveSimulationRange = 100;
 p.objectiveNames = {'Var1','Var2','Var3'};
 

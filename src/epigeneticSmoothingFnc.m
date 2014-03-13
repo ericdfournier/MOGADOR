@@ -63,6 +63,8 @@ P = inputParser;
 
 addRequired(P,'nargin',@(x)...
     x == 3);
+addRequired(P,'nargout',@(x)...
+    x == 1);
 addRequired(P,'individual',@(x)...
     isnumeric(x) &&...
     ismatrix(x) &&...
@@ -77,26 +79,92 @@ addRequired(P,'gridMask',@(x)...
     ismatrix(x) &&...
     ~isempty(x));
 
-parse(P,nargin,individual,objectiveVars,gridMask);
+parse(P,nargin,nargout,individual,objectiveVars,gridMask);
 
 %% Function Parameters
 
+gS = size(gridMask);
 gL = size(individual,2);
-output = zeros(1,gL);
-
+indiv = individual(any(individual,1));
+pL = size(indiv,2);
+output = zeros(1,pL);
 indiv = individual(any(individual,1));
 pL = numel(indiv);
-nC = 100;
+nF = (0.1:0.1:0.9);
+nR = size(nF,2);
+nC = floor(nF.*pL);
 
-if pL <= nC
+%% Generate Node Lists
+
+nodeList = cell(nR,1);
+
+for i = 1:nR
     
-    error('Inputs Individuals must be at least 100 nodes in length');
+    nodeInd = floor(linspace(1,pL,nC(i)));
+    nodeList{i,1} = indiv(nodeInd);
 
 end
 
-nodes = floor(linspace(1,pL,nC));
+%% Generate Epigenetic Replicates
 
-%% Initiate Smoothing Process
+choices = zeros(nR,gL);
+
+for i = 1:nR
+    
+    currentNodeList = nodeList{i,1};
+    sCNL = size(currentNodeList,2);
+    sections = cell(1,sCNL-1);
+    
+    for k = 1:(sCNL-1)
+        
+        [sourceRow, sourceCol] = ind2sub(gS,currentNodeList(1,k));
+        sourceIndex = [sourceRow, sourceCol];
+        
+        [destinRow, destinCol] = ind2sub(gS,currentNodeList(1,k+1));
+        destinIndex = [destinRow, destinCol];
+        
+        if sourceIndex(1,1) == destinIndex(1,1) &&...
+                sourceIndex(1,2) == destinIndex(1,2)
+            
+            sections{1,k} = [];
+        
+        else 
+        
+            sections{1,k} = euclShortestWalkFnc(...
+                gridMask,...
+                sourceIndex,...
+                destinIndex);
+        end
+    
+    end
+    
+    choice = [sections{:,:}];
+    choice = choice(any(choice,1));
+    sC = size(choice,2);
+    choices(i,1:sC) = choice;
 
 end
 
+%% Evaluate Fitness of Replicates
+
+indivFitness = sum(fitnessFnc(individual,objectiveVars,gridMask),2);
+replicateFitness = popFitnessFnc(choices,objectiveVars,gridMask);
+replicateAvgFitness = sum(replicateFitness,2);
+[~, sortRank] = sort(replicateAvgFitness,'ascend');
+fittestChoice = replicateAvgFitness(sortRank(1,1),:);
+
+%% Generate Output
+
+if indivFitness <= fittestChoice
+    
+    output = individual;
+    disp('No Fitness Improvement, Individual Returned');
+    
+else 
+    
+    sFI = size(choices(sortRank(1,1),:),2);
+    output(1,1:sFI) = choices(sortRank(1,1),:);
+
+end
+
+end
