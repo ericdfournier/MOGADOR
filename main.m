@@ -100,6 +100,12 @@ while convergence == 0
         
 end
 
+%% Execute Epigenetic Smoothing
+
+o{i+1,1} = popEpigeneticSmoothingFnc(o,i,p);
+
+i = i+1;
+
 %% Display Output Results
 
 subplot(2,3,1);

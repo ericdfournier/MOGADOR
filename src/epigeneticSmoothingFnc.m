@@ -16,8 +16,8 @@ function [ output ] = epigeneticSmoothingFnc(   individual,...
 %
 % SYNTAX:
 %
-%   [ output ] =  epigeneticSmoothingFnc( individual, gridMask,...
-%                                           objectiveVars )
+%   [ output ] =  epigeneticSmoothingFnc( individual, objectiveVars,...
+%                                           gridMask )
 %
 % INPUTS:
 %
@@ -26,16 +26,16 @@ function [ output ] = epigeneticSmoothingFnc(   individual,...
 %                   destination within the search domain specified in the
 %                   binary input gridMask
 %
-%   gridMask =      [q x s] binary array with valid pathway grid cells 
-%                   labeled as ones and invalid pathway grid cells labeled 
-%                   as NaN placeholders
-%
 %   objectiveVars = [q x s x k] three dimensional array in which the first
 %                   two dimensions correspond to the spatial dimensions 
 %                   depicted in the gridMask search domain input and the
 %                   values in the third dimension correspond to the scores
 %                   for one or more objective variables used in the
 %                   analysis
+%
+%   gridMask =      [q x s] binary array with valid pathway grid cells 
+%                   labeled as ones and invalid pathway grid cells labeled 
+%                   as NaN placeholders
 %
 % OUTPUTS:
 %
@@ -71,7 +71,6 @@ addRequired(P,'individual',@(x)...
     ~isempty(x));
 addRequired(P,'objectiveVars',@(x)...
     isnumeric(x) &&...
-    ismatrix(x) &&...
     numel(size(x)) == 3 &&...
     ~isempty(x));
 addRequired(P,'gridMask',@(x)...
@@ -87,10 +86,8 @@ gS = size(gridMask);
 gL = size(individual,2);
 indiv = individual(any(individual,1));
 pL = size(indiv,2);
-output = zeros(1,pL);
-indiv = individual(any(individual,1));
-pL = numel(indiv);
-nF = (0.1:0.1:0.9);
+output = zeros(1,gL);
+nF = (0.1:0.1:0.5);
 nR = size(nF,2);
 nC = floor(nF.*pL);
 
@@ -107,7 +104,7 @@ end
 
 %% Generate Epigenetic Replicates
 
-choices = zeros(nR,gL);
+choices = zeros(nR,pL);
 
 for i = 1:nR
     
@@ -138,10 +135,11 @@ for i = 1:nR
     
     end
     
-    choice = [sections{:,:}];
+    choice = [sections{1,:}];
     choice = choice(any(choice,1));
     sC = size(choice,2);
     choices(i,1:sC) = choice;
+    clearvars sections
 
 end
 
