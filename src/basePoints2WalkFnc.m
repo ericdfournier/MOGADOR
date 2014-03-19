@@ -1,4 +1,4 @@
-function [ individual ] = basePoints2WalkFnc( basePoints,...
+function [ individual ] = basePoints2WalkFnc(   basePoints,...
                                                 gridMask )
                                             
 % basePoints2WalkFnc.m Creates individual pseudo random walk sections
@@ -30,7 +30,7 @@ function [ individual ] = basePoints2WalkFnc( basePoints,...
 %                       should contain the subscripts corresponding to the 
 %                       path's final destination
 %
-%   gridMask =   [n x m] binary array in which all grid cells that
+%   gridMask =          [n x m] binary array in which all grid cells that
 %                       are contained within the allowed search domain 
 %                       have a value of one and all other grid cells are 
 %                       given a placeholder value of zero
@@ -52,23 +52,28 @@ function [ individual ] = basePoints2WalkFnc( basePoints,...
 %%%                                                                      %%
 %%%                          Eric Daniel Fournier                        %%
 %%%                  Bren School of Environmental Science                %%
-%%%               University of California Santa Barbara                 %%
-%%%                             January 2014                             %%
+%%%                 University of California Santa Barbara               %%
 %%%                                                                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Parse Inputs
 
-p = inputParser;
+P = inputParser;
 
-addRequired(p,'nargin',@(x) x == 2);
-addRequired(p,'nargout',@(x) x == 1);
-addRequired(p,'basePoints',@(x) isnumeric(x) && ismatrix(x)...
+addRequired(P,'nargin',@(x)...
+    x == 2);
+addRequired(P,'nargout',@(x)...
+    x == 1);
+addRequired(P,'basePoints',@(x)...
+    isnumeric(x) &&...
+    ismatrix(x)...
     && ~isempty(x));
-addRequired(p,'gridMask',@(x) isnumeric(x) && ismatrix(x)...
+addRequired(P,'gridMask',@(x)...
+    isnumeric(x) &&...
+    ismatrix(x)...
     && ~isempty(x));
 
-parse(p,nargin,nargout,basePoints,gridMask);
+parse(P,nargin,nargout,basePoints,gridMask);
 
 %% Function Parameters
 
@@ -102,6 +107,6 @@ for i = 1:iterations
     
 end
 
-individual = cell2mat(sectionsFinal);
+individual = [sectionsFinal{:,:}];
 
 end

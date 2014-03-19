@@ -11,22 +11,21 @@ p.gridMask = gridMask;
 %% Problem Initialization Parameters
 
 p.objectiveCount = 3;
-p.objectiveFraction = 0.5;
+p.objectiveFraction = 0.8;
 p.objectiveSimulationMean = 5;
 p.objectiveSimulationRange = 100;
 p.objectiveNames = {'Var1','Var2','Var3'};
 
 %% Population Initialization Parameters
 
-p.populationSize = 100;
+p.populationSize = 1000;
 p.minimumClusterSize = 2;
 p.sourceIndex = [40 20];
 p.destinIndex = [110 100];
 
 %% Selection Parameters
 
-p.tournamentSize = 10;
-p.selectionType = 0;
+p.selectionFraction = 0.5;
 p.selectionProbability = 1; 
 
 %% Mutation Parameters
@@ -49,6 +48,11 @@ p.objectiveVars = simObjectivesFnc(...
     p.objectiveSimulationMean,...
 	p.objectiveSimulationRange,...
 	p.gridMask          );
+
+%% Plotting Function Optional Arguments
+
+p.modelFit = 1;
+p.objectiveIndices = [1 2 3];
 
 %% Clear Variables
 

@@ -17,15 +17,14 @@ p.objectiveNames = {'Var1','Var2','Var3'};
 
 %% Population Initialization Parameters
 
-p.populationSize = 50;
+p.populationSize = 1000;
 p.minimumClusterSize = 4;
 p.sourceIndex = [80 40];
 p.destinIndex = [220 200];
 
 %% Selection Parameters
 
-p.tournamentSize = 10;
-p.selectionType = 0;
+p.selectionFraction = 0.5;
 p.selectionProbability = 1; 
 
 %% Mutation Parameters
@@ -44,6 +43,11 @@ p.maxGenerations = 100;
 %% Randomly Generate Objective Variables
 
 p.objectiveVars = randi(p.objectiveMax,[size(gridMask) p.objectiveCount]);
+
+%% Plotting Function Optional Arguments
+
+p.modelFit = 1;
+p.objectiveIndices = [1 2 3];
 
 %% Clear Variables
 

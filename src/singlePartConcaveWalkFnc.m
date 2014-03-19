@@ -137,7 +137,6 @@ addRequired(P,'gridMask',@(x)...
 parse(P,nargin,nargout,popSize,sourceIndex,destinIndex,objectiveVars,...
     objectiveFrac,minClusterSize,gridMask);
 
-
 %% Function Parameters
 
 pS = popSize;
@@ -160,13 +159,13 @@ if topCentroidsCount <= 0.01*numel(gridMask == 1)
     
     warning(['Top centroid count less than 1% of total search domain ',...
         'for input objectiveVars, consider increasing ',...
-        ' objectiveFraction or decreasing minimumClusterSize']);
+        'objectiveFraction or decreasing the minimum cluster size']);
 
 elseif topCentroidsCount >= 0.5*numel(gridMask == 1)
     
     warning(['Top centroid count greater than 50% of total search ',...
         'domain for input objectiveVars, consider decreasing ',...
-        'objectiveFraction or increasing minimumClusterSize']);
+        'objectiveFraction or increasing the minimum cluster size']);
     
 end
 
@@ -176,8 +175,6 @@ basePointLimit = floor(sqrt(gS(1,1)*gS(1,2)));
 w = waitbar(0,'Generating Walks');
 
 for i = 1:pS
-    
-%     disp(['Walk ',num2str(i),' of ',num2str(pS),' Initiated']);
     
     basePointCount = 0;
     basePointCheck = 0;
@@ -211,10 +208,10 @@ for i = 1:pS
         currentAreaMask = zeros(gS);
         currentAreaMask(currentAreaConn.PixelIdxList{1,Ind(1,1)}) = 1;
         
+        % Stop Base Point Search if Destination is within Current Area
+        
         containsDestin = ...
             currentAreaMask(destinIndex(1,1),destinIndex(1,2)) == 1;
-        
-        % Stop Base Point Search if Destination is within Current Area
         
         if containsDestin == 1
             
@@ -241,9 +238,6 @@ for i = 1:pS
         
         if eCentroidCount == 0
             
-%           disp(['Walk Reinitiated: No Elligible Cluster ',...
-%               'Centroids Found from Current Base Point']);
-            
             basePointCount = 1;            
             visitedAreaMask = ones(gS);
             
@@ -256,20 +250,7 @@ for i = 1:pS
         elseif eCentroidCount > 1
             
             sC = size(seCentroids,1);
-            P = 0.1;    % This value controls the randomness...
-            selection = 0;
-            
-            while selection == 0;
-                
-                selection = geornd(P);
-                
-                if selection >= sC
-                    
-                    selection = 0;
-                    
-                end
-                
-            end
+            selection = datasample(1:sC,1);
             
         end
         

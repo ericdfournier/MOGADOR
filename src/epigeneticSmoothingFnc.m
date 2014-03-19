@@ -87,81 +87,87 @@ gL = size(individual,2);
 indiv = individual(any(individual,1));
 pL = size(indiv,2);
 output = zeros(1,gL);
-nF = (0.1:0.1:0.5);
-nR = size(nF,2);
-nC = floor(nF.*pL);
+nodeList = cell(1,3);
 
-%% Generate Node Lists
+%% Generate Sorted Node Lists
 
-nodeList = cell(nR,1);
+nodeList{1,1} = indiv(1,1);
+nodeList{1,3} = indiv(1,end);
 
-for i = 1:nR
+indivMask = zeros(gS);
+indivMask(indiv) = 1;
+
+tmp = bwmorph(indivMask,'diag');
+tmp = bwmorph(tmp,'thicken',5);
+tmp = bwmorph(tmp,'majority');
+tmp = bwmorph(tmp,'close');
+tmp = bwmorph(tmp,'skel',Inf);
+tmp = bwmorph(tmp,'spur');
+nodeMask = bwmorph(tmp,'branch');
+nodeInd = find(nodeMask);
+
+nM = size(nodeInd,1);
+unsortedNodes = zeros(1,nM);
+
+for i = 1:nM
     
-    nodeInd = floor(linspace(1,pL,nC(i)));
-    nodeList{i,1} = indiv(nodeInd);
-
+   [~,I] = min(abs(nodeInd(i)-indiv));
+   unsortedNodes(i) = indiv(I);
+   
 end
 
-%% Generate Epigenetic Replicates
+[~, ~, sortInd] = intersect(unsortedNodes,indiv);
+sortedNodes = indiv(sortInd);
+nodeList{1,2} = sortedNodes;
+nodes = [nodeList{:,:}];
 
-choices = zeros(nR,pL);
+%% Generate Epigenetic Replicates Using Modified Ramer-Douglas-Peucker
 
-for i = 1:nR
+sN = size(nodes,2);
+sections = cell(1,sN-1);
+
+for k = 1:(sN-1)
     
-    currentNodeList = nodeList{i,1};
-    sCNL = size(currentNodeList,2);
-    sections = cell(1,sCNL-1);
+    [sourceRow, sourceCol] = ind2sub(gS,nodes(1,k));
+    sourceIndex = [sourceRow, sourceCol];
     
-    for k = 1:(sCNL-1)
-        
-        [sourceRow, sourceCol] = ind2sub(gS,currentNodeList(1,k));
-        sourceIndex = [sourceRow, sourceCol];
-        
-        [destinRow, destinCol] = ind2sub(gS,currentNodeList(1,k+1));
-        destinIndex = [destinRow, destinCol];
-        
-        if sourceIndex(1,1) == destinIndex(1,1) &&...
-                sourceIndex(1,2) == destinIndex(1,2)
-            
-            sections{1,k} = [];
-        
-        else 
-        
-            sections{1,k} = euclShortestWalkFnc(...
-                gridMask,...
-                sourceIndex,...
-                destinIndex);
-        end
+    [destinRow, destinCol] = ind2sub(gS,nodes(1,k+1));
+    destinIndex = [destinRow, destinCol];
     
+    if sourceIndex(1,1) == destinIndex(1,1) &&...
+            sourceIndex(1,2) == destinIndex(1,2)
+        
+        sections{1,k} = [];
+        
+    else
+        
+        sections{1,k} = euclShortestWalkFnc(...
+            gridMask,...
+            sourceIndex,...
+            destinIndex);
     end
     
-    choice = [sections{1,:}];
-    choice = choice(any(choice,1));
-    sC = size(choice,2);
-    choices(i,1:sC) = choice;
-    clearvars sections
-
 end
+
+choice = [sections{1,:}];
+choice = choice(any(choice,1));
 
 %% Evaluate Fitness of Replicates
 
 indivFitness = sum(fitnessFnc(individual,objectiveVars,gridMask),2);
-replicateFitness = popFitnessFnc(choices,objectiveVars,gridMask);
-replicateAvgFitness = sum(replicateFitness,2);
-[~, sortRank] = sort(replicateAvgFitness,'ascend');
-fittestChoice = replicateAvgFitness(sortRank(1,1),:);
+choiceFitness = sum(fitnessFnc(choice,objectiveVars,gridMask),2);
 
 %% Generate Output
 
-if indivFitness <= fittestChoice
+if indivFitness <= choiceFitness
     
     output = individual;
     disp('No Fitness Improvement, Individual Returned');
     
 else 
     
-    sFI = size(choices(sortRank(1,1),:),2);
-    output(1,1:sFI) = choices(sortRank(1,1),:);
+    sC = size(choice,2);
+    output(1,1:sC) = choice;
 
 end
 

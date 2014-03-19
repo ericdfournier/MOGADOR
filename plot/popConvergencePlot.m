@@ -112,7 +112,6 @@ switch modelFit
         xlabel('Population Generation #');
         ylabel('Population Mean Fitness');
         legend('Populations','Fitted Curve','Basis Solution');
-
         
         disp('Convergence Fit Parameters:');
         disp(fitObject);

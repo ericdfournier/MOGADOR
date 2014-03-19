@@ -262,9 +262,6 @@ for i = 1:pS
         
         if isempty(seCentroids) == 1
             
-%             disp(['Walk Reinitiated: No Elligible Cluster ',...
-%                 'Centroids Found from Current Base Point']);
-            
             basePointCount = 1;
             visitedAreaMask = ones(gS);
             
@@ -277,20 +274,7 @@ for i = 1:pS
         elseif eCentroidCount > 1
             
             sC = size(seCentroids,1);
-            P = 0.1;    % This value controls the randomness...
-            selection = 0;
-            
-            while selection == 0;
-                
-                selection = geornd(P);
-                
-                if selection >= sC
-                    
-                    selection = 0;
-                    
-                end
-                
-            end
+            selection = datasample(1:sC,1);
             
         end
         
