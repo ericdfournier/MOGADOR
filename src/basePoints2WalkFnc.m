@@ -1,4 +1,5 @@
 function [ individual ] = basePoints2WalkFnc(   basePoints,...
+                                                walkType,...
                                                 gridMask )
                                             
 % basePoints2WalkFnc.m Creates individual pseudo random walk sections
@@ -17,7 +18,7 @@ function [ individual ] = basePoints2WalkFnc(   basePoints,...
 %
 % SYNTAX:
 %
-% [ individual ] = basePoints2WalkFnc( basePoints, basePointCount,...
+% [ individual ] = basePoints2WalkFnc( basePoints,walkType,...
 %                                                gridMask )
 %
 % INPUTS:
@@ -29,6 +30,15 @@ function [ individual ] = basePoints2WalkFnc(   basePoints,...
 %                       to the path's source and the last row of this array
 %                       should contain the subscripts corresponding to the 
 %                       path's final destination
+%
+%   walkType =          [0 | 1 | 2] decision variable indicating whether or not
+%                       the path sections are to be constructed of
+%                       pseudoRandomWalks, euclideanShortestWalks, or a
+%                       random mixture of the two.
+%                           0 : All pseudoRandomWalk
+%                           1 : All euclShortestWalk
+%                           2 : Random mixture of pseudoRandomWalk &
+%                               euclShortestWalk                      
 %
 %   gridMask =          [n x m] binary array in which all grid cells that
 %                       are contained within the allowed search domain 
@@ -61,49 +71,68 @@ function [ individual ] = basePoints2WalkFnc(   basePoints,...
 P = inputParser;
 
 addRequired(P,'nargin',@(x)...
-    x == 2);
+    x == 3);
 addRequired(P,'nargout',@(x)...
     x == 1);
 addRequired(P,'basePoints',@(x)...
     isnumeric(x) &&...
     ismatrix(x)...
     && ~isempty(x));
+addRequired(P,'walkType',@(x)...
+    isnumeric(x) &&...
+    isscalar(x)...
+    && ~isempty(x));
 addRequired(P,'gridMask',@(x)...
     isnumeric(x) &&...
     ismatrix(x)...
     && ~isempty(x));
 
-parse(P,nargin,nargout,basePoints,gridMask);
+parse(P,nargin,nargout,basePoints,walkType,gridMask);
 
 %% Function Parameters
 
 plot = 0;
-
-%% Initialize Walk Procedure 
-
 basePointCount = size(basePoints,1);
 iterations = basePointCount-1;
 sectionsFinal = cell(1,iterations);
 
+%% Initialize Walk Procedure 
+
 for i = 1:iterations
     
-    if i < iterations
+    switch walkType
         
-        sections = pseudoRandomWalkFnc(gridMask,...
-            basePoints(i,:),basePoints(i+1,:),plot);
-        sections = sections(any(sections,1));
-        sections = sections(1,1:end-1);
-        sectionsFinal{1,i} = sections;
-        
-    elseif i == iterations
-        
-        sections = pseudoRandomWalkFnc(gridMask,...
-            basePoints(i,:),basePoints(i+1,:),plot);
-        sections = sections(any(sections,1));
-        sections = sections(1,1:end);
-        sectionsFinal{1,i} = sections;
-    
+        case 0
+            
+            sections = pseudoRandomWalkFnc(gridMask,...
+                basePoints(i,:),basePoints(i+1,:),plot);
+            
+        case 1
+            
+            sections = euclShortestWalkFnc(basePoints(i,:),...
+                basePoints(i+1,:),gridMask);
+            
+        case 2
+            
+            choice = randi([0 1],1);
+            
+            if choice == 0
+                
+                sections = pseudoRandomWalkFnc(gridMask,...
+                    basePoints(i,:),basePoints(i+1,:),plot);
+                
+            else
+                
+                sections = euclShortestWalkFnc(basePoints(i,:),...
+                    basePoints(i+1,:),gridMask);
+                
+            end
+            
     end
+    
+    sections = sections(any(sections,1));
+    sections = sections(1,1:end-1);
+    sectionsFinal{1,i} = sections;
     
 end
 

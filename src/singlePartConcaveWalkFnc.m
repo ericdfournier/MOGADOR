@@ -4,6 +4,7 @@ function [ outputPop ] = singlePartConcaveWalkFnc(  popSize,...
                                                     objectiveVars,...
                                                     objectiveFrac,...
                                                     minClusterSize,...
+                                                    walkType,...
                                                     gridMask )
 %
 % singlePartConcaveWalkFnc.m Creates a population of walks for a search
@@ -61,6 +62,15 @@ function [ outputPop ] = singlePartConcaveWalkFnc(  popSize,...
 %                       connected cells (assuming queen's connectivity) 
 %                       that are required to consititute a viable cluster
 %
+%   walkType =          [0 | 1 | 2] decision variable indicating whether or not
+%                       the path sections are to be constructed of
+%                       pseudoRandomWalks, euclideanShortestWalks, or a
+%                       random mixture of the two.
+%                           0 : All pseudoRandomWalk
+%                           1 : All euclShortestWalk
+%                           2 : Random mixture of pseudoRandomWalk &
+%                               euclShortestWalk 
+%
 %   gridMask =          [n x m] binary array with valid pathway grid cells 
 %                       labeled as ones and invalid pathway grid cells 
 %                       labeled as zeros
@@ -92,7 +102,7 @@ function [ outputPop ] = singlePartConcaveWalkFnc(  popSize,...
 P = inputParser;
 
 addRequired(P,'nargin',@(x)...
-    x == 7);
+    x == 8);
 addRequired(P,'nargout',@(x)...
     x == 1);
 addRequired(P,'popSize',@(x)...
@@ -129,13 +139,17 @@ addRequired(P,'minClusterSize',@(x)...
     && rem(x,1) == 0 &&...
     x > 0 &&...
     ~isempty(x));
+addRequired(P,'walkType',@(x)...
+    isnumeric(x) &&...
+    isscalar(x)...
+    && ~isempty(x));
 addRequired(P,'gridMask',@(x)...
     isnumeric(x) &&...
     ismatrix(x) &&...
     ~isempty(x));
 
 parse(P,nargin,nargout,popSize,sourceIndex,destinIndex,objectiveVars,...
-    objectiveFrac,minClusterSize,gridMask);
+    objectiveFrac,minClusterSize,walkType,gridMask);
 
 %% Function Parameters
 
@@ -205,6 +219,16 @@ for i = 1:pS
         currentAreaConn = bwconncomp(currentAreaRaw);
         currentAreaProps = regionprops(currentAreaConn);
         [~, Ind] = sort([currentAreaProps.Area],'descend');
+        
+        if isempty(Ind) == 1
+            
+            basePointCount = 1;
+            visitedAreaMask = ones(gS);
+            
+            continue
+            
+        end
+        
         currentAreaMask = zeros(gS);
         currentAreaMask(currentAreaConn.PixelIdxList{1,Ind(1,1)}) = 1;
         
@@ -265,7 +289,7 @@ for i = 1:pS
     
     % Generate and Concatenate Path Sections Between Base Points
     
-    individual = basePoints2WalkFnc(basePoints,gridMask);
+    individual = basePoints2WalkFnc(basePoints,walkType,gridMask);
     sizeIndiv = size(individual,2);
     outputPop(i,1:sizeIndiv) = individual;
     

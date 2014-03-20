@@ -101,7 +101,7 @@ basePointShadow = basePointShadow.*p.gridMask;
 
 %% Generate Pathways
 
-sections = basePoints2WalkFnc(basePoints,p.gridMask);
+sections = basePoints2WalkFnc(basePoints,p.walkType,p.gridMask);
 
 finalPath = zeros(gS);
 finalPath(sections') = 2;

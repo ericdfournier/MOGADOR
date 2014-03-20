@@ -1,6 +1,6 @@
-function [ individual ] = pseudoRandomWalkFncDev(   gridMask,...
-                                                    sourceSub,...
-                                                    destinSub )
+function [ individual ] = pseudoRandomWalkFncDev(   sourceSub,...
+                                                    destinSub,...
+                                                    gridMask)
 
 % pseudoRandomWalkFnc.m Generates pathway index values for one or more  
 % pseudo random walks between a given source and destination on a 2D grid. 
@@ -83,10 +83,6 @@ addRequired(P,'nargin',@(x)...
     x == 3);
 addRequired(P,'nargout',@(x)...
     x == 1);
-addRequired(P,'gridMask',@(x)...
-    isnumeric(x) &&...
-    ismatrix(x) &&...
-    ~isempty(x));
 addRequired(P,'sourceSub',@(x)...
     isnumeric(x) &&...
     isrow(x) &&...
@@ -95,8 +91,12 @@ addRequired(P,'destinSub',@(x)...
     isnumeric(x) &&...
     isrow(x) &&...
     ~isempty(x));
+addRequired(P,'gridMask',@(x)...
+    isnumeric(x) &&...
+    ismatrix(x) &&...
+    ~isempty(x));
 
-parse(P,nargin,nargout,gridMask,sourceSub,destinSub);
+parse(P,nargin,nargout,sourceSub,destinSub,gridMask);
 
 %% Error Checking
 
@@ -111,49 +111,236 @@ end
 %% Function Parameters
 
 sourceDistBasis = euclShortestWalkFnc(sourceSub,destinSub,gridMask);
+gS = size(gridMask);
 sB = size(sourceDistBasis,2);
 gL = 5.*sB;
 individual = zeros(1,gL);
 
-%% Initiate While Loop
+%% Generate Walk
 
+% Initialize Parameters and Output Data Structures
+
+convexMu = -sign(sourceSub - destinSub);
 currentInd = sub2ind(gS,sourceSub(1,1),sourceSub(1,2));
 destinInd = sub2ind(gS,destinSub(1,1),destinSub(1,2));
+currentBasis = sourceDistBasis;
+neighborhoodSub = zeros(9,2);
+visitedGrid = zeros(gS);
+visitedGrid(sourceSub(1,1),sourceSub(1,2)) = 1;
+visitedList = zeros(gL,2);
+visitedList(1,1) = sourceSub(1,1);
+visitedList(1,2) = sourceSub(1,2);
+i = 1;
+loops = 1;
+
+% Enter Loop
 
 while currentInd ~= destinInd;
     
-    currentBasis = sourceDistBasis;
+    if i == 1;
+        
+        guess = datasample([1 4],1);
+        
+    end
+    
+    currentSub = visitedList(i,:);
+    i = i + 1;
+    
+    % Extract Current Neighborhood
+    
+    j = currentSub(1,1);
+    k = currentSub(1,2);
+    neighborhoodSub(1,:) = [j-1,k-1];
+    neighborhoodSub(2,:) = [j-1,k];
+    neighborhoodSub(3,:) = [j-1,k+1];
+    neighborhoodSub(4,:) = [j,k-1];
+    neighborhoodSub(5,:) = [j,k];
+    neighborhoodSub(6,:) = [j,k+1];
+    neighborhoodSub(7,:) = [j+1,k-1];
+    neighborhoodSub(8,:) = [j+1,k];
+    neighborhoodSub(9,:) = [j+1,k+1];
+    
+    neighborhoodInd = sub2ind(gS,neighborhoodSub(:,1),...
+        neighborhoodSub(:,2));
+    
+    % Check for Neighborhood Error
+    
+    if all(neighborhoodSub(:,1)) == 0 || all(neighborhoodSub(:,2)) == 0
+        
+        currentBasis = sourceDistBasis;
+        visitedList = zeros(gL,2);
+        visitedGrid = zeros(gS);
+        visitedGrid(sourceSub(1,1),sourceSub(1,2)) = 1;
+        visitedList(1,1) = sourceSub(1,1);
+        visitedList(1,2) = sourceSub(1,2);
+        loops = loops+1;
+        i = 1;
+        
+        continue
+        
+    else
+        
+    end
+    
+    % Check for Grid Mask Error
+    
+    rawNeighbors = gridMask(neighborhoodInd);
+    openNeighborCheck = rawNeighbors == 1;
+    openNeighbors = neighborhoodInd(openNeighborCheck);
+    
+    if sum(openNeighborCheck) == 0
+        
+        currentBasis = sourceDistBasis;
+        visitedList = zeros(gL,2);
+        visitedGrid = zeros(gS);
+        visitedGrid(sourceSub(1,1),sourceSub(1,2)) = 1;
+        visitedList(1,1) = sourceSub(1,1);
+        visitedList(1,2) = sourceSub(1,2);
+        loops = loops+1;
+        i = 1;
+        
+        continue
+        
+    else
+        
+    end
+    
+    % Check Current Neighborhood for Previously Visited Neighbors
+    
+    visitedCur = logical(visitedGrid(neighborhoodInd));
+    visitedInd = neighborhoodInd(visitedCur);
+    [visitedNeighbors, ~] = intersect(...
+        neighborhoodInd,visitedInd);
+    newNeighbors = setdiff(neighborhoodInd,visitedNeighbors);
+    numNewNeighbors = size(newNeighbors,1);
+    
+    if numNewNeighbors == 0
+        
+        currentBasis = sourceDistBasis;
+        visitedList = zeros(gL,2);
+        visitedGrid = zeros(gS);
+        visitedGrid(sourceSub(1,1),sourceSub(1,2)) = 1;
+        visitedList(1,1) = sourceSub(1,1);
+        visitedList(1,2) = sourceSub(1,2);
+        loops = loops+1;
+        i = 1;
+        
+        continue
+        
+    else
+        
+    end
+    
+    % Find Valid New Neighbors
+    
+    validNewNeighborsInd = intersect(openNeighbors,newNeighbors);
+    
+    if isempty(validNewNeighborsInd) == 1
+        
+        currentBasis = sourceDistBasis;
+        visitedList = zeros(gL,2);
+        visitedGrid = zeros(gS);
+        visitedGrid(sourceSub(1,1),sourceSub(1,2)) = 1;
+        visitedList(1,1) = sourceSub(1,1);
+        visitedList(1,2) = sourceSub(1,2);
+        loops = loops+1;
+        i = 1;
+        
+        continue
+        
+    else
+        
+    end
+    
+    % Generate Bivariate Gaussian Distribution Parameters for Sampling
+    
     isConcave = any(gridMask(currentBasis) == 0);
     
     if isConcave == 1
         
-        [R, C] = ind2sub(gS,currentBasis(find(...
+        [rows, cols] = ind2sub(gS,currentBasis(find(...
             gridMask(currentBasis) == 0,1,'first')));
-        obstacleSub = [R C];
+        obstacleSub = [rows cols];
         diffVector = currentSub - obstacleSub;
         [theta, rho] = cart2pol(diffVector(1,1),diffVector(1,2));
         theta = (pi/2) + theta;
-        mu = -sign(sourceSub - obstacleSub);
         R = [cos(theta) -sin(theta); sin(theta) cos(theta)];
-        S = [log(rho) 0; 0 log(rho)];
-        sigma = R.*S.*R';
-        tryMove = sign(mvnrnd(mu,sigma));
-                    
+        S = [log(rho) 0.3; 0.3 log(rho)];
+        S(guess) = 1;
+        mu = -sign(sourceSub - obstacleSub);
+        
     elseif isConcave == 0
         
-        [R, C] = ind2sub(gS,currentBasis(find(...
-            gridMask(currentBasis) == 0,1,'first')));
-        obstacleSub = [R C];
-        diffVector = currentSub - obstacleSub;
+        diffVector = currentSub - destinSub;
         [theta, rho] = cart2pol(diffVector(1,1),diffVector(1,2));
         theta = (pi/2) + theta;
-        mu = -sign(sourceSub - obstacleSub);
         R = [cos(theta) -sin(theta); sin(theta) cos(theta)];
-        S = [log(rho) 0; 0 log(rho)];
-        sigma = R.*S.*R';
-        tryMove = sign(mvnrnd(mu,sigma));
+        S = [log(rho) 0; 0 log(rho)];        
+        mu = -sign(sourceSub - destinSub);
         
     end
     
+    sigma = R.*S.*R';
+    
+    % Initiate New Move Search
+    
+    validCheck = 0;
+    s = 0;
+    
+    while validCheck == 0
+        
+        s = s + 1;
+        
+        newMove = sign(mvnrnd(mu,sigma));
+        newSub = currentSub + newMove;
+        newInd = sub2ind(gS,newSub(1,1),newSub(1,2));
+        validCheck = ~isempty(intersect(newInd,validNewNeighborsInd));
+        
+        if s == 20;
+            
+            break
+            
+        end
+        
+    end
+    
+    if s == 20
+        
+        currentBasis = sourceDistBasis;
+        visitedList = zeros(gL,2);
+        visitedGrid = zeros(gS);
+        visitedGrid(sourceSub(1,1),sourceSub(1,2)) = 1;
+        visitedList(1,1) = sourceSub(1,1);
+        visitedList(1,2) = sourceSub(1,2);
+        loops = loops+1;
+        i = 1;
+        
+        continue
+        
+    end
+        
+    currentBasis = euclShortestWalkFnc(newSub,destinSub,gridMask);        
+    visitedList(i,:) = newSub;
+    visitedGrid(newInd) = 1;
+    
+    % Deterministic Stopping Conditions
+    
+    if i == 5*gL || loops == 100;
+        
+        error('Runtime Error: Process Terminated');
+    
+    else
+    
+    end
+    
+    disp(['i = ',num2str(i)]);
+    disp(['loops = ',num2str(loops)]);
+    
+end
+
+anyVisited = visitedList(any(visitedList,2),:);
+sizeAnyVisited = size(anyVisited,1);
+individual(1,1:sizeAnyVisited) = sub2ind(gS,anyVisited(:,1),...
+    anyVisited(:,2))'; 
 
 end

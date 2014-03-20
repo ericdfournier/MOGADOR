@@ -15,6 +15,7 @@ p.objectiveFraction = 0.2;
 p.objectiveSimulationMean = 100;
 p.objectiveSimulationRange = 100;
 p.objectiveNames = {'Var1','Var2','Var3'};
+p.walkType = 2;
 
 %% Population Initialization Parameters
 

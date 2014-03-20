@@ -6,7 +6,7 @@ cd ~/Repositories/MOGADOR
 %% Initialize Input Parameters
 
 run ./prm/concaveLarge.m
-% load ./data/samplePopConvexSmall.mat
+load ./data/samplePopConcaveLarge.mat
 i = 1;
 
 %% Initialize Population
@@ -20,6 +20,7 @@ o{i,1} = initPopFnc(...
 	p.objectiveVars,...
     p.objectiveFraction,...
 	p.minimumClusterSize,...
+    p.walkType,...
 	p.gridMask          );
 
 o{i,2} = popFitnessFnc(...
@@ -43,7 +44,7 @@ while convergence == 0
         
     if i <= 2
         
-        convergenceAbsolute = 0;
+        % convergenceAbsolute = 0;
         convergenceRate = 0;
         convergence = 0;
         
@@ -56,9 +57,8 @@ while convergence == 0
         convergenceAbsolute = fix(diff(averageFitnessHistory,1));
         convergenceRate = fix(diff(averageFitnessHistory,2));
         convergence = ...
-            convergenceAbsolute(i-1) <= 0.000000001 ||...
             convergenceRate(i-2) <= 0.0000000001 ;
-        
+            % convergenceAbsolute(i-1) <= 0.000000001 ||...
     end
 
     selection = popSelectionFnc(...
@@ -95,6 +95,8 @@ while convergence == 0
     o{i+1,1} = mutation;
     o{i+1,2} = fitness;
     o{i+1,3} = avgfitness;
+    
+    disp(['Generation: ',num2str(i),' Completed']);
     
     i = i+1;
         
@@ -133,8 +135,10 @@ popParetoFrontierPlot(o,i,p);
 subplot(2,3,5);
 popSearchDomainPlot(o,i,p);
 
+[topVal, topRank] = sort(sum(o{4,2},2),'ascend');
+
 subplot(2,3,6);
-individualPlot(o{i,1}(1,:),p.gridMask);
+individualPlot(o{i,1}(topRank(7),:),p.gridMask);
 
 %% Write Output Data
 

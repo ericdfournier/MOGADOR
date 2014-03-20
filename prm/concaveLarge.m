@@ -14,6 +14,7 @@ p.objectiveCount = 3;
 p.objectiveFraction = 0.2;
 p.objectiveMax = 10;
 p.objectiveNames = {'Var1','Var2','Var3'};
+p.walkType = 2;
 
 %% Population Initialization Parameters
 
