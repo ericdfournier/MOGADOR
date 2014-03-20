@@ -127,7 +127,7 @@ destinInd = sub2ind(gS,destinIndex(1,1),destinIndex(1,2));
 
 %% Compute Basis and Basis Distances
 
-basisInd = euclShortestWalkFnc(gridMask,sourceIndex,destinIndex);
+basisInd = euclShortestWalkFnc(sourceIndex,destinIndex,gridMask);
 basisInd = basisInd(any(basisInd,1))';
 bS = size(basisInd,2);
 bw = gridMask;

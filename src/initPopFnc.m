@@ -170,7 +170,7 @@ walkMsg =   {   '**Initiating Walks**',...
 
 %% Switch Parameters
 
-euclPath = euclShortestWalkFnc(gridMask,sourceIndex,destinIndex);
+euclPath = euclShortestWalkFnc(sourceIndex,destinIndex,gridMask);
 isConcave = ~all(gridMask(euclPath));
 basePointCount = floor(sqrt(gS(1,1)*gS(1,2))/bandWidth);
 isMultiPart = basePointCount >= 1;

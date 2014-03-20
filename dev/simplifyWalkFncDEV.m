@@ -203,8 +203,8 @@ sections = cell(sizeLSS-1,1);
 
 for i = 1:sizeLSS-1
     
-    section = euclShortestWalkFnc(gridMask,individual(i,:),...
-        individual(i+1,:));
+    section = euclShortestWalkFnc(individual(i,:),...
+        individual(i+1,:),gridMask);
     sectionRaw = section(any(section,1))';
     
     if i == 1
