@@ -5,12 +5,16 @@ cd ~/Repositories/MOGADOR
 
 %% Initialize Input Parameters
 
-run ./prm/concaveLarge.m
+run ./prm/concaveExtraLarge.m
+
+%% Load Sample Population
+
 load ./data/samplePopConcaveLarge.mat
 i = 1;
 
 %% Initialize Population
 
+i = 1;
 o = cell(p.maxGenerations,3);
 
 o{i,1} = initPopFnc(...

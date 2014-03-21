@@ -158,7 +158,7 @@ gS = size(gridMask);
 sD = pdist([sourceIndex; destinIndex]);
 gL = ceil(5*sD);
 outputPop = zeros(pS,gL);
-bandWidth = 142;
+bandWidth = fix(gL/10);
 
 %% Generate Top Centroids Mask
 
@@ -185,6 +185,7 @@ end
 
 %% Generate Walks from Base Points Selected Using Distance Band Masks
 
+sourceConvexAreaMask = convexAreaMaskFnc(sourceIndex,gridMask);
 basePointLimit = floor(sqrt(gS(1,1)*gS(1,2)));
 w = waitbar(0,'Generating Walks');
 
@@ -234,8 +235,16 @@ for i = 1:pS
         
         % Compute Convex Area within Current Distance Band
         
-        convexAreaMask = convexAreaMaskFnc(currentBasePoint,...
-            gridMask);
+        if basePointCount == 1
+            
+            convexAreaMask = sourceConvexAreaMask;
+            
+        else
+        
+            convexAreaMask = convexAreaMaskFnc(currentBasePoint,...
+                gridMask);
+            
+        end
         
         % Generate Current Area
         

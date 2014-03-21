@@ -185,6 +185,7 @@ end
 
 %% Generate Walks from Base Points Selected Using Convex Area Masks
 
+sourceConvexAreaMask = convexAreaMaskFnc(sourceIndex,gridMask);
 basePointLimit = floor(sqrt(gS(1,1)*gS(1,2)));
 w = waitbar(0,'Generating Walks');
 
@@ -211,7 +212,17 @@ for i = 1:pS
         end
         
         currentBasePoint = basePoints(basePointCount,:);
-        convexAreaMask = convexAreaMaskFnc(currentBasePoint,gridMask);
+        
+        if basePointCount == 1
+            
+            convexAreaMask = sourceConvexAreaMask;
+            
+        else
+            
+            convexAreaMask = convexAreaMaskFnc(currentBasePoint,gridMask);
+        
+        end
+        
         currentAreaRaw = convexAreaMask .* visitedAreaMask;
         
         % Clean Current Area

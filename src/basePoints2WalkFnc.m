@@ -91,7 +91,6 @@ parse(P,nargin,nargout,basePoints,walkType,gridMask);
 
 %% Function Parameters
 
-plot = 0;
 basePointCount = size(basePoints,1);
 iterations = basePointCount-1;
 sectionsFinal = cell(1,iterations);
@@ -104,13 +103,13 @@ for i = 1:iterations
         
         case 0
             
-            sections = pseudoRandomWalkFnc(gridMask,...
-                basePoints(i,:),basePoints(i+1,:),plot);
+            sections = pseudoRandomWalkFnc(...
+                basePoints(i,:),basePoints(i+1,:),gridMask);
             
         case 1
             
-            sections = euclShortestWalkFnc(basePoints(i,:),...
-                basePoints(i+1,:),gridMask);
+            sections = euclShortestWalkFnc(...
+                basePoints(i,:),basePoints(i+1,:),gridMask);
             
         case 2
             
@@ -118,13 +117,13 @@ for i = 1:iterations
             
             if choice == 0
                 
-                sections = pseudoRandomWalkFnc(gridMask,...
-                    basePoints(i,:),basePoints(i+1,:),plot);
+                sections = pseudoRandomWalkFnc(...
+                    basePoints(i,:),basePoints(i+1,:),gridMask);
                 
             else
                 
-                sections = euclShortestWalkFnc(basePoints(i,:),...
-                    basePoints(i+1,:),gridMask);
+                sections = euclShortestWalkFnc(...
+                    basePoints(i,:),basePoints(i+1,:),gridMask);
                 
             end
             
