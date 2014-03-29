@@ -1,18 +1,28 @@
-# INSTALLATION
+#MOGADOR
+
+Generate good solutions to multi-objective corridor location problems.
+
+For more read documentation. 
+
+## INSTALLATION
 
 - Clone Git Repository: cd into a working directory of choice and clone the git repository via the following shell commands (on mac)
 
 ````bash
+$ mkdir ~/MOGADOR
+$ cd ~/MOGADOR
 $ git clone https://github.com/ericdfournier/MOGADOR.git
 ````
 
 - Download and Unpack Zipped Git Repository: cd into a working directory of choice and unzip the zipped version of the repository downloaded from the project github page via the following shell commands (on mac)
 
 ````bash
+$ mkdir ~/MOGADOR
+$ cd ~/MOGADOR
 $ unzip MOGADOR.zip
 ````
 
-# DESCRIPTION
+## DESCRIPTION
 
 (MOGADOR) Multiobjective Genetic Algorithm for Corridor Location Problems
 
