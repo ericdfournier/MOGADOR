@@ -1,7 +1,7 @@
 function [ outputPop ] = popEpigeneticSmoothingFnc( popCell,...
                                                     popIndex,...
                                                     paramsStruct )
-% popEpigeneticSmoothingFnc.m function to generate epigenetic variants of
+% popEpigeneticSmoothingFnc.m Function to generate epigenetic variants of
 % individuals within a given input population. 
 %
 % DESCRIPTION:

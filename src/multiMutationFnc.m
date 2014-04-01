@@ -2,7 +2,7 @@ function [ mutant ] = multiMutationFnc(     individual,...
                                             gridMask,...
                                             mutations )
 
-% multiMutationFnc function to generate an output mutant mutant from
+% multiMutationFnc Function to generate an output mutant mutant from
 % the multi-point mutation of an input mutant
 %
 % DESCRIPTION:

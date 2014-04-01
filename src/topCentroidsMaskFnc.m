@@ -4,7 +4,7 @@ function [ topCentroidsMask, topCentroidsCount ] = topCentroidsMaskFnc(...
                                                         minClusterSize,...
                                                         gridMask )
 %
-% topCentroidsFnc.m Generates a mask layer containg the centroids of 
+% topCentroidsMaskFnc.m Generates a mask layer containg the centroids of 
 % contiguous regions of grid cells whose various objective scores are 
 % below some user specified threshold quantile
 %

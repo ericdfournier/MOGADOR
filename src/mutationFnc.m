@@ -1,6 +1,6 @@
 function [ mutant ] = mutationFnc( individual, gridMask )
 
-% mutationFnc function to generate a single or multi-point mutation of an
+% mutationFnc Function to generate a single or multi-point mutation of an
 % of an individual pathway
 %
 % DESCRIPTION:

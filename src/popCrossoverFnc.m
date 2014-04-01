@@ -5,7 +5,7 @@ function [ outputPop ] = popCrossoverFnc(   selection,...
                                             crossoverType,...
                                             gridMask )
 
-% crossoverFnc Generates a child pathway from the single or double point 
+% popCrossoverFnc.m Generates a child pathway from the single or double point 
 % crossover of two previously selected parent pathways.
 %
 % DESCRIPTION:

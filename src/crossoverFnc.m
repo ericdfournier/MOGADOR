@@ -5,7 +5,7 @@ function [ child ] = crossoverFnc(  parent1,...
                                     crossoverType,...
                                     gridMask )
 
-% crossoverFnc generates a child pathway from the single or double point 
+% crossoverFnc.m Generates a child pathway from the single or double point 
 % crossover of two previously selected parent pathways.
 %
 % DESCRIPTION:

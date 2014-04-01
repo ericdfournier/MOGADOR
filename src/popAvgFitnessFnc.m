@@ -2,7 +2,7 @@ function [ popAvgFitness ] = popAvgFitnessFnc(      inputPop,...
                                                     objectiveVars,...
                                                     gridMask)
 %
-% popFitnessFnc.m This function computes the different components 
+% popAvgFitnessFnc.m Function computes the different components 
 % of the multi-objective function used to evaluate different proposed 
 % pathways between the source and destination locations
 %

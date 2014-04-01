@@ -1,6 +1,6 @@
 function [ convexAreaMask ] = convexAreaMaskFnc( sourceIndex, gridMask )
 % 
-% convexAreaFnc.m Generates a binary mask of grid cells that are convex 
+% convexAreaMaskFnc.m Generates a binary mask of grid cells that are convex 
 % relative to a user specified source index and irregularly shaped search
 % boundary
 %

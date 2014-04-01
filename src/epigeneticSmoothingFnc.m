@@ -1,7 +1,7 @@
 function [ output ] = epigeneticSmoothingFnc(   individual,...
                                                 objectiveVars,...
                                                 gridMask )
-% epigeneticSmoothingFnc.m performs epigenetic smoothing to an input
+% epigeneticSmoothingFnc.m Performs epigenetic smoothing to an input
 % individual from a final stage population. This smoothing procedure
 % involves an iterative neighborhood search procedure which operates along
 % the length of the input individual. 

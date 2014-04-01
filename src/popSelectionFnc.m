@@ -4,7 +4,7 @@ function [ selection ] = popSelectionFnc(   inputPop,...
                                             objectiveVars,...
                                             gridMask)
 
-% popSelectionFnc selects individuals from an input population 
+% popSelectionFnc.m Selects individuals from an input population 
 % for transferral to the output population on the basis of a tournament
 % selection process. First the top and the bottom ten percent of the 
 % population (20% total), as measured in terms of fitness, are selected.

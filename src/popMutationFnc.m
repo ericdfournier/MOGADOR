@@ -3,7 +3,7 @@ function [ outputPop ] = popMutationFnc(    inputPop,...
                                             fraction,...
                                             mutations )
 
-% popMutationFnc function to generate a child pathway from the 
+% popMutationFnc.m Function to generate a child pathway from the 
 % single point crossover of two previously selected parent pathways.
 %
 % DESCRIPTION:

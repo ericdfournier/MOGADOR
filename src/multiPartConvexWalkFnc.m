@@ -6,12 +6,15 @@ function [ outputPop ] = multiPartConvexWalkFnc(    popSize,...
                                                     minClusterSize,...
                                                     walkType,...
                                                     gridMask )
-%
-% multiPartConvexWalk.m 
+% multiPartConvexWalkFnc.m Generates a multi-part walk for an input search
+% domain that is convex with respect to the relative positions of the
+% source location and the destination location.  
 %
 % DESCRIPTION:
 %
-%   Function to...
+%   Function iteratively divides the search domain into distance bands and 
+%   then searches convex sub-regions to construct a path that is able to 
+%   somewhat directly navigate around obstacles with the search area.
 %
 %   Warning: minimal error checking is performed.
 %
@@ -258,9 +261,6 @@ for i = 1:pS
         eCentroidCount = size(eCentroidRows,1);
         
         if isempty(seCentroids) == 1
-            
-%             disp(['Restarting Walk: No Elligible Cluster Centroids',...
-%                 ' Found from Current Base Point']);
             
             break
             
