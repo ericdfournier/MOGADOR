@@ -19,7 +19,7 @@ p.walkType = 2;
 
 %% Population Initialization Parameters
 
-p.populationSize = 1000;
+p.populationSize = 100;
 p.minimumClusterSize = 2;
 p.sourceIndex = [40 20];
 p.destinIndex = [110 100];
@@ -54,6 +54,10 @@ p.objectiveVars = simObjectivesFnc(...
 
 p.modelFit = 1;
 p.objectiveIndices = [1 2 3];
+
+%% Problem Concavity
+
+p.concave = 1;
 
 %% Clear Variables
 

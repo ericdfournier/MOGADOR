@@ -50,6 +50,10 @@ p.objectiveVars = randi(p.objectiveMax,[size(gridMask) p.objectiveCount]);
 p.modelFit = 1;
 p.objectiveIndices = [1 2 3];
 
+%% Problem Concavity
+
+p.concave = 1;
+
 %% Clear Variables
 
 clearvars -except p

@@ -173,13 +173,13 @@ if topCentroidsCount <= 0.01*numel(gridMask == 1)
     
     warning(['Top centroid count less than 1% of total search domain ',...
         'for input objectiveVars, consider increasing ',...
-        'objectiveFraction or decreasing the minimum cluster size']);
+        'objectiveFraction or decreasing the minClusterSize']);
 
 elseif topCentroidsCount >= 0.5*numel(gridMask == 1)
     
     warning(['Top centroid count greater than 50% of total search ',...
         'domain for input objectiveVars, consider decreasing ',...
-        'objectiveFraction or increasing the minimum cluster size']);
+        'objectiveFraction or increasing the minClusterSize']);
     
 end
 

@@ -55,6 +55,10 @@ p.objectiveVars = simObjectivesFnc(...
 p.modelFit = 1;
 p.objectiveIndices = [1 2 3];
 
+%% Problem Concavity
+
+p.concave = 0;
+
 %% Clear Variables
 
 clearvars -except p

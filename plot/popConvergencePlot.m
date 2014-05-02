@@ -65,9 +65,20 @@ parse(P,nargin,popCell,paramsStruct);
 
 %% Function Parameters
 
+concave = paramsStruct.concave;
 modelFit = paramsStruct.modelFit;
 avgFitness = [popCell{:,3}]';
 gN = (1:size(avgFitness,1))';
+
+if modelFit == 0 && concave == 0
+    switchCase = 0;
+elseif modelFit == 0 && concave == 1
+    switchCase = 1;
+elseif modelFit == 1 && concave == 0
+    switchCase = 2;
+elseif modelFit == 1 && concave == 1
+    switchCase = 3;
+end
 
 %% Compute Basis Fitness
 
@@ -83,13 +94,14 @@ basisAverageFitness = sum(fitnessFnc(...
 
 %% Switch Case
 
-switch modelFit
+switch switchCase
     
     case 0
         
         hold on
         plotHandle = scatter(gN, avgFitness,'ko');
         plot(gN,repmat(basisAverageFitness, [size(gN,1), 1]),'co-');
+        hold off
         axis tight square
         grid on
         title(' Convergence Plot');
@@ -98,6 +110,16 @@ switch modelFit
         legend('Populations','Basis Solution');
         
     case 1
+        
+        plotHandle = scatter(gN, avgFitness,'ko');
+        axis tight square
+        grid on
+        title(' Convergence Plot');
+        xlabel('Population Generation #');
+        ylabel('Population Mean Fitness');
+        legend('Populations');
+        
+    case 2
         
         [fitObject, goodnessParams] = fit(gN, avgFitness,'poly2');
         
@@ -112,6 +134,26 @@ switch modelFit
         xlabel('Population Generation #');
         ylabel('Population Mean Fitness');
         legend('Populations','Fitted Curve','Basis Solution');
+        
+        disp('Convergence Fit Parameters:');
+        disp(fitObject);
+        disp('Goodness of Fit Parameters:');
+        disp(goodnessParams);
+        
+    case 3
+        
+        [fitObject, goodnessParams] = fit(gN, avgFitness,'poly2');
+        
+        hold on
+        scatter(gN,avgFitness,'ko')
+        plot(fitObject);
+        hold off
+        axis tight square
+        grid on
+        title(' Convergence Plot');
+        xlabel('Population Generation #');
+        ylabel('Population Mean Fitness');
+        legend('Populations','Fitted Curve');
         
         disp('Convergence Fit Parameters:');
         disp(fitObject);
