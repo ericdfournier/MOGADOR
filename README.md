@@ -1,7 +1,7 @@
 #MOGADOR
 
 Generate good solutions to multi-objective corridor location problems.
-For more read the documentation at: www.MOGADOR.com
+For more read the documentation at: www.ericdfournier.com/MOGADOR
 
 ## INSTALLATION
 
