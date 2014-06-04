@@ -85,12 +85,8 @@ parse(p,nargin,sourceIndex,gridMask);
 %% Iteration Parameters
 
 gS = size(gridMask);
-perimeter = bwperim(gridMask);
-perimeter = bwmorph(perimeter,'thicken',2);
-perimeter = bwmorph(perimeter,'diag');
-perimeter = perimeter.*gridMask;
-perimeter(sourceIndex(1,1),sourceIndex(1,2)) = 0;
-[Xdestin, Ydestin, ~] = find(perimeter);
+boundary = gridMaskBoundaryFnc(gridMask);
+[Xdestin, Ydestin, ~] = find(boundary);
 iter = size(Xdestin,1);
 convexAreaMask = zeros(gS);
 
@@ -169,9 +165,7 @@ for i = 1:iter
         end
         
     end
-    
-    % THE PROBLEM STARTS HERE....SOMEWHERE????
-    
+        
     pathInd = sub2ind(gS,x,y);
     pathZeros = gridMask(pathInd);
     isUnbrokenPath = all(pathZeros,1);
