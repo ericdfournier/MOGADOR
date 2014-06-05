@@ -1,5 +1,4 @@
-function [ outputPop ] = multiPartConvexWalkFnc(    popSize,...
-                                                    sourceIndex,...
+function [ outputWalk ] = multiPartConvexWalkFnc(   sourceIndex,...
                                                     destinIndex,...
                                                     objectiveVars,...
                                                     objectiveFrac,...
@@ -20,23 +19,15 @@ function [ outputPop ] = multiPartConvexWalkFnc(    popSize,...
 %
 % SYNTAX:
 %
-%   [ outputPop ] =     initPopFnc(     popSize,...
-%                                       sourceIndex,...
-%                                       destinIndex,...
-%                                       objectiveVars,...
-%                                       objectiveFrac,...
-%                                       minClusterSize,...
-%                                       walkType,...
-%                                       gridMask )
+%   [ outputWalk ] =     multiPartConvexWalkFnc(    sourceIndex,...
+%                                                   destinIndex,...
+%                                                   objectiveVars,...
+%                                                   objectiveFrac,...
+%                                                   minClusterSize,...
+%                                                   walkType,...
+%                                                   gridMask )
 %
 % INPUTS:
-%
-%   popSize =           [q] scalar with the desired number of individuals
-%                       contained within the seed population. If the input
-%                       argument popSize is empty ([]) then the default
-%                       population size will be computed as 10 times the
-%                       genome length (which is itself based upon the
-%                       dimensions of the gridMask)
 %
 %   sourceIndex =       [1 x 2] array with the subscript indices of the
 %                       source location within the study area for which the 
@@ -75,7 +66,7 @@ function [ outputPop ] = multiPartConvexWalkFnc(    popSize,...
 %
 % OUTPUTS:
 %
-%   outputPop =         [j x k] double array containing the grid index 
+%   outputWalk =        [1 x k] double array containing the grid index 
 %                       values of the individuals within the population 
 %                       (Note: each individual corresponds to a connected 
 %                       pathway from the source to the destination grid 
@@ -101,15 +92,9 @@ function [ outputPop ] = multiPartConvexWalkFnc(    popSize,...
 P = inputParser;
 
 addRequired(P,'nargin',@(x)...
-    x == 8);
+    x == 7);
 addRequired(P,'nargout',@(x)...
     x == 1);
-addRequired(P,'popSize',@(x)...
-    isnumeric(x) &&...
-    isscalar(x)...
-    && rem(x,1) == 0 &&...
-    x > 0 &&...
-    ~isempty(x));
 addRequired(P,'sourceIndex',@(x)...
     isnumeric(x) &&...
     isrow(x) &&...
@@ -119,8 +104,8 @@ addRequired(P,'sourceIndex',@(x)...
 addRequired(P,'destinIndex',@(x)...
     isnumeric(x) &&...
     isrow(x) &&...
-    ~isempty(x)...
-    && rem(x(1,1),1) == 0 &&...
+    ~isempty(x) &&...
+    rem(x(1,1),1) == 0 &&...
     rem(x(1,2),1) == 0);
 addRequired(P,'objectiveVars',@(x)...
     isnumeric(x) &&...
@@ -134,29 +119,28 @@ addRequired(P,'objectiveFrac',@(x)...
     ~isempty(x));
 addRequired(P,'minClusterSize',@(x)...
     isnumeric(x) &&...
-    isscalar(x)...
-    && rem(x,1) == 0 &&...
+    isscalar(x) &&...
+    rem(x,1) == 0 &&...
     x > 0 &&...
     ~isempty(x));
 addRequired(P,'walkType',@(x)...
     isnumeric(x) &&...
-    isscalar(x)...
-    && ~isempty(x));
+    isscalar(x) &&...
+    ~isempty(x));
 addRequired(P,'gridMask',@(x)...
     isnumeric(x) &&...
     ismatrix(x) &&...
     ~isempty(x));
 
-parse(P,nargin,nargout,popSize,sourceIndex,destinIndex,objectiveVars,...
+parse(P,nargin,nargout,sourceIndex,destinIndex,objectiveVars,...
     objectiveFrac,minClusterSize,walkType,gridMask);
 
 %% Function Parameters
 
-pS = popSize;
 gS = size(gridMask);
 sD = pdist([sourceIndex; destinIndex]);
 gL = ceil(5*sD);
-outputPop = zeros(pS,gL);
+outputWalk = zeros(1,gL);
 bandWidth = 142;
 
 %% Generate Top Centroids Mask
@@ -190,111 +174,98 @@ sourceDistMask = bwdist(sourceMask);
 
 %% Generate Walks from Base Points Selected Using Distance Band Masks
 
-basePointLimit = floor(sqrt(gS(1,1)*gS(1,2)));
-w = waitbar(0,'Generating Walks');
+basePointLimit = floor(sqrt(gS(1,1)*gS(1,2)));    
+basePointCount = 0;
+basePointCheck = 0;
+basePoints = zeros(basePointLimit,2);
+basePoints(1,:) = sourceIndex;
 
-for i = 1:pS
+while basePointCheck == 0
     
-    basePointCount = 0;
-    basePointCheck = 0;
-    basePoints = zeros(basePointLimit,2);
-    basePoints(1,:) = sourceIndex;
+    % Check that the current number of base points is below the maximum
     
-    while basePointCheck == 0
+    basePointCount = basePointCount+1;
+    
+    if basePointCount == basePointLimit
         
-        % Check that the current number of base points is below the maximum
-        
-        basePointCount = basePointCount+1;
-        
-        if basePointCount == basePointLimit
-            
-            error(['Process Terminated: Unable to Reach Target',...
-                ' Destination due to Extreme Concavity of the',...
-                ' Search Domain']);
-            
-        end
-        
-        % Check if final destination is contained in convex area mask
-        
-        currentBasePoint = basePoints(basePointCount,:);
-        currentBasePointDist = sourceDistMask(currentBasePoint(1,1),...
-            currentBasePoint(1,2));
-        maxSourceDist = max(max(sourceDistMask));
-        testDistLimMax = currentBasePointDist + bandWidth;
-        
-        if testDistLimMax > maxSourceDist
-            
-            currentDistBandLim = [currentBasePointDist maxSourceDist];
-        
-        else
-            
-            currentDistBandLim = [currentBasePointDist testDistLimMax];
-        
-        end
-            
-        currentDistBandMask = ...
-            sourceDistMask > currentDistBandLim(1,1) &...
-            sourceDistMask <= currentDistBandLim(1,2);
-        sourceShadowMask = sourceShadowMaskFnc(...
-            currentBasePoint,...
-            destinIndex,...
-            gridMask);
-        currentAreaMask = currentDistBandMask .* sourceShadowMask;
-        containsDestin = ...
-            currentAreaMask(destinIndex(1,1),destinIndex(1,2)) == 1;
-        
-        if containsDestin == 1
-            
-            break;
-            
-        end
-        
-        % Sort Elligible Top Centroids by Distance from Source
-        
-        eCentroidDistMask = topCentroidsMask .* currentAreaMask ...
-            .* gridMask;
-        [eCentroidRows, eCentroidCols, eCentroidVals] =...
-            find(eCentroidDistMask);
-        seCentroids = ...
-            flipud(...
-            sortrows([eCentroidRows eCentroidCols eCentroidVals],3));
-        eCentroidCount = size(eCentroidRows,1);
-        
-        if isempty(seCentroids) == 1
-            
-            break
-            
-        elseif eCentroidCount == 1
-            
-            selection = 1;
-            
-        elseif eCentroidCount > 1
-            
-            selection = randi(eCentroidCount,1);
-            
-        end
-        
-        nextBasePoint = seCentroids(selection,1:2);
-        basePoints(basePointCount+1,:) = nextBasePoint;
+        error(['Process Terminated: Unable to Reach Target',...
+            ' Destination due to Extreme Concavity of the',...
+            ' Search Domain']);
         
     end
     
-    basePoints(basePointCount+1,:) = destinIndex;
-    basePoints = basePoints(any(basePoints,2),:);
+    % Check if final destination is contained in convex area mask
     
-    % Generate and Concatenate Path Sections Between Base Points
+    currentBasePoint = basePoints(basePointCount,:);
+    currentBasePointDist = sourceDistMask(currentBasePoint(1,1),...
+        currentBasePoint(1,2));
+    maxSourceDist = max(max(sourceDistMask));
+    testDistLimMax = currentBasePointDist + bandWidth;
     
-    individual = basePoints2WalkFnc(basePoints,walkType,gridMask);
-    sizeIndiv = size(individual,2);
-    outputPop(i,1:sizeIndiv) = individual;
+    if testDistLimMax > maxSourceDist
+        
+        currentDistBandLim = [currentBasePointDist maxSourceDist];
+        
+    else
+        
+        currentDistBandLim = [currentBasePointDist testDistLimMax];
+        
+    end
     
-    % Display Function Progress
-
-    perc = i/pS;
-    waitbar(perc,w,[num2str(perc*100),'% Completed...']);
-
+    currentDistBandMask = ...
+        sourceDistMask > currentDistBandLim(1,1) &...
+        sourceDistMask <= currentDistBandLim(1,2);
+    sourceShadowMask = sourceShadowMaskFnc(...
+        currentBasePoint,...
+        destinIndex,...
+        gridMask);
+    currentAreaMask = currentDistBandMask .* sourceShadowMask;
+    containsDestin = ...
+        currentAreaMask(destinIndex(1,1),destinIndex(1,2)) == 1;
+    
+    if containsDestin == 1
+        
+        break;
+        
+    end
+    
+    % Sort Elligible Top Centroids by Distance from Source
+    
+    eCentroidDistMask = topCentroidsMask .* currentAreaMask ...
+        .* gridMask;
+    [eCentroidRows, eCentroidCols, eCentroidVals] =...
+        find(eCentroidDistMask);
+    seCentroids = ...
+        flipud(...
+        sortrows([eCentroidRows eCentroidCols eCentroidVals],3));
+    eCentroidCount = size(eCentroidRows,1);
+    
+    if isempty(seCentroids) == 1
+        
+        break
+        
+    elseif eCentroidCount == 1
+        
+        selection = 1;
+        
+    elseif eCentroidCount > 1
+        
+        selection = randi(eCentroidCount,1);
+        
+    end
+    
+    nextBasePoint = seCentroids(selection,1:2);
+    basePoints(basePointCount+1,:) = nextBasePoint;
+    
 end
 
-close(w);
+basePoints(basePointCount+1,:) = destinIndex;
+basePoints = basePoints(any(basePoints,2),:);
+
+% Generate and Concatenate Path Sections Between Base Points
+
+individual = basePoints2WalkFnc(basePoints,walkType,gridMask);
+sizeIndiv = size(individual,2);
+outputWalk(1,1:sizeIndiv) = individual;
 
 end

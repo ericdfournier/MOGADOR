@@ -14,6 +14,7 @@ p.objectiveCount = 3;
 p.objectiveFraction = 0.8;
 p.objectiveSimulationMean = 5;
 p.objectiveSimulationRange = 100;
+p.objectiveMax = 10;
 p.objectiveNames = {'Var1','Var2','Var3'};
 p.walkType = 2;
 
@@ -44,11 +45,13 @@ p.maxGenerations = 100;
 
 %% Simulate Objective Variables
 
-p.objectiveVars = simObjectivesFnc(...
-    p.objectiveCount,...
-    p.objectiveSimulationMean,...
-	p.objectiveSimulationRange,...
-	p.gridMask          );
+p.objectiveVars = randi(p.objectiveMax,[size(gridMask) p.objectiveCount]);
+
+% p.objectiveVars = simObjectivesFnc(...
+%     p.objectiveCount,...
+%     p.objectiveSimulationMean,...
+% 	p.objectiveSimulationRange,...
+% 	p.gridMask          );
 
 %% Plotting Function Optional Arguments
 

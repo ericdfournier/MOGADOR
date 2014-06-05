@@ -1,10 +1,10 @@
-function [ outputPop ] = singlePartConcaveWalkFnc(  popSize,...
-                                                    sourceIndex,...
+function [ outputWalk ] = singlePartConcaveWalkFnc(  sourceIndex,...
                                                     destinIndex,...
                                                     objectiveVars,...
                                                     objectiveFrac,...
                                                     minClusterSize,...
                                                     walkType,...
+                                                    sourceConvexMask,...
                                                     gridMask )
 %
 % singlePartConcaveWalkFnc.m Creates a population of walks for a search
@@ -22,12 +22,13 @@ function [ outputPop ] = singlePartConcaveWalkFnc(  popSize,...
 %
 % SYNTAX:
 %
-%   [ outputPop ] =     singlePartConcaveWalkFnc(   popSize,...
-%                                                   sourceIndex,...
+%   [ outputWalk ] =     singlePartConcaveWalkFnc(  sourceIndex,...
 %                                                   destinIndex,...
 %                                                   objectiveVars,...
 %                                                   objectiveFrac,...
 %                                                   minClusterSize,...
+%                                                   walkType,...
+%                                                   sourceConvexMask,...
 %                                                   gridMask );
 %
 % INPUTS:
@@ -69,7 +70,10 @@ function [ outputPop ] = singlePartConcaveWalkFnc(  popSize,...
 %                           0 : All pseudoRandomWalk
 %                           1 : All euclShortestWalk
 %                           2 : Random mixture of pseudoRandomWalk &
-%                               euclShortestWalk 
+%                               euclShortestWalk
+%
+%   sourceConvexMask =  [n x m] binary array indicating the grid cells that
+%                       are convex to the initial source index location
 %
 %   gridMask =          [n x m] binary array with valid pathway grid cells 
 %                       labeled as ones and invalid pathway grid cells 
@@ -77,7 +81,7 @@ function [ outputPop ] = singlePartConcaveWalkFnc(  popSize,...
 %
 % OUTPUTS:
 %
-%   outputPop =         [j x k] double array containing the grid index 
+%   outputWalk =        [j x k] double array containing the grid index 
 %                       values of the individuals within the population 
 %                       (Note: each individual corresponds to a connected 
 %                       pathway from the source to the destination grid 
@@ -105,12 +109,6 @@ addRequired(P,'nargin',@(x)...
     x == 8);
 addRequired(P,'nargout',@(x)...
     x == 1);
-addRequired(P,'popSize',@(x)...
-    isnumeric(x) &&...
-    isscalar(x)...
-    && rem(x,1) == 0 &&...
-    x > 0 &&...
-    ~isempty(x));
 addRequired(P,'sourceIndex',@(x)...
     isnumeric(x) &&...
     isrow(x) &&...
@@ -143,21 +141,24 @@ addRequired(P,'walkType',@(x)...
     isnumeric(x) &&...
     isscalar(x)...
     && ~isempty(x));
+addRequired(P,'sourceConvexMask',@(x)...
+    isnumeric(x) &&...
+    ismatrix(x) &&...
+    ~isempty(x));
 addRequired(P,'gridMask',@(x)...
     isnumeric(x) &&...
     ismatrix(x) &&...
     ~isempty(x));
 
-parse(P,nargin,nargout,popSize,sourceIndex,destinIndex,objectiveVars,...
-    objectiveFrac,minClusterSize,walkType,gridMask);
+parse(P,nargin,nargout,sourceIndex,destinIndex,objectiveVars,...
+    objectiveFrac,minClusterSize,walkType,sourceConvexMask,gridMask);
 
 %% Function Parameters
 
-pS = popSize;
 gS = size(gridMask);
 sD = pdist([sourceIndex; destinIndex]);
 gL = ceil(5*sD);
-outputPop = zeros(pS,gL);
+outputWalk = zeros(1,gL);
 
 %% Generate Top Centroids Mask
 
@@ -185,132 +186,118 @@ end
 
 %% Generate Walks from Base Points Selected Using Convex Area Masks
 
-sourceConvexAreaMask = convexAreaMaskFnc(sourceIndex,gridMask);
-basePointLimit = floor(sqrt(gS(1,1)*gS(1,2)));
-w = waitbar(0,'Generating Walks');
+basePointLimit = floor(sqrt(gS(1,1)*gS(1,2))); 
+basePointCount = 0;
+basePointCheck = 0;
+basePoints = zeros(basePointLimit,2);
+basePoints(1,:) = sourceIndex;
+visitedAreaMask = ones(gS);
 
-for i = 1:pS
+while basePointCheck == 0
     
-    basePointCount = 0;
-    basePointCheck = 0;
-    basePoints = zeros(basePointLimit,2);
-    basePoints(1,:) = sourceIndex;
-    visitedAreaMask = ones(gS);
+    % Check that the current number of base points is below the maximum
     
-    while basePointCheck == 0
+    basePointCount = basePointCount+1;
+    
+    if basePointCount == basePointLimit
         
-        % Check that the current number of base points is below the maximum
-        
-        basePointCount = basePointCount+1;
-        
-        if basePointCount == basePointLimit
-            
-            error(['Process Terminated: Unable to Reach Target',...
-                ' Destination due to Extreme Concavity of the',...
-                ' Search Domain']);
-            
-        end
-        
-        currentBasePoint = basePoints(basePointCount,:);
-        
-        if basePointCount == 1
-            
-            convexAreaMask = sourceConvexAreaMask;
-            
-        else
-            
-            convexAreaMask = convexAreaMaskFnc(currentBasePoint,gridMask);
-        
-        end
-        
-        currentAreaRaw = convexAreaMask .* visitedAreaMask;
-        
-        % Clean Current Area
-        
-        currentAreaConn = bwconncomp(currentAreaRaw);
-        currentAreaProps = regionprops(currentAreaConn);
-        [~, Ind] = sort([currentAreaProps.Area],'descend');
-        
-        if isempty(Ind) == 1
-            
-            basePointCount = 1;
-            visitedAreaMask = ones(gS);
-            
-            continue
-            
-        end
-        
-        currentAreaMask = zeros(gS);
-        currentAreaMask(currentAreaConn.PixelIdxList{1,Ind(1,1)}) = 1;
-        
-        % Stop Base Point Search if Destination is within Current Area
-        
-        containsDestin = ...
-            currentAreaMask(destinIndex(1,1),destinIndex(1,2)) == 1;
-        
-        if containsDestin == 1
-            
-            break;
-            
-        end
-        
-        % Sort Elligible Top Centroids by Distance from Current Source
-        
-        sourceMask = zeros(gS);
-        sourceMask(currentBasePoint(1,1),currentBasePoint(1,2)) = 1;
-        sourceDistMask = bwdist(sourceMask);
-        
-        % Locate elligible centroids within current area mask
-        
-        eCentroidDistMask = sourceDistMask .* gridMask .*...
-            topCentroidsMask .* currentAreaMask;
-        [eCentroidRows, eCentroidCols, eCentroidVals] =...
-            find(eCentroidDistMask);
-        seCentroids = ...
-            flipud(...
-            sortrows([eCentroidRows eCentroidCols eCentroidVals],3));
-        eCentroidCount = size(eCentroidRows,1);
-        
-        if eCentroidCount == 0
-            
-            basePointCount = 1;            
-            visitedAreaMask = ones(gS);
-            
-            continue
-            
-        elseif eCentroidCount == 1
-            
-            selection = 1;
-            
-        elseif eCentroidCount > 1
-            
-            sC = size(seCentroids,1);
-            selection = datasample(1:sC,1);
-            
-        end
-        
-        nextBasePoint = seCentroids(selection,1:2);
-        basePoints(basePointCount+1,:) = nextBasePoint;
-        visitedAreaMask(logical(currentAreaMask)) = 0;
+        error(['Process Terminated: Unable to Reach Target',...
+            ' Destination due to Extreme Concavity of the',...
+            ' Search Domain']);
         
     end
     
-    basePoints(basePointCount+1,:) = destinIndex;
-    basePoints = basePoints(any(basePoints,2),:);
+    currentBasePoint = basePoints(basePointCount,:);
     
-    % Generate and Concatenate Path Sections Between Base Points
+    if basePointCount == 1
+        
+        convexAreaMask = sourceConvexMask;
+        
+    else
+        
+        convexAreaMask = convexAreaMaskFnc(currentBasePoint,gridMask);
+        
+    end
     
-    individual = basePoints2WalkFnc(basePoints,walkType,gridMask);
-    sizeIndiv = size(individual,2);
-    outputPop(i,1:sizeIndiv) = individual;
+    currentAreaRaw = convexAreaMask .* visitedAreaMask;
     
-    % Display Function Progress
+    % Clean Current Area
     
-    perc = i/pS;
-    waitbar(perc,w,[num2str(perc*100),'% Completed...']);
+    currentAreaConn = bwconncomp(currentAreaRaw);
+    currentAreaProps = regionprops(currentAreaConn);
+    [~, Ind] = sort([currentAreaProps.Area],'descend');
+    
+    if isempty(Ind) == 1
+        
+        basePointCount = 1;
+        visitedAreaMask = ones(gS);
+        
+        continue
+        
+    end
+    
+    currentAreaMask = zeros(gS);
+    currentAreaMask(currentAreaConn.PixelIdxList{1,Ind(1,1)}) = 1;
+    
+    % Stop Base Point Search if Destination is within Current Area
+    
+    containsDestin = ...
+        currentAreaMask(destinIndex(1,1),destinIndex(1,2)) == 1;
+    
+    if containsDestin == 1
+        
+        break;
+        
+    end
+    
+    % Sort Elligible Top Centroids by Distance from Current Source
+    
+    sourceMask = zeros(gS);
+    sourceMask(currentBasePoint(1,1),currentBasePoint(1,2)) = 1;
+    sourceDistMask = bwdist(sourceMask);
+    
+    % Locate elligible centroids within current area mask
+    
+    eCentroidDistMask = sourceDistMask .* gridMask .*...
+        topCentroidsMask .* currentAreaMask;
+    [eCentroidRows, eCentroidCols, eCentroidVals] =...
+        find(eCentroidDistMask);
+    seCentroids = ...
+        flipud(...
+        sortrows([eCentroidRows eCentroidCols eCentroidVals],3));
+    eCentroidCount = size(eCentroidRows,1);
+    
+    if eCentroidCount == 0
+        
+        basePointCount = 1;
+        visitedAreaMask = ones(gS);
+        
+        continue
+        
+    elseif eCentroidCount == 1
+        
+        selection = 1;
+        
+    elseif eCentroidCount > 1
+        
+        sC = size(seCentroids,1);
+        selection = datasample(1:sC,1);
+        
+    end
+    
+    nextBasePoint = seCentroids(selection,1:2);
+    basePoints(basePointCount+1,:) = nextBasePoint;
+    visitedAreaMask(logical(currentAreaMask)) = 0;
     
 end
 
-close(w);
+basePoints(basePointCount+1,:) = destinIndex;
+basePoints = basePoints(any(basePoints,2),:);
+
+% Generate and Concatenate Path Sections Between Base Points
+
+individual = basePoints2WalkFnc(basePoints,walkType,gridMask);
+sizeIndiv = size(individual,2);
+outputWalk(1,1:sizeIndiv) = individual;
 
 end

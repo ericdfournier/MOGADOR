@@ -133,7 +133,7 @@ for i = 1:oC(1,3)
     
     objVars = reshape(objectiveVars(:,:,i),rowLen,1);
     fracQuant = quantile(objVars,objectiveFrac,1);
-    fracInd = objVars <= fracQuant;
+    fracInd = objVars >= fracQuant;
     topFracMask = reshape(fracInd,gS(1,1),gS(1,2));
     
     % Compute Connected Area Centroids for Each Objective Variable

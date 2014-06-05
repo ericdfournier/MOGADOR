@@ -1,9 +1,10 @@
-function [ outputPop ] = singlePartConvexWalkFnc(   popSize,...
+function [ outputPop ] = singlePartConvexPopFnc(    popSize,...
                                                     sourceIndex,...
                                                     destinIndex,...
+                                                    executionType,...
                                                     gridMask )                                                 
 %
-% singlePartConvexWalkFnc.m Initializes the creation of a population where
+% singlePartConvexPopFnc.m Initializes the creation of a population where
 % the search domain is sufficiently small that each walk has only a single
 % part and also, the relationship between the source and the destination
 % within the search domain indicates that a euclidean shortest path 
@@ -20,7 +21,7 @@ function [ outputPop ] = singlePartConvexWalkFnc(   popSize,...
 % SYNTAX:
 %
 %   [ outputPop ] =  singlePartConvexWalkFnc( popSize, sourceIndex,...
-%                       destinIndex, gridMask );
+%                       destinIndex, executionType, gridMask );
 %
 % INPUTS:
 %
@@ -38,6 +39,10 @@ function [ outputPop ] = singlePartConvexWalkFnc(   popSize,...
 %   destinIndex =       [1 x 2] array with the subscript indices of the
 %                       destination location within the study area for 
 %                       which the paths are to be evaluated
+%
+%   executionType =     [0 | 1] binary scalar value indicating whether the
+%                       process should be run in serial or in parallel on 
+%                       the host CPU. 
 %
 %   gridMask =          [n x m] binary array with valid pathway grid cells 
 %                       labeled as ones and invalid pathway grid cells 
@@ -70,7 +75,7 @@ function [ outputPop ] = singlePartConvexWalkFnc(   popSize,...
 P = inputParser;
 
 addRequired(P,'nargin',@(x)...
-    x == 4);
+    x == 5);
 addRequired(P,'nargout',@(x)...
     x == 1);
 addRequired(P,'popSize',@(x)...
@@ -90,27 +95,48 @@ addRequired(P,'destinIndex',@(x)...
     isrow(x) && ~isempty(x)...
     && rem(x(1,1),1) == 0 &&...
     rem(x(1,2),1) == 0);
+addRequired(P,'executionType',@(x)...
+    isnumeric(x) &&...
+    isscalar(x) &&...
+    ~isempty(x));
 addRequired(P,'gridMask',@(x)...
     isnumeric(x) &&...
     ismatrix(x) &&...
     ~isempty(x));
 
-parse(P,nargin,nargout,popSize,sourceIndex,destinIndex,gridMask);
+parse(P,nargin,nargout,popSize,sourceIndex,destinIndex,executionType,...
+    gridMask);
 
 %% Function Parameters
 
 pS = popSize;
 sD = pdist([sourceIndex; destinIndex]);
 gL = ceil(5*sD);
+eT = executionType;
 outputPop = zeros(pS,gL);
 
-%% Generate Output
+%% Switch Case
 
-parfor i = 1:pS
+switch eT
     
-    outputPop(i,:) = pseudoRandomWalkFnc(sourceIndex,destinIndex,...
-        gridMask);
+    case 0  % Serial execution
+        
+        for i = 1:pS
+        
+            outputPop(i,:) = pseudoRandomWalkFnc(sourceIndex,...
+                destinIndex,gridMask);
+            
+        end
     
+    case 1
+
+        parfor i = 1:pS
+            
+            outputPop(i,:) = pseudoRandomWalkFnc(sourceIndex,...
+                destinIndex,gridMask);
+            
+        end
+
 end
 
 end
