@@ -106,20 +106,11 @@ outputPop = zeros(pS,gL);
 
 %% Generate Output
 
-w = waitbar(0,'Generating Walks');
-
-for i = 1:pS
+parfor i = 1:pS
     
     outputPop(i,:) = pseudoRandomWalkFnc(sourceIndex,destinIndex,...
         gridMask);
     
-    % Display Function Progress
-
-    perc = i/pS;
-    waitbar(perc,w,[num2str(perc*100),'% Completed...']);
-    
 end
-
-close(w);
 
 end

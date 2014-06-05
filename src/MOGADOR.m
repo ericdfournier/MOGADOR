@@ -1,4 +1,5 @@
 function [ output ] = MOGADOR( runType, params, varargin )
+
 % MOGADOR.m Initializes a multi-objective genetic algorithm for the
 % solution of the corridor location problem. The user is required to supply
 % an input parameter object (structure object) which specifies the source
