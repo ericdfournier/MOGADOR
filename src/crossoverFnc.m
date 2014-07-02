@@ -114,11 +114,8 @@ parse(P,nargin,nargout,parent1,parent2,sourceIndex,destinIndex,...
 
 %% Function Parameters
 
-gS = size(gridMask);
 n = size(parent1);
 child = zeros(1,n(1,2));
-sourceInd = sub2ind(gS,sourceIndex(1,1),sourceIndex(1,2));
-destinInd = sub2ind(gS,destinIndex(1,1),destinIndex(1,2));
 
 %% Extract Parent Data
 
@@ -142,23 +139,15 @@ switch crossoverType
             
             cxSel = cxSize(1,2);
             section1 = p1(1,1:cxPt1(cxSel));
-            section2 = p2(1,cxPt2(cxSel)+1:end);
-            sections = horzcat(section1,section2);
-            sizeST = size(sections);
-            child(1,2:sizeST(1,2)+1) = sections;
-            child(1,1) = sourceInd;
-            child(1,sizeST(1,2)+2) = destinInd;
+            section2 = p2(1,(cxPt2(cxSel)+1):end);
+            child = horzcat(section1,section2);
             
         elseif cxSize(1,2) > 1
             
             cxSel = randi(cxSize(1,2));
             section1 = p1(1,1:cxPt1(cxSel));
-            section2 = p2(1,cxPt2(cxSel)+1:end);
-            sections = horzcat(section1,section2);
-            sizeST = size(sections);
-            child(1,2:sizeST(1,2)+1) = sections;
-            child(1,1) = sourceInd;
-            child(1,sizeST(1,2)+2) = destinInd;
+            section2 = p2(1,(cxPt2(cxSel)+1):end);
+            child = horzcat(section1,section2);
             
         end
         
@@ -173,13 +162,9 @@ switch crossoverType
             cxSel1 = 1;
             cxSel2 = 2;
             section1 = p1(1,1:cxPt1(cxSel1));
-            section2 = p2(1,cxPt2(cxSel1)+1:cxPt2(cxSel2));
-            section3 = p1(1,cxPt1(cxSel2)+1:end);
-            sections = horzcat(section1,section2,section3(1,2:end));
-            sizeST = size(sections);
-            child(1,2:sizeST(1,2)+1) = sections;
-            child(1,1) = sourceInd;
-            child(1,sizeST(1,2)+2) = destinInd;
+            section2 = p2(1,(cxPt2(cxSel1)+1):cxPt2(cxSel2));
+            section3 = p1(1,(cxPt1(cxSel2)):end);
+            child = horzcat(section1,section2,section3(1,2:end));
             
         else
             
@@ -187,13 +172,9 @@ switch crossoverType
             cxSel1 = randi(mid);
             cxSel2 = randi([mid+1, cxSize(1,2)]);
             section1 = p1(1,1:cxPt1(cxSel1));
-            section2 = p2(1,cxPt2(cxSel1)+1:cxPt2(cxSel2));
-            section3 = p1(1,cxPt1(cxSel2)+1:end);
-            sections = horzcat(section1,section2,section3(1,2:end));
-            sizeST = size(sections);
-            child(1,2:sizeST(1,2)+1) = sections;
-            child(1,1) = sourceInd;
-            child(1,sizeST(1,2)+2) = destinInd;
+            section2 = p2(1,(cxPt2(cxSel1)+1):cxPt2(cxSel2));
+            section3 = p1(1,(cxPt1(cxSel2)):end);
+            child = horzcat(section1,section2,section3(1,2:end));
             
         end
         

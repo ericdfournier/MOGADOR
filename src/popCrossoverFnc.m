@@ -148,6 +148,7 @@ while popCount < popSize
     parent2 = selection(parentInd(1,2),:);
     child = crossoverFnc(parent1,parent2,sourceIndex,...
         destinIndex,crossoverType,gridMask);
+    sizeChild = size(child,2);
     
     if isempty(child) == 1
         
@@ -155,7 +156,7 @@ while popCount < popSize
         
     else
         
-        outputPop(popCount,:) = child;
+        outputPop(popCount,1:sizeChild) = child;
         
     end
     

@@ -18,8 +18,9 @@ function [ individual ] = basePoints2WalkFnc(   basePoints,...
 %
 % SYNTAX:
 %
-% [ individual ] = basePoints2WalkFnc( basePoints,walkType,...
-%                                                gridMask )
+% [ individual ] = basePoints2WalkFnc(  basePoints,...
+%                                       walkType,...
+%                                       gridMask )
 %
 % INPUTS:
 %
@@ -130,7 +131,17 @@ for i = 1:iterations
     end
     
     sections = sections(any(sections,1));
-    sections = sections(1,1:end-1);
+    
+    if i < iterations
+        
+        sections = sections(1,1:end-1);
+    
+    elseif i == iterations
+        
+        sections = sections(1,1:end);
+        
+    end
+    
     sectionsFinal{1,i} = sections;
     
 end

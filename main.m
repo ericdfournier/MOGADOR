@@ -7,11 +7,6 @@ cd ~/Repositories/MOGADOR
 
 run ./prm/concaveLarge.m
 
-%% Load Sample Population
-
-load ./data/samplePopConcaveLarge.mat
-i = 1;
-
 %% Initialize Population
 
 i = 1;
@@ -41,6 +36,8 @@ o{i,3} = popAvgFitnessFnc(...
 %% Execute MOGADOR
 
 convergence = 0;
+
+disp('**Initiating Evolutionary Process**'); 
 
 while convergence == 0
     
@@ -99,27 +96,13 @@ while convergence == 0
     o{i+1,2} = fitness;
     o{i+1,3} = avgfitness;
     
-    disp(['Generation: ',num2str(i),' Completed']);
+    disp(['**Generation: ',num2str(i),'**']);
     
     i = i+1;
         
 end
 
-%% Execute Epigenetic Smoothing
-
-i = i+1;
-
-o{i,1} = popEpigeneticSmoothingFnc(o,i-1,p);
-
-o{i,2} = popFitnessFnc(...
-    o{i,1},...
-    p.objectiveVars,...
-    p.gridMask          );
-
-o{i,3} = popAvgFitnessFnc(...
-    o{i,1},...
-    p.objectiveVars,...
-    p.gridMask          );
+disp('**Evolutionary Process Completed**');
 
 %% Display Output Results
 
@@ -138,13 +121,13 @@ popParetoFrontierPlot(o,i,p);
 subplot(2,3,5);
 popSearchDomainPlot(o,i,p);
 
-[topVal, topRank] = sort(sum(o{4,2},2),'ascend');
+[topVal, topRank] = sort(sum(o{i,2},2),'ascend');
 
 subplot(2,3,6);
 individualPlot(o{i,1}(topRank(7),:),p.gridMask);
 
 %% Write Output Data
 
-o = o(~isempty(o));
+o = o(1:i,:);
 cd ~/Repositories/MOGADOR/rslt
 save(['simResults_',datestr(now,30),'.mat'],'o');

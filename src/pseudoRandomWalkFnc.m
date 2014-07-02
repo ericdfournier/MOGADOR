@@ -91,7 +91,7 @@ end
 %% Iteration Parameters
 
 gS = size(gridMask);
-sF = nthroot((gS(1,1)*gS(1,2)),10);      % This controls the randomness          
+sF = nthroot((gS(1,1)*gS(1,2)),100); % 2nd argument controls the randomness          
 sI = sourceIndex;
 dI = destinIndex;
 sD = pdist([sourceIndex; destinIndex]);
