@@ -89,7 +89,7 @@ parse(P,nargin,nargout,individual,gridMask);
 %% Iteration Parameters
 
 indiv = individual(any(individual,1));
-gL = size(indiv,2);
+aI = size(indiv,2);
 gS = size(gridMask);
 indivMask = zeros(gS);
 indivMask(indiv) = 1;
@@ -100,7 +100,7 @@ validMutSite = 1;
 
 while validMutSite == 1
     
-    mutSel = randsample(2:1:gL-1,1);
+    mutSel = randsample(2:1:aI-1,1);
     mutInd = indiv(1,mutSel);
     mutRange = indiv((mutSel-1):(mutSel+1));
     
@@ -188,14 +188,19 @@ while validMutSite == 1
     newMutSite = reshape(sdMask == 0 & mutSDMask == 1,[9 1]);
     tryMut = neighInd(newMutSite);
 
-end 
+end
+
+% TRY INTRODUCING A ROUTINE WHERE YOU IDENTIFY THE SEQUENCING OF THE POINTS
+% BEFORE AND AFTER THE MUTATION SITE. YOU CAN THEN USE THE DISTANCE FROM
+% THIS SUB-SOURCE CELL TO THE INIVIDUAL MUTATION COMPONENTS TO DETERMINE
+% HOW THEY NEED TO BE SORTED FOR REINTRODUCTION INTO THE MUTATED INDIVIDUAL
 
 newMut{1,1} = tryMut';
 
 %% Insert New Mutations into Individual
 
 sections = cell(2,2);
-z = vertcat(1,mutSel,gL);
+z = vertcat(1,mutSel,aI);
 
 sections{1,1} = indiv(1,z(1):z(2)-1);
 tmp = size(sections{1,1});
