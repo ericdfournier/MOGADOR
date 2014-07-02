@@ -1,4 +1,4 @@
-function [ outputWalk ] = multiPartConcaveWalkFnc(  sourceIndex,...
+function [ outputWalk ] = multiPartConcaveWalkDemo( sourceIndex,...
                                                     destinIndex,...
                                                     objectiveVars,...
                                                     objectiveFrac,...
@@ -7,7 +7,7 @@ function [ outputWalk ] = multiPartConcaveWalkFnc(  sourceIndex,...
                                                     sourceConvexMask,...
                                                     gridMask )
 %
-% multiPartConcaveWalkFnc.m Creates a single walk for a search
+% multiPartConcaveWalkDemo.m Creates a single walk for a search
 % domain that is sufficiently large that multiple pseudorandom walk
 % sections are necessary and for which the relationship between the source
 % index the destination index causes the problem to be concave
@@ -22,7 +22,7 @@ function [ outputWalk ] = multiPartConcaveWalkFnc(  sourceIndex,...
 %
 % SYNTAX:
 %
-%   [ outputWalk ] =     multiPartConcaveWalkFnc(   sourceIndex,...
+%   [ outputWalk ] =     multiPartConcaveWalkDemo(  sourceIndex,...
 %                                                   destinIndex,...
 %                                                   objectiveVars,...
 %                                                   objectiveFrac,...
@@ -100,7 +100,7 @@ P = inputParser;
 addRequired(P,'nargin',@(x)...
     x == 8);
 addRequired(P,'nargout',@(x)...
-    x == 1);
+    x >= 0);
 addRequired(P,'sourceIndex',@(x)...
     isnumeric(x) &&...
     isrow(x) &&...
@@ -161,7 +161,7 @@ bandWidth = fix(gL/10);
     minClusterSize,...
     gridMask);
 
-% Throw warning based on top centroid count
+%% Throw warning based on top centroid count
 
 if topCentroidsCount <= 0.01*numel(gridMask == 1)
     
@@ -184,6 +184,8 @@ basePointCheck = 0;
 basePoints = zeros(basePointLimit,2);
 basePoints(1,:) = sourceIndex;
 visitedAreaMask = ones(gS);
+
+%% Initiate While Loop
 
 while basePointCheck == 0
     
@@ -306,6 +308,39 @@ while basePointCheck == 0
     nextBasePoint = seCentroids(selection,1:2);
     basePoints(basePointCount+1,:) = nextBasePoint;
     visitedAreaMask(logical(currentAreaMask)) = 0;
+    
+    % Generate stepwise visualization
+   
+    tmpMaskCA = currentAreaMask;
+    tmpMaskVA = visitedAreaMask;
+    
+    tmpIndexBP = sub2ind(gS,basePoints(any(basePoints,2),1),...
+        basePoints(any(basePoints,2),2));
+    tmpMaskCA(tmpIndexBP) = 3;
+        
+    tmpMaskCA(sourceIndex(1,1),sourceIndex(1,2)) = 2;
+    tmpMaskCA(destinIndex(1,1),destinIndex(1,2)) = 4;
+    
+    tmpIndividual = basePoints2WalkFnc(basePoints(any(basePoints,2),:),...
+        1,gridMask);
+    
+    subplot(2,2,1);
+    imagesc(gridMask);
+    axis square;
+    
+    subplot(2,2,2);
+    imagesc(tmpMaskCA);
+    axis square;
+    
+    subplot(2,2,3);
+    imagesc(tmpMaskVA);
+    axis square;
+    
+    subplot(2,2,4);
+    individualPlot(tmpIndividual,gridMask);
+    axis square;
+    
+    waitforbuttonpress;
     
 end
 

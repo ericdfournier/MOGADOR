@@ -113,17 +113,26 @@ addRequired(P,'objectiveVars',@(x)...
     isnumeric(x) &&...
     numel(size(x)) >= 2 &&...
     ~isempty(x));
+addRequired(P,'gridMask',@(x)...
+    isnumeric(x) &&...
+    ismatrix(x) &&...
+    ~isempty(x));
 
-parse(P,nargin,nargout,inputPop,selectionFrac,selectionProb,objectiveVars);
+parse(P,nargin,nargout,inputPop,selectionFrac,selectionProb,...
+    objectiveVars,gridMask);
 
 %% Function Parameters 
 
-pS = size(inputPop,1);
-gL = size(inputPop,2);
-tS = floor(selectionFrac.*pS);
+pS = size(inputPop,1); % population size
+gL = size(inputPop,2); % genome length
+tS = floor(selectionFrac.*pS); % initial selection size
+
+% Make selection size even if it is odd
+
 if mod(tS,2) == 1
-    tS = tS+1;
+    tS = tS-1;
 end
+
 tF = floor(tS.*0.1);
 bF = floor(tS.*0.1);
 mF = tS - tF - bF;

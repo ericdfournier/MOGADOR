@@ -65,31 +65,29 @@ function [ individual ] = pseudoRandomWalkDemo( sourceIndex,...
 
 %% Parse Inputs
 
-p = inputParser;
+P = inputParser;
 
-addRequired(p,'nargin',@(x) x == 4);
-addRequired(p,'nargout',@(x) x >= 1);
-addRequired(p,'gridMask',@(x) isnumeric(x) && ismatrix(x) && ~isempty(x));
-addRequired(p,'sourceIndex',@(x) isnumeric(x) && isrow(x) && ~isempty(x));
-addRequired(p,'destinIndex',@(x) isnumeric(x) && isrow(x) && ~isempty(x));
-addRequired(p,'plot',@(x) isnumeric(x) && isscalar(x) && ~isempty(x));
+addRequired(P,'nargin',@(x) x == 3);
+addRequired(P,'nargout',@(x) x >= 1);
+addRequired(P,'sourceIndex',@(x) ...
+    isnumeric(x) && ...
+    isrow(x) && ...
+    ~isempty(x));
+addRequired(P,'destinIndex',@(x) ...
+    isnumeric(x) && ...
+    isrow(x) && ...
+    ~isempty(x));
+addRequired(P,'gridMask',@(x) ...
+    isnumeric(x) && ...
+    ismatrix(x) && ...
+    ~isempty(x));
 
-parse(p,nargin,nargout,gridMask,sourceIndex,destinIndex,plot);
-
-%% Error Checking
-
-if destinIndex == sourceIndex
-    
-    tit='Source Cannot be the Same as Destination';
-    disp(tit);
-    error('Source Cannot be the Same as Destination');
-    
-end
+parse(P,nargin,nargout,sourceIndex,destinIndex,gridMask);
 
 %% Iteration Parameters
 
 gS = size(gridMask);
-sF = nthroot((gS(1,1)*gS(1,2)),4);                
+sF = nthroot((gS(1,1)*gS(1,2)),10);      % This controls the randomness          
 sI = sourceIndex;
 dI = destinIndex;
 sD = pdist([sourceIndex; destinIndex]);
@@ -101,40 +99,9 @@ destinInd = sub2ind(gS,destinIndex(1,1),destinIndex(1,2));
 
 basisInd = euclShortestWalkFnc(sourceIndex,destinIndex,gridMask);
 basisInd = basisInd(any(basisInd,1))';
-bS = size(basisInd,2);
 bw = gridMask;
 bw(basisInd) = 1;
 basisDist = bwdist(bw);
-
-%% Generate Initial Plot
-
-demoMask = gridMask;
-demoMask(basisInd) = 3;
-demoMask(basisInd(1,1)) = 4;
-demoMask(basisInd(end,1)) = 5;
-
-x1 = -1:0.1:1;
-x2 = -1:0.1:1;
-[X1,X2] = meshgrid(x1,x2);
-mu = [1 1];
-sigma = [1 0; 0 1];
-PDF = mvnpdf([X1(:) X2(:)],mu,sigma);
-demoNeighborhood = reshape(PDF,length(x2),length(x1));
-centerRowInt = round(linspace(1,size(X1,2),4));
-centerColInt = round(linspace(1,size(X1,2),4));
-demoNeighborhood(centerRowInt(1,2):centerRowInt(1,3),...
-    centerColInt(1,2):centerColInt(1,3)) = NaN;
-
-fig = figure();
-set(fig,'position',[50 50 1050 550]);
-
-subplot(1,2,1);
-imagesc(demoMask);
-
-subplot(1,2,2);
-imagesc(demoNeighborhood)
-set(gca,'xticklabel',{'-1','0','1'});
-set(gca,'yticklabel',{'-1','0','1'});
 
 %% Generate Pathways
 
@@ -210,7 +177,7 @@ while walkCheck == 0
         % Check Current Neighborhood Against the Grid Mask
         
         rawNeighbors = gridMask(neighborhoodInd);
-        openNeighborCheck = rawNeighbors == 0;
+        openNeighborCheck = rawNeighbors == 1;
         openNeighbors = neighborhoodInd(openNeighborCheck);
         
         if sum(openNeighborCheck) == 0
@@ -296,7 +263,7 @@ while walkCheck == 0
             break
             
         end
-        
+                
     end
     
     if iter == 200 % DETERMINISTIC STOPPING CONDITION
@@ -313,6 +280,6 @@ end
 anyVisited = visitedList(any(visitedList,2),:);
 sizeAnyVisited = size(anyVisited,1);
 individual(1,1:sizeAnyVisited) = sub2ind(gS,anyVisited(:,1),...
-    anyVisited(:,2))'; 
+    anyVisited(:,2))';
 
 end

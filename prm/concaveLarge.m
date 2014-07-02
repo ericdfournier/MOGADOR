@@ -14,11 +14,12 @@ p.objectiveCount = 3;
 p.objectiveFraction = 0.2;
 p.objectiveMax = 10;
 p.objectiveNames = {'Var1','Var2','Var3'};
-p.walkType = 2;
+p.walkType = 1;
+p.executionType = 1;
 
 %% Population Initialization Parameters
 
-p.populationSize = 1000;
+p.populationSize = 100;
 p.minimumClusterSize = 4;
 p.sourceIndex = [80 40];
 p.destinIndex = [220 200];

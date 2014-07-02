@@ -103,7 +103,6 @@ destinInd = sub2ind(gS,destinIndex(1,1),destinIndex(1,2));
 
 basisInd = euclShortestWalkFnc(sourceIndex,destinIndex,gridMask);
 basisInd = basisInd(any(basisInd,1))';
-bS = size(basisInd,2);
 bw = gridMask;
 bw(basisInd) = 1;
 basisDist = bwdist(bw);
