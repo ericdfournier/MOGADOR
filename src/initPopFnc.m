@@ -59,6 +59,21 @@ function [ initialPop ] = initPopFnc(   popSize,...
 %                       connected cells (assuming queen's connectivity) 
 %                       that are required to consititute a viable cluster
 %
+%   walkType =          [0 | 1 | 2] binary decision variable indicating 
+%                       whether or not the path sections are to be 
+%                       constructed of pseudoRandomWalks, 
+%                       euclideanShortestWalks, or a random mixture of the 
+%                       two.
+%                           0 : All pseudoRandomWalk
+%                           1 : All euclShortestWalk
+%                           2 : Random mixture of pseudoRandomWalk &
+%                               euclShortestWalk
+%
+%   executionType =     [0 | 1 ] binary decision variable indicating
+%                       whether or not the population generation procedure 
+%                       should execute in series or in parallel. 
+%                           0 : Series
+%                           1 : Parallel
 %
 %   gridMask =          [n x m] binary array with valid pathway grid cells 
 %                       labeled as ones and invalid pathway grid cells 

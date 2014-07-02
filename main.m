@@ -61,6 +61,7 @@ while convergence == 0
         convergenceAbsolute = fix(diff(averageFitnessHistory,1));
         convergenceRate = fix(diff(averageFitnessHistory,2));
         convergence = convergenceRate(i-2) <= 1E-10 ;
+        
     end
 
     selection = popSelectionFnc(...

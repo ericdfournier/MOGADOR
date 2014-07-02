@@ -103,7 +103,7 @@ destinInd = sub2ind(gS,destinIndex(1,1),destinIndex(1,2));
 
 basisInd = euclShortestWalkFnc(sourceIndex,destinIndex,gridMask);
 basisInd = basisInd(any(basisInd,1))';
-bw = gridMask;
+bw = zeros(gS);
 bw(basisInd) = 1;
 basisDist = bwdist(bw);
 
@@ -164,10 +164,12 @@ while walkCheck == 0
         
         % Check Validity of Current Neighborhood
         
-        if all(neighborhoodSub(:,1)) == 0 || all(neighborhoodSub(:,2)) == 0
-
+        if      any(neighborhoodSub(:,1) < 1) || ...
+                any(neighborhoodSub(:,2) < 1) || ...
+                any(neighborhoodSub(:,1) > (gS(1,1) - 1)) || ...
+                any(neighborhoodSub(:,2) > (gS(1,2) - 1)) 
+            
             neighborhoodBoundaryError = neighborhoodBoundaryError + 1;
-            walkCheck = 0;
             
             break
             
@@ -181,13 +183,11 @@ while walkCheck == 0
         % Check Current Neighborhood Against the Grid Mask
         
         rawNeighbors = gridMask(neighborhoodInd);
-        openNeighborCheck = rawNeighbors == 1;
-        openNeighbors = neighborhoodInd(openNeighborCheck);
+        openNeighbors = neighborhoodInd(rawNeighbors == 1);
         
-        if sum(openNeighborCheck) == 0
+        if any(openNeighbors) == 0
             
             gridMaskBoundaryError = gridMaskBoundaryError + 1;
-            walkCheck = 0;
             
             break
             
@@ -197,17 +197,13 @@ while walkCheck == 0
         
         % Check Current Neighborhood for Previously Visited Neighbors
         
-        visitedCur = logical(visitedGrid(neighborhoodInd));
-        visitedInd = neighborhoodInd(visitedCur);        
-        [visitedNeighbors, ~] = intersect(...
-            neighborhoodInd,visitedInd);
-        newNeighbors = setdiff(neighborhoodInd,visitedNeighbors);
+        visitedInd = neighborhoodInd(visitedGrid(neighborhoodInd) == 1);        
+        newNeighbors = setdiff(neighborhoodInd,visitedInd);
         numNewNeighbors = size(newNeighbors,1);
         
         if numNewNeighbors == 0
             
             culDeSacError = culDeSacError + 1;
-            walkCheck = 0;
             
             break
             
@@ -222,7 +218,6 @@ while walkCheck == 0
         if isempty(validNewNeighborsInd) == 1
             
             noValidNeighborError = noValidNeighborError + 1;
-            walkCheck = 0;
             
             break
             
@@ -257,12 +252,10 @@ while walkCheck == 0
             
             visitedList(i+1,:) = newSub;
             visitedGrid(newInd) = 1;
-            walkCheck = 0;
             
         elseif i == gL && newInd ~= destinInd
             
             visitedList(i+1,:) = newSub;
-            walkCheck = 0;
             
             break
             
@@ -270,7 +263,7 @@ while walkCheck == 0
         
     end
     
-    if iter == 200 % DETERMINISTIC STOPPING CONDITION
+    if iter == 100 % DETERMINISTIC STOPPING CONDITION
         
         failure = failure + 1;
         walkCheck = 1;

@@ -62,6 +62,10 @@ p.objectiveIndices = [1 2 3];
 
 p.concave = 1;
 
+%% Execution Type
+
+p.executionType = 0;
+
 %% Clear Variables
 
 clearvars -except p
