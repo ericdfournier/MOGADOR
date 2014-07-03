@@ -14,12 +14,13 @@ function [ mutant ] = multiMutationFnc(     individual,...
 %
 % SYNTAX:
 %
-%   [ mutant, mutationInd ] =  multiMutationFnc( mutant, gridMask,...
+%   [ mutant ] =  multiMutationFnc( mutant,...
+%                                   gridMask,...
 %                                   mutations )
 %
 % INPUTS:
 %
-%   mutant =    [1 x m] array of index values listing the connected 
+%   mutant =        [1 x m] array of index values listing the connected 
 %                   grid cells forming a pathway from a specified source to
 %                   a specified target destination given the constraints of
 %                   a specified study region
@@ -48,8 +49,9 @@ function [ mutant ] = multiMutationFnc(     individual,...
 %
 %                   mutations = 5;
 %
-%                   [mutant, mutationInd] = multiMutationFnc(mutant,...
-%                                               gridMask,mutations);
+%                   [ mutant ] = multiMutationFnc(  mutant,...
+%                                                   gridMask,...
+%                                                   mutations);
 %
 % CREDITS:
 %
@@ -91,7 +93,9 @@ gL = size(individual);
 %% Compute Mutations
 
 for i = 1:mutations
+    
     individual = mutationFnc(individual,gridMask);
+    
 end
 
 %% Generate Output

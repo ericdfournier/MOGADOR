@@ -18,7 +18,7 @@ p.walkType = 2;
 
 %% Population Initialization Parameters
 
-p.populationSize = 1000;
+p.populationSize = 100;
 p.minimumClusterSize = 5;
 p.sourceIndex = [20 20];
 p.destinIndex = [280 280];
@@ -53,6 +53,10 @@ p.objectiveIndices = [1 2 3];
 %% Problem Concavity
 
 p.concave = 0;
+
+%% Execution Type
+
+p.executionType = 0;
 
 %% Clear Variables
 

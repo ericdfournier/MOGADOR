@@ -1,6 +1,5 @@
-function [ plotHandle ] = crossoverPlot(    parent1,...
-                                            parent2,...
-                                            child,...
+function [ plotHandle ] = mutationPlot(     individual,...
+                                            mutant,...
                                             sourceIndex,...
                                             destinIndex,...
                                             gridMask )
@@ -10,30 +9,30 @@ function [ plotHandle ] = crossoverPlot(    parent1,...
 %
 % DESCRIPTION:
 %
-%   Function to graphically display the results of a crossover operation
-%   performed on a parent population of individuals. This graphical display
-%   can be used to debug the algorithms used by the crossoverFnc in
-%   executing the crossover procedure. 
+%   Function to graphically display the results of a mutantion operation
+%   performed on an individual. This graphical display
+%   can be used to debug the algorithms used by the mutantFnc in
+%   executing the mutation procedure. 
 % 
 %   Warning: minimal error checking is performed.
 %
 % SYNTAX:
 %
-%   [ plotHandle ] =  crossoverPlot( parent1, parent2, child, gridMask )
+%   [ plotHandle ] =  crossoverPlot(    individual,...
+%                                       mutant,...
+%                                       sourceIndex,...
+%                                       destinIndex,...
+%                                       gridMask )
 %
 % INPUTS:
 %
-%   parent1 =           [1 x m] array of index values listing the connected
+%   individual =        [1 x m] array of index values listing the connected
 %                       grid cells forming a pathway from a specified
 %                       source to a specified target destination given the
 %                       constraints of a specified study region
 %
-%   parent2 =           [1 x m] array of index values listing the connected
-%                       grid cells forming a pathway from a specified
-%                       source to a specified target destination given the
-%                       constraints of a specified study region
 %
-%   child =             [1 x m] array of index values listing the connected
+%   mutant =            [1 x m] array of index values listing the connected
 %                       grid cells forming a pathway from a specified
 %                       source to a specified target destination given the
 %                       constraints of a specified study region and
@@ -53,20 +52,11 @@ function [ plotHandle ] = crossoverPlot(    parent1,...
 % OUTPUTS:
 %
 %   plotHandle =        An output variable assigning a plot handle to the 
-%                       crossover plot.
+%                       mutation plot.
 %
 % EXAMPLES:
 %   
 %   Example 1 =
-%
-%                   % Pass 'parents' input as output from
-%                   'initializePop' function
-%
-%                   % Pass 'child' inputs as outputs from 
-%                   'crossoverFnc' function
-%
-%                   plotHandle = crossoverPlot(parent1,parent2,child,...
-%                                   gridMask);
 %
 % CREDITS:
 %
@@ -83,16 +73,12 @@ function [ plotHandle ] = crossoverPlot(    parent1,...
 P = inputParser;
 
 addRequired(P,'nargin',@(x) ...
-    x == 6);
-addRequired(P,'parent1',@(x) ...
+    x == 5);
+addRequired(P,'individual',@(x) ...
     isnumeric(x) && ...
     isrow(x) && ...
     ~isempty(x));
-addRequired(P,'parent2',@(x) ...
-    isnumeric(x) && ...
-    isrow(x) && ...
-    ~isempty(x));
-addRequired(P,'child',@(x) ...
+addRequired(P,'mutant',@(x) ...
     isnumeric(x) && ...
     isrow(x) && ...
     ~isempty(x));
@@ -109,7 +95,7 @@ addRequired(P,'gridMask',@(x) ...
     ismatrix(x) && ...
     ~isempty(x));
 
-parse(P,nargin,parent1,parent2,child,sourceIndex,destinIndex,gridMask);
+parse(P,nargin,individual,mutant,sourceIndex,destinIndex,gridMask);
 
 %% Generate Function Paramters
 
@@ -119,28 +105,22 @@ destinInd = sub2ind(gS,destinIndex(1,1),destinIndex(1,2));
 
 %% Extract Parent Data
 
-parent1Plt = gridMask;
-p1 = parent1(any(parent1,1));
-parent1Plt(p1(2:end-1)) = 4;
-parent1Plt(sourceInd) = 7;
-parent1Plt(destinInd) = 10;
+individualPlt = gridMask;
+indiv = individual(any(individual,1));
+individualPlt(indiv(2:end-1)) = 4;
+individualPlt(sourceInd) = 7;
+individualPlt(destinInd) = 10;
 
-parent2Plt = gridMask;
-p2 = parent2(any(parent2,1));
-parent2Plt(p2) = 5;
-parent2Plt(sourceInd) = 7;
-parent2Plt(destinInd) = 10;
-
-childPlt = gridMask;
+mutantPlt = gridMask;
 c = child(any(child,1));
 
-parent1_cont = intersect(p1(2:end-1),c(2:end-1),'stable');
+parent1_cont = intersect(indiv(2:end-1),c(2:end-1),'stable');
 parent2_cont = intersect(p2(2:end-1),c(2:end-1),'stable');
 
-childPlt(parent1_cont) = 4;
-childPlt(parent2_cont) = 5;
-childPlt(sourceInd) = 7;
-childPlt(destinInd) = 10;
+mutantPlt(parent1_cont) = 4;
+mutantPlt(parent2_cont) = 5;
+mutantPlt(sourceInd) = 7;
+mutantPlt(destinInd) = 10;
 
 %% Generate Plot
 
@@ -149,7 +129,7 @@ plotHandle = figure();
 set(plotHandle,'position',scrn);
 
 subplot(1,3,1);
-imagesc(parent1Plt);
+imagesc(individualPlt);
 axis square
 title('Parent #1 Phenotype','FontSize',16,'FontWeight','Bold');
 
@@ -159,7 +139,7 @@ axis square
 title('Parent #2 Phenotype','FontSize',16,'FontWeight','Bold');
 
 subplot(1,3,3);
-imagesc(childPlt);
+imagesc(mutantPlt);
 axis square
 title('Child Phenotype With Parent Contributions','FontSize',16,...
     'FontWeight','Bold');

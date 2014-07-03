@@ -1,7 +1,8 @@
-function [ mutant ] = mutationFnc( individual, gridMask )
+function [ mutant ] = mutationFnc(  individual,...
+                                    gridMask )
 
-% mutationFnc Function to generate a single or multi-point mutation of an
-% of an individual pathway
+% mutationFnc Function to generate a single-point mutation on an individual
+% pathway
 %
 % DESCRIPTION:
 %
@@ -12,7 +13,8 @@ function [ mutant ] = mutationFnc( individual, gridMask )
 %
 % SYNTAX:
 %
-%   mutant =  mutationFnc( individual, gridMask )
+%   mutant =  mutationFnc(  individual,...
+%                           gridMask )
 %
 % INPUTS:
 %
@@ -88,24 +90,27 @@ parse(P,nargin,nargout,individual,gridMask);
 
 %% Iteration Parameters
 
-indiv = individual(any(individual,1));
-aI = size(indiv,2);
-gS = size(gridMask);
-indivMask = zeros(gS);
-indivMask(indiv) = 1;
+validSite = 0;
 
-%% Select Mutation Sites and Generate Mutations
+while validSite == 0;
 
-validMutSite = 1;
-
-while validMutSite == 1
+    indiv = individual(any(individual,1));
+    aI = size(indiv,2);
+    gS = size(gridMask);
+    indivMask = gridMask;
+    indivMask(indivMask == 0) = NaN;
+    indivMask(indivMask == 1) = 0;
+    indivMask(indiv) = 1;
     
-    mutSel = randsample(2:1:aI-1,1);
+    % Select Mutation Sites
+    
+    mutSel = randsample(5:1:aI-5,1);
     mutInd = indiv(1,mutSel);
-    mutRange = indiv((mutSel-1):(mutSel+1));
-    
+    mutRange = indiv(mutSel-1:mutSel+1);
     neighSub = zeros(9,2);
     newMut = cell(1,1);
+    
+    % Generate mutation site neighborhood
     
     [j,k] = ind2sub(gS,mutInd);
     neighSub(1,:) = [j-1,k-1];
@@ -118,105 +123,128 @@ while validMutSite == 1
     neighSub(8,:) = [j+1,k];
     neighSub(9,:) = [j+1,k+1];
     neighInd = sub2ind(gS,neighSub(:,1),neighSub(:,2));
+    neighMask = reshape(indivMask(neighInd),[3 3]);
+    
+    % Find and sort nearest path neighbors
     
     [~, B, C] = intersect(mutRange, neighInd);
     sdMask = zeros(3);
-    sdMask(C(B == 1)) = 1;
-    sdMask(C(B == 3)) = 1;
     
-    % Check for Deletion Mutation Validity
-    
-    sdConn = bwconncomp(sdMask,8);
-    
-    if sdConn.NumObjects == 1
+    for i = 1:size(B)
         
-        tryMut = [];
-        break
+        sdMask(C(i)) = B(i);
         
     end
     
-    % Eliminate Invalid Mutation Sites and Iteratively Select Candidates
+    rankMask = sdMask ./ min(B);
     
-    allMask =  reshape(indivMask(neighInd),[3 3]);
-    choices = find(allMask == 0);
+    % Generate mutation using pseudo random walk on sub grid mask
     
-    viableMut = 0;
-    mutCount = 0;
-    mutSDMask = sdMask;
+    sourceDestinMask = zeros(5,5);
+    sourceDestinMask(2:4,2:4) = rankMask;
     
-    s = 0;
+    [x1, y1] = find(sourceDestinMask == 1);
+    subSourceInd = [x1 y1];
     
-    while viableMut == 0
+    [x2, y2] = find(sourceDestinMask == 3);
+    subDestinInd = [x2 y2];
+    
+    if isempty(subDestinInd)
         
-        s = s + 1;
-        
-        if s == 10;
-            
-            validMutSite = 0;
-            
-            break
-        
-        elseif nnz(sdMask) == numel(sdMask)
-            
-            validMutSite = 0;
-            
-            break
-            
-        elseif isempty(choices) == 1
-            
-            validMutSite = 0;
-            
-            break
-            
-        end
-        
-        mutCount = mutCount + 1;
-        mutChoice = randomsample(choices,1);
-        mutSDMask(mutChoice) = 1;
-        mutTest = bwconncomp(mutSDMask);
-        
-        if mutTest.NumObjects == 1
-            
-            viableMut = 1;
-            
-        end
-        
+        validSite = 0;
+        continue;
+   
     end
     
-    % Generate Mutation Site Indices
+    subGridMask = zeros(5,5);
+    subGridMask(2:4,2:4) = ...
+        double(imcomplement(rankMask ~= 0 )) == 1 & ...
+        neighMask == 0 & ...
+        reshape(~isnan(indivMask(neighInd)),[3 3]) == 1 | ...
+        rankMask == 1 | ...
+        rankMask == 3;
     
-    newMutSite = reshape(sdMask == 0 & mutSDMask == 1,[9 1]);
-    tryMut = neighInd(newMutSite);
+    tryMutRawMask = zeros(5,5);
+    tryMutRawInd = pseudoRandomWalkFnc(subSourceInd,subDestinInd,...
+        subGridMask);
+        
+        
+    tryMutRawInd(1,1) = 0;
+    tryMutRawInd = tryMutRawInd(any(tryMutRawInd,1));
+    tryMutRawSize = size(tryMutRawInd,2);
+    
+    if tryMutRawSize < 1 
+        
+        validSite = 0;
+        
+    else
+        
+        validSite = 1;
+       
+    end
 
 end
 
-% TRY INTRODUCING A ROUTINE WHERE YOU IDENTIFY THE SEQUENCING OF THE POINTS
-% BEFORE AND AFTER THE MUTATION SITE. YOU CAN THEN USE THE DISTANCE FROM
-% THIS SUB-SOURCE CELL TO THE INIVIDUAL MUTATION COMPONENTS TO DETERMINE
-% HOW THEY NEED TO BE SORTED FOR REINTRODUCTION INTO THE MUTATED INDIVIDUAL
+%% Generate mutation indices depending on mutation size
 
-newMut{1,1} = tryMut';
+if tryMutRawSize == 1
+    
+    tryMutRawMask(tryMutRawInd) = 1;
+    tryMutMask = tryMutRawMask(2:4,2:4);
+    tryMutInd = tryMutMask == 1;
+    tryMut = neighInd(tryMutInd);
+    
+    % Generate Final Output
+    
+    mutant = individual;
+    mutant(mutSel) = tryMut;
+    
+elseif tryMutRawSize > 1
+    
+    tryMutRawSeq = 1:1:tryMutRawSize;
+    
+    for i = 1:tryMutRawSize
+        
+        tryMutRawMask(tryMutRawInd(i)) = tryMutRawSeq(i);
+        
+    end
+    
+    tryMutMask = tryMutRawMask(2:4,2:4);
+    tryMutMaskVec = reshape(tryMutMask,[9 1]);
+    tryMutMaskVecInd = find(tryMutMaskVec);
+    [a, b] = sort(tryMutMaskVecInd,'ascend');
+    tryMut = zeros(1,tryMutRawSize);
+    
+    for i = 1:tryMutRawSize
+        
+        tryMut(1,i) = neighInd(a(b(i)));
+        
+    end
+    
+    newMut{1,1} = tryMut;
+    
+    % Insert New Mutations into Individual
+    
+    sections = cell(2,2);
+    z = vertcat(1,mutSel,aI);
+    
+    sections{1,1} = indiv(1,z(1):z(2)-1);
+    tmp = size(sections{1,1});
+    sections{1,2} = tmp(1,2);
+    
+    sections{2,1} = indiv(1,z(2)+1:z(3));
+    tmp = size(sections{2,1});
+    sections{2,2} = tmp(1,2);
+    
+    mutantRaw = horzcat(sections{1,1},newMut{1,1},sections{2,1});
+    
+    % Generate Final Output
+    
+    x = size(individual);
+    mutant = zeros(x);
+    v = size(mutantRaw);
+    mutant(1,1:v(1,2)) = mutantRaw;
 
-%% Insert New Mutations into Individual
-
-sections = cell(2,2);
-z = vertcat(1,mutSel,aI);
-
-sections{1,1} = indiv(1,z(1):z(2)-1);
-tmp = size(sections{1,1});
-sections{1,2} = tmp(1,2);
-
-sections{2,1} = indiv(1,z(2)+1:z(3));
-tmp = size(sections{2,1});
-sections{2,2} = tmp(1,2);
-
-mutantRaw = horzcat(sections{1,1},newMut{1,1},sections{2,1});
-
-%% Generate Final Output
-
-x = size(individual);
-mutant = zeros(x);
-v = size(mutantRaw);
-mutant(1,1:v(1,2)) = mutantRaw;
+end
 
 end

@@ -23,15 +23,15 @@ function [ individual ] = pseudoRandomWalkFnc( sourceIndex,...
 %
 % INPUTS:
 %
-%   gridMask =      [n x m] binary array with valid pathway grid cells 
-%                   labeled as ones and invalid pathway grid cells labeled 
-%                   as zero placeholders
-%
 %   sourceIndex =   [i x j] index value of the source node for the
 %                   start of the pseudo random walk
 %
 %   destinIndex =   [p x q] index value of the destination node for
 %                   the termination of the pseudo random walk
+%
+%   gridMask =      [n x m] binary array with valid pathway grid cells 
+%                   labeled as ones and invalid pathway grid cells labeled 
+%                   as zero placeholders
 %
 % OUTPUTS:
 %
