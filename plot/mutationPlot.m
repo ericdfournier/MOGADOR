@@ -103,24 +103,23 @@ gS = size(gridMask);
 sourceInd = sub2ind(gS,sourceIndex(1,1),sourceIndex(1,2));
 destinInd = sub2ind(gS,destinIndex(1,1),destinIndex(1,2));
 
-%% Extract Parent Data
+%% Extract Individual and Mutation Data
 
 individualPlt = gridMask;
 indiv = individual(any(individual,1));
-individualPlt(indiv(2:end-1)) = 4;
-individualPlt(sourceInd) = 7;
-individualPlt(destinInd) = 10;
+individualPlt(indiv) = 2;
 
 mutantPlt = gridMask;
-c = child(any(child,1));
+mut = mutant(any(mutant,1));
+mutantPlt(mut) = 2;
 
-parent1_cont = intersect(indiv(2:end-1),c(2:end-1),'stable');
-parent2_cont = intersect(p2(2:end-1),c(2:end-1),'stable');
+mutation = mutantPlt - individualPlt;
 
-mutantPlt(parent1_cont) = 4;
-mutantPlt(parent2_cont) = 5;
+mutantPlt(mut(2:end-1)) = 3;
+mutantPlt(mutation == -1) = 10;
+mutantPlt(mutation == 1) = 5;
 mutantPlt(sourceInd) = 7;
-mutantPlt(destinInd) = 10;
+mutantPlt(destinInd) = 9;
 
 %% Generate Plot
 
@@ -128,20 +127,8 @@ scrn = get(0,'screensize');
 plotHandle = figure();
 set(plotHandle,'position',scrn);
 
-subplot(1,3,1);
-imagesc(individualPlt);
-axis square
-title('Parent #1 Phenotype','FontSize',16,'FontWeight','Bold');
-
-subplot(1,3,2);
-imagesc(parent2Plt);
-axis square
-title('Parent #2 Phenotype','FontSize',16,'FontWeight','Bold');
-
-subplot(1,3,3);
 imagesc(mutantPlt);
 axis square
-title('Child Phenotype With Parent Contributions','FontSize',16,...
-    'FontWeight','Bold');
+title('Mutant Phenotype','FontSize',16,'FontWeight','Bold');
 
 end
