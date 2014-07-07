@@ -123,12 +123,19 @@ mutantPlt(destinInd) = 9;
 
 %% Generate Plot
 
-scrn = get(0,'screensize');
+scrn = get(0,'ScreenSize');
 plotHandle = figure();
 set(plotHandle,'position',scrn);
 
+subplot(1,3,1);
+individualPlot(individual,gridMask);
+
+subplot(1,3,2);
+individualPlot(mutant,gridMask);
+
+subplot(1,3,3);
 imagesc(mutantPlt);
 axis square
-title('Mutant Phenotype','FontSize',16,'FontWeight','Bold');
+title('Mutation Plot');
 
 end
