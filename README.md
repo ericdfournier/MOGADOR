@@ -8,8 +8,7 @@ For more read the documentation at: www.ericdfournier.com/MOGADOR
 - Clone Git Repository: cd into a working directory of choice and clone the git repository via the following shell commands (on mac)
 
 ````bash
-$ mkdir ~/MOGADOR
-$ cd ~/MOGADOR
+$ cd ~
 $ git clone https://github.com/ericdfournier/MOGADOR.git
 ````
 
