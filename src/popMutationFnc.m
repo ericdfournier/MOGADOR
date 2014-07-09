@@ -1,6 +1,7 @@
 function [ outputPop ] = popMutationFnc(    inputPop,...
                                             fraction,...
                                             mutations,...
+                                            randomness,...
                                             gridMask )
 
 % popMutationFnc.m Function to generate a child pathway from the 
@@ -19,6 +20,7 @@ function [ outputPop ] = popMutationFnc(    inputPop,...
 %   [ outputPop ] =  popMutationFnc(    inputPop,...
 %                                       fraction,...
 %                                       mutations,...
+%                                       randomness,...
 %                                       gridMask )
 %
 % INPUTS:
@@ -36,6 +38,14 @@ function [ outputPop ] = popMutationFnc(    inputPop,...
 %                   mutations to be processed for each individual within 
 %                   the input population
 %
+%   randomness =    [h] a value > 0 indicating the degree of randomness
+%                   to be applied in the process of generating the 
+%                   walk. Specifically, this value corresponds to  the 
+%                   degree of the root that is used to compute the 
+%                   covariance from the minimum basis distance at each 
+%                   movement iteration along the path. Higher numbers 
+%                   equate to less random paths.
+%
 %   gridMask =      [n x m] binary array with valid pathway grid cells 
 %                   labeled as ones and invalid pathway grid cells labeled 
 %                   as NaN placeholders
@@ -50,26 +60,6 @@ function [ outputPop ] = popMutationFnc(    inputPop,...
 % EXAMPLES:
 %   
 %   Example 1 =         
-%
-%                   gridMask = zeros(100);
-%                   gridMask(1,:) = nan;
-%                   gridMask(:,1) = nan;
-%                   gridMask(end,:) = nan;
-%                   gridMask(:,end) = nan;
-%                   sourceIndex = [20 20];
-%                   destinIndex = [80 80];
-%                   iterations = 1000;
-%                   sigma = [10 0; 0 10];
-%                   plot = 0;
-%                   [initialPop, genomeLength] = initializePopFnc(popSize,
-%                                               gridMask,iterations,...
-%                                               sigma,sourceIndex,...
-%                                               destinIndex);
-%               
-%                   fraction = 0.25;
-%                   mutations = 1;
-%
-%                   ouputPop = mutationFnc(inputPop,gridMask,mutations);
 %
 % CREDITS:
 %
@@ -86,7 +76,7 @@ function [ outputPop ] = popMutationFnc(    inputPop,...
 P = inputParser;
 
 addRequired(P,'nargin',@(x)...
-    x == 4);
+    x == 5);
 addRequired(P,'nargout',@(x)...
     x == 1);
 addRequired(P,'inputPop',@(x)...
@@ -100,12 +90,15 @@ addRequired(P,'mutations',@(x)...
     isnumeric(x) &&...
     isscalar(x) &&...
     ~isempty(x));
+addRequired(P,'randomness',@(x)...
+    isnumeric(x) &&...
+    ~isempty(x));
 addRequired(P,'gridMask',@(x)...
     isnumeric(x) &&...
     ismatrix(x) &&...
     ~isempty(x));
 
-parse(P,nargin,nargout,inputPop,fraction,mutations,gridMask);
+parse(P,nargin,nargout,inputPop,fraction,mutations,randomness,gridMask);
 
 %% Iteration Parameters
 
@@ -120,8 +113,8 @@ outputPop = zeros(mF,gL);
 
 for i = 1:mF
     
-    outputPop(i,:) = multiMutationFnc(mutPop(i,:),...
-        gridMask,mutations);
+    outputPop(i,:) = multiMutationFnc(mutPop(i,:),mutations,randomness,...
+        gridMask);
     
 end
 

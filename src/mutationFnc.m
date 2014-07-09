@@ -1,4 +1,5 @@
 function [ mutant ] = mutationFnc(  individual,...
+                                    randomness,...
                                     gridMask )
 
 % mutationFnc Function to generate a single-point mutation on an individual
@@ -22,6 +23,14 @@ function [ mutant ] = mutationFnc(  individual,...
 %                   grid cells forming a pathway from a specified source to
 %                   a specified target destination given the constraints of
 %                   a specified study region
+%
+%   randomness =    [h] a value > 0 indicating the degree of randomness
+%                   to be applied in the process of generating the 
+%                   walk. Specifically, this value corresponds to  the 
+%                   degree of the root that is used to compute the 
+%                   covariance from the minimum basis distance at each 
+%                   movement iteration along the path. Higher numbers 
+%                   equate to less random paths.
 %
 %   gridMask =      [n x m] binary array with valid pathway grid cells 
 %                   labeled as ones and invalid pathway grid cells labeled 
@@ -74,19 +83,22 @@ function [ mutant ] = mutationFnc(  individual,...
 P = inputParser;
 
 addRequired(P,'nargin',@(x)...
-    x == 2);
+    x == 3);
 addRequired(P,'nargout',@(x)...
     x == 1);
 addRequired(P,'individual',@(x)...
     isnumeric(x) &&...
     isrow(x) &&...
     ~isempty(x));
+addRequired(P,'randomness',@(x)...
+    isnumeric(x) &&...
+    ~isempty(x));
 addRequired(P,'gridMask',@(x)...
     isnumeric(x) &&...
     ismatrix(x) &&...
     ~isempty(x));
 
-parse(P,nargin,nargout,individual,gridMask);
+parse(P,nargin,nargout,individual,randomness,gridMask);
 
 %% Iteration Parameters
 
@@ -166,7 +178,7 @@ while validSite == 0;
     
     tryMutRawMask = zeros(5,5);
     tryMutRawInd = pseudoRandomWalkFnc(subSourceInd,subDestinInd,...
-        subGridMask);
+        randomness,subGridMask);
         
         
     tryMutRawInd(1,1) = 0;

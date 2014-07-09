@@ -1,5 +1,6 @@
 function [ individual ] = pseudoRandomWalkFnc( sourceIndex,...
                                                destinIndex,...
+                                               randomness,...
                                                gridMask)
 
 % pseudoRandomWalkFnc.m Generates pathway index values for one or more  
@@ -18,8 +19,10 @@ function [ individual ] = pseudoRandomWalkFnc( sourceIndex,...
 %
 % SYNTAX:
 %
-%   [ individual ] =  pseudoRandomWalkFnc( sourceIndex, destinIndex,...
-%                       gridMask )
+%   [ individual ] =  pseudoRandomWalkFnc(  sourceIndex, ...
+%                                           destinIndex, ...
+%                                           randomness, ...
+%                                           gridMask )
 %
 % INPUTS:
 %
@@ -28,6 +31,14 @@ function [ individual ] = pseudoRandomWalkFnc( sourceIndex,...
 %
 %   destinIndex =   [p x q] index value of the destination node for
 %                   the termination of the pseudo random walk
+%
+%   randomness =    [k] a value > 0 indicating the degree of randomness
+%                   to be applied in the process of generating the walk.
+%                   Specifically, this value corresponds to  the degree of
+%                   the root that is used to compute the covariance from
+%                   the minimum basis distance at each movement iteration
+%                   along the path. Higher numbers equate to less random
+%                   paths.
 %
 %   gridMask =      [n x m] binary array with valid pathway grid cells 
 %                   labeled as ones and invalid pathway grid cells labeled 
@@ -60,7 +71,7 @@ function [ individual ] = pseudoRandomWalkFnc( sourceIndex,...
 P = inputParser;
 
 addRequired(P,'nargin',@(x)...
-    x == 3);
+    x == 4);
 addRequired(P,'nargout',@(x)...
     x == 1);
 addRequired(P,'sourceIndex',@(x)...
@@ -71,19 +82,21 @@ addRequired(P,'destinIndex',@(x)...
     isnumeric(x) &&...
     isrow(x) &&...
     ~isempty(x));
+addRequired(P,'randomness',@(x)...
+    isnumeric(x) &&...
+    ~isempty(x));
 addRequired(P,'gridMask',@(x)...
     isnumeric(x) &&...
     ismatrix(x) &&...
     ~isempty(x));
 
-parse(P,nargin,nargout,sourceIndex,destinIndex,gridMask);
+
+parse(P,nargin,nargout,sourceIndex,destinIndex,randomness,gridMask);
 
 %% Error Checking
 
 if destinIndex == sourceIndex
     
-    tit='Source Cannot be the Same as Destination';
-    disp(tit);
     error('Source Cannot be the Same as Destination');
     
 end
@@ -91,15 +104,15 @@ end
 %% Iteration Parameters
 
 gS = size(gridMask);
-sF = nthroot((gS(1,1)*gS(1,2)),100); % 2nd argument controls the randomness          
 sI = sourceIndex;
 dI = destinIndex;
 sD = pdist([sourceIndex; destinIndex]);
 gL = ceil(5*sD);                      
 individual = zeros(1,gL);
 destinInd = sub2ind(gS,destinIndex(1,1),destinIndex(1,2));
+maxIter = 100;
 
-%% Compute Basis and Basis Distances
+%% Compute Basis Solution and Basis Distances
 
 basisInd = euclShortestWalkFnc(sourceIndex,destinIndex,gridMask);
 basisInd = basisInd(any(basisInd,1))';
@@ -115,8 +128,6 @@ neighborhoodBoundaryError = 0;
 gridMaskBoundaryError = 0;
 culDeSacError = 0;
 noValidNeighborError = 0;
-success = 0;
-failure = 0;
 
 while walkCheck == 0
     
@@ -138,11 +149,11 @@ while walkCheck == 0
         
         if minBasisDist == 0
             
-            cov = sF*sqrt(1/(1/sF));
+            cov = 1;
             
         else
             
-            cov = sF*sqrt(1/minBasisDist);
+            cov = ceil(nthroot(minBasisDist,randomness)./iter);
             
         end
         
@@ -243,7 +254,6 @@ while walkCheck == 0
         if newInd == destinInd
             
             visitedList(i+1,:) = newSub;
-            success = success + 1;
             walkCheck = 1;
             
             break
@@ -263,15 +273,16 @@ while walkCheck == 0
         
     end
     
-    if iter == 100 % DETERMINISTIC STOPPING CONDITION
+    if iter == maxIter % DETERMINISTIC STOPPING CONDITION
         
-        failure = failure + 1;
-        walkCheck = 1;
+        warning('Search Terminated: Destination Not Reached');
+        
+        break
         
     else
         
     end
-    
+        
 end
 
 anyVisited = visitedList(any(visitedList,2),:);

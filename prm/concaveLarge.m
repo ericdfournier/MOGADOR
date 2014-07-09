@@ -16,6 +16,7 @@ p.objectiveMax = 10;
 p.objectiveNames = {'Var1','Var2','Var3'};
 p.walkType = 1;
 p.executionType = 1;
+p.randomness = 2;
 
 %% Population Initialization Parameters
 

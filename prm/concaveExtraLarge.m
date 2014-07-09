@@ -54,6 +54,14 @@ p.objectiveIndices = [1 2 3];
 
 p.concave = 1;
 
+%% Execution Type
+
+p.executionType = 0;
+
+%% Randomness Level
+
+p.randomness = 2;
+
 %% Clear Variables
 
 clearvars -except p
