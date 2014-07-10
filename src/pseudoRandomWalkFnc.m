@@ -153,7 +153,8 @@ while walkCheck == 0
             
         else
             
-            cov = ceil(nthroot(minBasisDist,randomness)./iter);
+            cov = nthroot(minBasisDist,randomness) ./ ...
+                nthroot(iter,randomness);
             
         end
         

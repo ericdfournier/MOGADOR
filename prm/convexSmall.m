@@ -17,11 +17,11 @@ p.objectiveSimulationRange = 100;
 p.objectiveNames = {'Var1','Var2','Var3'};
 p.walkType = 2;
 p.executionType = 0;
-p.randomness = 2;
+p.randomness = 10;
 
 %% Population Initialization Parameters
 
-p.populationSize = 100;
+p.populationSize = 1000;
 p.minimumClusterSize = 3;
 p.sourceIndex = [20 20];
 p.destinIndex = [80 80];
