@@ -30,15 +30,15 @@ zlabel('Covariance');
 
 %% Plot PDF
 
-sampleCount = 4;
+sampleCount = 2;
 iHat = linspace(1,100,sampleCount);
 jHat = linspace(1,100,sampleCount);
 
 plotGrids = cell(sampleCount,sampleCount);
 
-for i = 1:iHat
+for i = 1:size(iHat,2)
     
-    for j = 1:jHat
+    for j = 1:size(jHat,2)
         
         sigma = [covGrid(iHat(i),jHat(j)) 0; 0 covGrid(iHat(i),jHat(j))];
         [X1, X2] = meshgrid(linspace(-1,1,100),linspace(-1,1,100));
@@ -55,13 +55,16 @@ end
 fig2 = figure();
 set(fig2,'position',scrn);
 
-for i = 1:(sampleCount^2)
+reshape(plotGrids,[sampleCount^2 1]);
+
+for k = 1:(sampleCount^2)
 
     subplot(sampleCount,sampleCount,k);
-    surf(probGrid1);
+    surf(plotGrids{k});
     axis square;
     xlabel('X Dim');
     ylabel('Y Dim');
     zlabel('Probability Density');
+    zlim([0 0.25]);
 
 end
