@@ -22,7 +22,7 @@ scrn = get(0,'ScreenSize');
 fig1 = figure(1);
 set(fig1,'position',scrn);
 
-surface(covGrid);
+surf(covGrid);
 axis square;
 xlabel('Search Iterations');
 ylabel('Distance from Basis Solution');
@@ -33,6 +33,7 @@ zlabel('Covariance');
 sampleCount = 2;
 iHat = linspace(1,100,sampleCount);
 jHat = linspace(1,100,sampleCount);
+mu = [1 1];
 
 plotGrids = cell(sampleCount,sampleCount);
 
@@ -41,10 +42,10 @@ for i = 1:size(iHat,2)
     for j = 1:size(jHat,2)
         
         sigma = [covGrid(iHat(i),jHat(j)) 0; 0 covGrid(iHat(i),jHat(j))];
-        [X1, X2] = meshgrid(linspace(-1,1,100),linspace(-1,1,100));
+        [X1, X2] = meshgrid(linspace(-1,1,30),linspace(-1,1,30));
         X = [X1(:) X2(:)];
         probVec = mvnpdf(X,mu,sigma);
-        plotGrids{i,j} = reshape(probVec,[100 100]);
+        plotGrids{i,j} = reshape(probVec,[30 30]);
         
     end
     
