@@ -21,7 +21,7 @@ p.randomness = 10;
 
 %% Population Initialization Parameters
 
-p.populationSize = 1000;
+p.populationSize = 100;
 p.minimumClusterSize = 3;
 p.sourceIndex = [20 20];
 p.destinIndex = [80 80];
