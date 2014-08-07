@@ -5,7 +5,7 @@ cd ~/Repositories/MOGADOR
 
 %% Initialize Input Parameters
 
-run ./prm/convexSmall.m
+run ./prm/concaveLarge.m
 
 %% Initialize Population
 

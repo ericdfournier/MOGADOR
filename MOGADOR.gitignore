@@ -1,0 +1,11 @@
+# Data Directory
+
+data/
+
+# Results Directory
+
+rslt/
+
+# Temporary m-files
+
+*.m~
