@@ -204,6 +204,8 @@ switch eT
                 randomness,...
                 gridMask);
             
+            disp(i);
+            
         end
         
     case 1  % Parallel execution
@@ -219,7 +221,7 @@ switch eT
                 walkType,...
                 randomness,...
                 gridMask);
-            
+                        
         end
         
 end

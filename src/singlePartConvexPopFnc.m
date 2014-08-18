@@ -142,6 +142,8 @@ switch eT
             outputPop(i,:) = pseudoRandomWalkFnc(sourceIndex,...
                 destinIndex,randomness,gridMask);
             
+            disp(i);
+            
         end
     
     case 1
@@ -150,7 +152,7 @@ switch eT
             
             outputPop(i,:) = pseudoRandomWalkFnc(sourceIndex,...
                 destinIndex,randomness,gridMask);
-            
+                        
         end
 
 end

@@ -209,6 +209,8 @@ switch eT
                 sourceConvexMask,...
                 gridMask);
             
+            disp(i);
+            
         end
         
     case 1  % Parallel execution
@@ -225,7 +227,7 @@ switch eT
                 randomness,...
                 sourceConvexMask,...
                 gridMask);
-            
+                        
         end
         
 end

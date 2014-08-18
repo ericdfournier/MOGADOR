@@ -131,7 +131,7 @@ noValidNeighborError = 0;
 
 while walkCheck == 0
     
-    iter = iter+1;
+    iter = iter + 1;
     visitedGrid = zeros(gS);
     visitedGrid(sI(1,1),sI(1,2)) = 1;
     visitedList = zeros(gL,2);
@@ -157,7 +157,7 @@ while walkCheck == 0
                 nthroot(iter,randomness);
             
         end
-        
+                
         sigma = [cov 0; 0 cov];
         
         % Construct Current Neighborhood
