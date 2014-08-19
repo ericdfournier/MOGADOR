@@ -91,7 +91,7 @@ sF = nthroot((gS(1,1)*gS(1,2)),10);      % This controls the randomness
 sI = sourceIndex;
 dI = destinIndex;
 sD = pdist([sourceIndex; destinIndex]);
-gL = ceil(5*sD);                      
+gL = ceil(10*sD);                      
 individual = zeros(1,gL);
 destinInd = sub2ind(gS,destinIndex(1,1),destinIndex(1,2));
 

@@ -183,7 +183,7 @@ parse(P,nargin,nargout,popSize,sourceIndex,destinIndex,objectiveVars,...
 
 pS = popSize;
 sD = pdist([sourceIndex; destinIndex]);
-gL = ceil(5*sD);
+gL = ceil(10*sD);
 outputPop = zeros(pS,gL);
 eT = executionType;
 

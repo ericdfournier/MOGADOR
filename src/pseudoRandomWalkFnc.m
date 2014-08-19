@@ -108,7 +108,7 @@ gS = size(gridMask);
 sI = sourceIndex;
 dI = destinIndex;
 sD = pdist([sourceIndex; destinIndex]);
-gL = ceil(5*sD);                      
+gL = ceil(10*sD);                      
 individual = zeros(1,gL);
 destinInd = sub2ind(gS,destinIndex(1,1),destinIndex(1,2));
 maxIter = 100;
@@ -277,7 +277,7 @@ while walkCheck == 0
     
     if iter == maxIter % DETERMINISTIC STOPPING CONDITION
         
-        warning('Search Terminated: Destination Not Reached');
+        individual = zeros(1,gL);
         
         break
         

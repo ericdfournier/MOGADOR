@@ -153,7 +153,7 @@ parse(P,nargin,nargout,sourceIndex,destinIndex,objectiveVars,...
 
 gS = size(gridMask);
 sD = pdist([sourceIndex; destinIndex]);
-gL = ceil(5*sD);
+gL = ceil(10*sD);
 outputWalk = zeros(1,gL);
 bandWidth = 142;
 

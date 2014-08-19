@@ -177,11 +177,23 @@ while validSite == 0;
         rankMask == 1 | ...
         rankMask == 3;
     
+    % Terminate Impossible Cases
+    
+    connCompObj = bwconncomp(subGridMask);
+    
+    if connCompObj.NumObjects > 1
+        
+        validSite = 0;
+        continue;
+        
+    end
+    
+    % Generate Mutation
+    
     tryMutRawMask = zeros(5,5);
     tryMutRawInd = pseudoRandomWalkFnc(subSourceInd,subDestinInd,...
         randomness,subGridMask);
-        
-        
+           
     tryMutRawInd(1,1) = 0;
     tryMutRawInd = tryMutRawInd(any(tryMutRawInd,1));
     tryMutRawSize = size(tryMutRawInd,2);

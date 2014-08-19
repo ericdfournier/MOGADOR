@@ -20,7 +20,7 @@ p.randomness = 2;
 
 %% Population Initialization Parameters
 
-p.populationSize = 10;
+p.populationSize = 500;
 p.minimumClusterSize = 4;
 p.sourceIndex = [80 40];
 p.destinIndex = [220 200];
@@ -55,10 +55,6 @@ p.objectiveIndices = [1 2 3];
 %% Problem Concavity
 
 p.concave = 1;
-
-%% Generate Source Convex Mask
-
-p.sourceConvexMask = convexAreaMaskFnc(p.sourceIndex,p.gridMask);
 
 %% Clear Variables
 
