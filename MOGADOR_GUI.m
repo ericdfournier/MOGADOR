@@ -1,19 +1,21 @@
 function varargout = MOGADOR_GUI(varargin)
 % MOGADOR MATLAB code for MOGADOR.fig
-%      MOGADOR, by itself, creates a new MOGADOR or raises the existing
-%      singleton*.
+%      MOGADOR_GUI, by itself, creates a new MOGADOR_GUI or raises the 
+%      existing singleton*.
 %
-%      H = MOGADOR returns the handle to a new MOGADOR or the handle to
+%      H = MOGADOR_GUI returns the handle to a new MOGADOR or the handle to
 %      the existing singleton*.
 %
-%      MOGADOR('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in MOGADOR.M with the given input arguments.
+%      MOGADOR_GUI('CALLBACK',hObject,eventData,handles,...) calls the 
+%      local function named CALLBACK in MOGADOR.M with the given input 
+%      arguments.
 %
-%      MOGADOR('Property','Value',...) creates a new MOGADOR or raises the
-%      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before MOGADOR_OpeningFcn gets called.  An
-%      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to MOGADOR_OpeningFcn via varargin.
+%      MOGADOR_GUI('Property','Value',...) creates a new MOGADOR or raises 
+%      the existing singleton*.  Starting from the left, property value 
+%      pairs are applied to the GUI before MOGADOR_OpeningFcn gets called. 
+%      An unrecognized property name or invalid value makes property 
+%      application stop.  All inputs are passed to MOGADOR_OpeningFcn via 
+%      varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
@@ -22,7 +24,7 @@ function varargout = MOGADOR_GUI(varargin)
 
 % Edit the above text to modify the response to help MOGADOR
 
-% Last Modified by GUIDE v2.5 19-Aug-2014 14:39:03
+% Last Modified by GUIDE v2.5 20-Aug-2014 10:07:03
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -348,18 +350,18 @@ end
 
 
 
-function edit3_Callback(hObject, eventdata, handles)
-% hObject    handle to edit3 (see GCBO)
+function searchDomainFilepath_Callback(hObject, eventdata, handles)
+% hObject    handle to searchDomainFilepath (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit3 as text
-%        str2double(get(hObject,'String')) returns contents of edit3 as a double
+% Hints: get(hObject,'String') returns contents of searchDomainFilepath as text
+%        str2double(get(hObject,'String')) returns contents of searchDomainFilepath as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit3_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit3 (see GCBO)
+function searchDomainFilepath_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to searchDomainFilepath (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -371,22 +373,22 @@ end
 
 
 % --------------------------------------------------------------------
-function Untitled_1_Callback(hObject, eventdata, handles)
-% hObject    handle to Untitled_1 (see GCBO)
+function fileSystemParameters_Callback(hObject, eventdata, handles)
+% hObject    handle to fileSystemParameters (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 
 % --------------------------------------------------------------------
-function Untitled_5_Callback(hObject, eventdata, handles)
-% hObject    handle to Untitled_5 (see GCBO)
+function problemSpecificationParameters_Callback(hObject, eventdata, handles)
+% hObject    handle to problemSpecificationParameters (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 
 % --------------------------------------------------------------------
 function Untitled_2_Callback(hObject, eventdata, handles)
-% hObject    handle to Untitled_2 (see GCBO)
+% hObject    handle to searchDomainFilepath (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -652,3 +654,258 @@ function listbox6_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in radiobutton2.
+function radiobutton2_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton2
+
+
+% --- Executes on button press in radiobutton3.
+function radiobutton3_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton3
+
+
+% --- Executes on button press in radiobutton4.
+function radiobutton4_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton4
+
+
+% --------------------------------------------------------------------
+function populationInitializationParameters_Callback(hObject, eventdata, handles)
+% hObject    handle to populationInitializationParameters (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function evoluationaryOperators_Callback(hObject, eventdata, handles)
+% hObject    handle to evoluationaryOperators (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function selectionParameters_Callback(hObject, eventdata, handles)
+% hObject    handle to selectionParameters (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function crossoverParameters_Callback(hObject, eventdata, handles)
+% hObject    handle to crossoverParameters (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function mutatoinParameters_Callback(hObject, eventdata, handles)
+% hObject    handle to mutatoinParameters (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function executionType_Callback(hObject, eventdata, handles)
+% hObject    handle to executionType (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function walkSectionType_Callback(hObject, eventdata, handles)
+% hObject    handle to walkSectionType (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function objectiveFraction_Callback(hObject, eventdata, handles)
+% hObject    handle to objectiveFraction (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function maximumObjectiveClusterSize_Callback(hObject, eventdata, handles)
+% hObject    handle to maximumObjectiveClusterSize (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function Untitled_16_Callback(hObject, eventdata, handles)
+% hObject    handle to Untitled_16 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function sourceLocation_Callback(hObject, eventdata, handles)
+% hObject    handle to sourceLocation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function destinationLocation_Callback(hObject, eventdata, handles)
+% hObject    handle to destinationLocation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function populationSize_Callback(hObject, eventdata, handles)
+% hObject    handle to populationSize (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function genomeLength_Callback(hObject, eventdata, handles)
+% hObject    handle to genomeLength (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function objectiveVariableFilepath_Callback(hObject, eventdata, handles)
+% hObject    handle to objectiveVariableFilepath (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function mutationFraction_Callback(hObject, eventdata, handles)
+% hObject    handle to mutationFraction (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function crossoverType_Callback(hObject, eventdata, handles)
+% hObject    handle to crossoverType (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function selectionFraction_Callback(hObject, eventdata, handles)
+% hObject    handle to selectionFraction (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function selectionProbability_Callback(hObject, eventdata, handles)
+% hObject    handle to selectionProbability (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in radiobutton5.
+function radiobutton5_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton5
+
+
+% --------------------------------------------------------------------
+function outputPlotParameters_Callback(hObject, eventdata, handles)
+% hObject    handle to outputPlotParameters (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+function edit23_Callback(hObject, eventdata, handles)
+% hObject    handle to edit23 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit23 as text
+%        str2double(get(hObject,'String')) returns contents of edit23 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit23_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit23 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --------------------------------------------------------------------
+function individualPlotParameters_Callback(hObject, eventdata, handles)
+% hObject    handle to individualPlotParameters (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function populationPlotParameters_Callback(hObject, eventdata, handles)
+% hObject    handle to populationPlotParameters (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function Untitled_26_Callback(hObject, eventdata, handles)
+% hObject    handle to Untitled_26 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function populationEvolutionaryConvergencePlot_Callback(hObject, eventdata, handles)
+% hObject    handle to populationEvolutionaryConvergencePlot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function populationParetoFrontierPlot_Callback(hObject, eventdata, handles)
+% hObject    handle to populationParetoFrontierPlot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function individualToPlot_Callback(hObject, eventdata, handles)
+% hObject    handle to individualToPlot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function individualPlot_Callback(hObject, eventdata, handles)
+% hObject    handle to individualPlot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function individualFitnessTradeoffPlot_Callback(hObject, eventdata, handles)
+% hObject    handle to individualFitnessTradeoffPlot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
