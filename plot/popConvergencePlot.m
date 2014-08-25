@@ -121,7 +121,7 @@ switch switchCase
         
     case 2
         
-        [fitObject, goodnessParams] = fit(gN, avgFitness,'poly2');
+        [fitObject, goodnessParams] = fit(gN, avgFitness,'exp2');
         
         hold on
         scatter(gN,avgFitness,'ko')
@@ -142,7 +142,7 @@ switch switchCase
         
     case 3
         
-        [fitObject, goodnessParams] = fit(gN, avgFitness,'poly2');
+        [fitObject, goodnessParams] = fit(gN, avgFitness,'exp2');
         
         hold on
         scatter(gN,avgFitness,'ko')

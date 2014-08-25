@@ -4,7 +4,6 @@ function [ outputWalk ] = multiPartConcaveWalkDemo( sourceIndex,...
                                                     objectiveFrac,...
                                                     minClusterSize,...
                                                     walkType,...
-                                                    sourceConvexMask,...
                                                     randomness,...
                                                     gridMask )
 %
@@ -67,9 +66,6 @@ function [ outputWalk ] = multiPartConcaveWalkDemo( sourceIndex,...
 %                           2 : Random mixture of pseudoRandomWalk &
 %                               euclShortestWalk
 %
-%   sourceConvexMask =  [n x m] binary array with the valid convex area
-%                       relative to the source cell
-%
 %   randomness =        [k] a value > 0 indicating the degree of 
 %                       randomness to be applied in the process of 
 %                       generating the walk. Specifically, this value 
@@ -109,7 +105,7 @@ function [ outputWalk ] = multiPartConcaveWalkDemo( sourceIndex,...
 P = inputParser;
 
 addRequired(P,'nargin',@(x)...
-    x == 9);
+    x == 8);
 addRequired(P,'nargout',@(x)...
     x >= 0);
 addRequired(P,'sourceIndex',@(x)...
@@ -144,10 +140,6 @@ addRequired(P,'walkType',@(x)...
     isnumeric(x) &&...
     isscalar(x) &&...
     ~isempty(x));
-addRequired(P,'sourceConvexMask',@(x)...
-    isnumeric(x) &&...
-    ismatrix(x) &&...
-    ~isempty(x));
 addRequired(P,'randomness',@(x)...
     isnumeric(x) &&...
     isscalar(x));
@@ -157,8 +149,7 @@ addRequired(P,'gridMask',@(x)...
     ~isempty(x));
 
 parse(P,nargin,nargout,sourceIndex,destinIndex,objectiveVars,...
-    objectiveFrac,minClusterSize,walkType,sourceConvexMask,randomness,...
-    gridMask);
+    objectiveFrac,minClusterSize,walkType,randomness,gridMask);
 
 %% Function Parameters
 
@@ -167,6 +158,7 @@ sD = pdist([sourceIndex; destinIndex]);
 gL = ceil(10*sD);
 outputWalk = zeros(1,gL);
 bandWidth = fix(gL/10);
+sourceConvexMask = convexAreaMaskFnc(sourceIndex,gridMask);
 
 %% Generate Top Centroids Mask
 
@@ -337,22 +329,22 @@ while basePointCheck == 0
     tmpMaskCA(destinIndex(1,1),destinIndex(1,2)) = 4;
     
     tmpIndividual = basePoints2WalkFnc(basePoints(any(basePoints,2),:),...
-        1,randomness,gridMask);
+        walkType,randomness,gridMask);
     
     subplot(2,2,1);
-    imagesc(gridMask);
+    imagesc(gridMask), title('Search Domain');
     axis square;
     
     subplot(2,2,2);
-    imagesc(tmpMaskCA);
+    imagesc(tmpMaskCA), title('Current Convex Area');
     axis square;
     
     subplot(2,2,3);
-    imagesc(tmpMaskVA);
+    imagesc(tmpMaskVA), title('Previously Visited Area');
     axis square;
     
     subplot(2,2,4);
-    individualPlot(tmpIndividual,gridMask);
+    individualPlot(tmpIndividual,gridMask), title('Current Pathway');
     axis square;
     
     waitforbuttonpress;
@@ -367,5 +359,10 @@ basePoints = basePoints(any(basePoints,2),:);
 individual = basePoints2WalkFnc(basePoints,walkType,randomness,gridMask);
 sizeIndiv = size(individual,2);
 outputWalk(1,1:sizeIndiv) = individual;
+
+% Update Sub Plot with Final Completed Walk
+
+subplot(2,2,4);
+individualPlot(outputWalk,gridMask), title('Current Pathway');
 
 end
