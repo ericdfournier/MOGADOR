@@ -24,7 +24,7 @@ function varargout = MOGADOR_GUI(varargin)
 
 % Edit the above text to modify the response to help MOGADOR_GUI
 
-% Last Modified by GUIDE v2.5 22-Aug-2014 09:01:40
+% Last Modified by GUIDE v2.5 27-Aug-2014 08:53:50
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -63,7 +63,6 @@ guidata(hObject, handles);
 % UIWAIT makes MOGADOR_GUI wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
-
 % --- Outputs from this function are returned to the command line.
 function varargout = MOGADOR_GUI_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
@@ -75,15 +74,130 @@ function varargout = MOGADOR_GUI_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                           FILE SYSTEM PARAMETERS                        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+function inputSearchDomainFilepath_Callback(hObject, eventdata, handles)
+% hObject    handle to inputSearchDomainFilepath (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+p.searchDomainFilepath = get(hObject,'String');
+p.gridMask = load(p.searchDomainFilepath);
+
+% Hints: get(hObject,'String') returns contents of inputSearchDomainFilepath as text
+%        str2double(get(hObject,'String')) returns contents of inputSearchDomainFilepath as a double
+
+% --- Executes during object creation, after setting all properties.
+function inputSearchDomainFilepath_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to inputSearchDomainFilepath (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in browseSearchDomainFilepath.
+function browseSearchDomainFilepath_Callback(hObject, eventdata, handles)
+% hObject    handle to browseSearchDomainFilepath (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+function inputObjectiveVariableFilepath_Callback(hObject, eventdata, handles)
+% hObject    handle to inputObjectiveVariableFilepath (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+objectiveVariableFilepath = get(hObject,'String');
+
+% --- Executes during object creation, after setting all properties.
+function inputObjectiveVariableFilepath_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to inputObjectiveVariableFilepath (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in browseObjectiveVariableFilepath.
+function browseObjectiveVariableFilepath_Callback(hObject, eventdata, handles)
+% hObject    handle to browseObjectiveVariableFilepath (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+function inputOutputResultsDirectoryPath_Callback(hObject, eventdata, handles)
+% hObject    handle to inputOutputResultsDirectoryPath (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+outputResultsDirectoryPath = get(hObject,'String');
+
+% --- Executes during object creation, after setting all properties.
+
+function inputOutputResultsDirectoryPath_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to inputOutputResultsDirectoryPath (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), ...
+        get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in browseOutputResultsDirectoryPath.
+function browseOutputResultsDirectoryPath_Callback(hObject, eventdata, handles)
+% hObject    handle to browseOutputResultsDirectoryPath (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in loadFileSystemParameters.
+function loadFileSystemParameters_Callback(hObject, eventdata, handles)
+% hObject    handle to loadFileSystemParameters (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+loadFileSystemParametersButtonState = get(hObject,'Value');
+
+if loadFileSystemParametersButtonState == 0
+    
+    clear p.outputResultsDirectoryPath p.objectiveVariables p.
+    
+elseif loadFileSystemParametersButtonState == 1
+    
+    p.outputResultsDirectoryPath = load(outputResultsDirectoryPath);
+    p.objectiveVariables = load(objectiveVariableFilepath);
+    p.outputResultsDirectory = outputResultsDirectoryPath;
+
+end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                   PROBLEM SPECIFICATION PARAMETERS                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 function inputSourceRowSubscript_Callback(hObject, eventdata, handles)
 % hObject    handle to inputSourceRowSubscript (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of inputSourceRowSubscript as text
-%        str2double(get(hObject,'String')) returns contents of inputSourceRowSubscript as a double
-
+sourceRow = get(hObject,'String');
 
 % --- Executes during object creation, after setting all properties.
 function inputSourceRowSubscript_CreateFcn(hObject, eventdata, handles)
@@ -98,61 +212,12 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
-function inputPopulationSizeRowCount_Callback(hObject, eventdata, handles)
-% hObject    handle to inputPopulationSizeRowCount (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of inputPopulationSizeRowCount as text
-%        str2double(get(hObject,'String')) returns contents of inputPopulationSizeRowCount as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function inputPopulationSizeRowCount_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to inputPopulationSizeRowCount (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function inputGenomeLengthColumnCount_Callback(hObject, eventdata, handles)
-% hObject    handle to inputGenomeLengthColumnCount (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of inputGenomeLengthColumnCount as text
-%        str2double(get(hObject,'String')) returns contents of inputGenomeLengthColumnCount as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function inputGenomeLengthColumnCount_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to inputGenomeLengthColumnCount (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
 function inputSourceColumnSubscript_Callback(hObject, eventdata, handles)
 % hObject    handle to inputSourceColumnSubscript (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of inputSourceColumnSubscript as text
-%        str2double(get(hObject,'String')) returns contents of inputSourceColumnSubscript as a double
-
+sourceCol = get(hObject,'String');
 
 % --- Executes during object creation, after setting all properties.
 function inputSourceColumnSubscript_CreateFcn(hObject, eventdata, handles)
@@ -167,14 +232,12 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
 function inputDestinationRowSubscript_Callback(hObject, eventdata, handles)
 % hObject    handle to inputDestinationRowSubscript (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of inputDestinationRowSubscript as text
-%        str2double(get(hObject,'String')) returns contents of inputDestinationRowSubscript as a double
+destinRow = get(hObject,'String');
 
 
 % --- Executes during object creation, after setting all properties.
@@ -190,15 +253,12 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
 function inputDestinationColumnSubscript_Callback(hObject, eventdata, handles)
 % hObject    handle to inputDestinationColumnSubscript (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of inputDestinationColumnSubscript as text
-%        str2double(get(hObject,'String')) returns contents of inputDestinationColumnSubscript as a double
-
+destinCol = get(hObject,'String');
 
 % --- Executes during object creation, after setting all properties.
 function inputDestinationColumnSubscript_CreateFcn(hObject, eventdata, handles)
@@ -213,27 +273,70 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in selectWalkType.
-function selectWalkType_Callback(hObject, eventdata, handles)
-% hObject    handle to selectWalkType (see GCBO)
+function inputPopulationSizeRowCount_Callback(hObject, eventdata, handles)
+% hObject    handle to inputPopulationSizeRowCount (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns selectWalkType contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from selectWalkType
-
+popSize = get(hObject,'String');
 
 % --- Executes during object creation, after setting all properties.
-function selectWalkType_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to selectWalkType (see GCBO)
+function inputPopulationSizeRowCount_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to inputPopulationSizeRowCount (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: listbox controls usually have a white background on Windows.
+% Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+function inputGenomeLengthColumnCount_Callback(hObject, eventdata, handles)
+% hObject    handle to inputGenomeLengthColumnCount (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+genomeLength = get(hObject,'String');
+
+% --- Executes during object creation, after setting all properties.
+function inputGenomeLengthColumnCount_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to inputGenomeLengthColumnCount (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in loadProblemSpecificationParameters.
+function loadProblemSpecificationParameters_Callback(hObject, eventdata, handles)
+% hObject    handle to loadProblemSpecificationParameters (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+loadProblemSpecificationParametersButtonState = get(hObject,'Value');
+
+if loadProblemSpecificationParametersButtonState == 0
+    
+    clear p.sourceIndex p.destinIndex p.populationSize p.genomeLength
+    
+elseif loadProblemSpecificationParametersButtonState == 1
+
+    p.sourceIndex = [str2double(sourceRow) str2double(sourceCol)];
+    p.destinIndex = [str2double(destinRow) str2double(destinCol)];
+    p.populationSize = str2double(popSize);
+    p.genomeLength = str2double(genomeLength);
+
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                   POPULATION INITIALIZATION PARAMETERS                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 % --- Executes on selection change in selectExecutionType.
@@ -259,15 +362,35 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
+% --- Executes on selection change in selectWalkType.
+function selectWalkType_Callback(hObject, eventdata, handles)
+% hObject    handle to selectWalkType (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+walkType = get(hObject,'String');
+p.walkType = str2double(walkType);
+
+% --- Executes during object creation, after setting all properties.
+function selectWalkType_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to selectWalkType (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
 % --- Executes on slider movement.
 function slideObjectiveFraction_Callback(hObject, eventdata, handles)
 % hObject    handle to slideObjectiveFraction (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
+p.objectiveFraction = get(hObject,'Value');
 
 % --- Executes during object creation, after setting all properties.
 function slideObjectiveFraction_CreateFcn(hObject, eventdata, handles)
@@ -280,120 +403,14 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
 
-function inputObjectiveVariableFilepath_Callback(hObject, eventdata, handles)
-% hObject    handle to inputObjectiveVariableFilepath (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of inputObjectiveVariableFilepath as text
-%        str2double(get(hObject,'String')) returns contents of inputObjectiveVariableFilepath as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function inputObjectiveVariableFilepath_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to inputObjectiveVariableFilepath (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function inputOutputResultsDirectoryPath_Callback(hObject, eventdata, handles)
-% hObject    handle to inputOutputResultsDirectoryPath (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of inputOutputResultsDirectoryPath as text
-%        str2double(get(hObject,'String')) returns contents of inputOutputResultsDirectoryPath as a double
-
-
-% --- Executes during object creation, after setting all properties.
-
-function inputOutputResultsDirectoryPath_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to inputOutputResultsDirectoryPath (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), ...
-        get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-function inputSearchDomainFilepath_Callback(hObject, eventdata, handles)
-% hObject    handle to inputSearchDomainFilepath (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-p.searchDomainFilepath = get(hObject,'String');
-p.gridMask = load(p.searchDomainFilepath);
-
-
-% Hints: get(hObject,'String') returns contents of inputSearchDomainFilepath as text
-%        str2double(get(hObject,'String')) returns contents of inputSearchDomainFilepath as a double
-
-% --- Executes during object creation, after setting all properties.
-function inputSearchDomainFilepath_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to inputSearchDomainFilepath (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --------------------------------------------------------------------
-function fileSystemParameters_Callback(hObject, eventdata, handles)
-% hObject    handle to fileSystemParameters (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --------------------------------------------------------------------
-function problemSpecificationParameters_Callback(hObject, eventdata, handles)
-% hObject    handle to problemSpecificationParameters (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --------------------------------------------------------------------
-function Untitled_2_Callback(hObject, eventdata, handles)
-% hObject    handle to inputSearchDomainFilepath (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --------------------------------------------------------------------
-function fileSystemParametersContext_Callback(hObject, eventdata, handles)
-% hObject    handle to fileSystemParametersContext (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --------------------------------------------------------------------
-function Untitled_4_Callback(hObject, eventdata, handles)
-% hObject    handle to Untitled_4 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
 
 function inputMinimumObjectiveClusterSizeCellCount_Callback(hObject, eventdata, handles)
 % hObject    handle to inputMinimumObjectiveClusterSizeCellCount (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of inputMinimumObjectiveClusterSizeCellCount as text
-%        str2double(get(hObject,'String')) returns contents of inputMinimumObjectiveClusterSizeCellCount as a double
-
+ minimumClusterSize = get(hObject,'String');
+ p.minimumClusterSize = str2double(minimumClusterSize);
 
 % --- Executes during object creation, after setting all properties.
 function inputMinimumObjectiveClusterSizeCellCount_CreateFcn(hObject, eventdata, handles)
@@ -408,15 +425,13 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
 function inputCoefficientOfRandomnessValue_Callback(hObject, eventdata, handles)
 % hObject    handle to inputCoefficientOfRandomnessValue (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of inputCoefficientOfRandomnessValue as text
-%        str2double(get(hObject,'String')) returns contents of inputCoefficientOfRandomnessValue as a double
-
+randomness = get(hObject,'String');
+p.randomness = str2double(randomness);
 
 % --- Executes during object creation, after setting all properties.
 function inputCoefficientOfRandomnessValue_CreateFcn(hObject, eventdata, handles)
@@ -440,91 +455,14 @@ function generateInitialPopulation_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of generateInitialPopulation
 
 
-% --- Executes on button press in checkbox1.
-function checkbox1_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox1
-
-
-% --- Executes on button press in checkbox2.
-function checkbox2_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox2
-
-
-
-function edit20_Callback(hObject, eventdata, handles)
-% hObject    handle to edit20 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit20 as text
-%        str2double(get(hObject,'String')) returns contents of edit20 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit20_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit20 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in pushbutton1.
-function pushbutton1_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in togglebutton3.
-function togglebutton3_Callback(hObject, eventdata, handles)
-% hObject    handle to togglebutton3 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of togglebutton3
-
-
-% --- Executes on button press in loadFileSystemParameters.
-function loadFileSystemParameters_Callback(hObject, eventdata, handles)
-% hObject    handle to loadFileSystemParameters (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of loadFileSystemParameters
-
-
-% --- Executes on button press in loadProblemSpecificationParameters.
-function loadProblemSpecificationParameters_Callback(hObject, eventdata, handles)
-% hObject    handle to loadProblemSpecificationParameters (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of loadProblemSpecificationParameters
-
-
-% --- Executes on button press in pushbutton2.
-function pushbutton2_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                         EVOLUTIONARY OPERATORS                          %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 % --- Executes on slider movement.
-function slideMutationFraction_Callback(hObject, eventdata, handles)
-% hObject    handle to slideMutationFraction (see GCBO)
+function slideSelectionFraction_Callback(hObject, eventdata, handles)
+% hObject    handle to slideSelectionFraction (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -533,37 +471,14 @@ function slideMutationFraction_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function slideMutationFraction_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slideMutationFraction (see GCBO)
+function slideSelectionFraction_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slideSelectionFraction (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: slider controls usually have a light gray background.
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-
-function inputMutationCountValue_Callback(hObject, eventdata, handles)
-% hObject    handle to inputMutationCountValue (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of inputMutationCountValue as text
-%        str2double(get(hObject,'String')) returns contents of inputMutationCountValue as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function inputMutationCountValue_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to inputMutationCountValue (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
 end
 
 
@@ -580,28 +495,6 @@ function slideSelectionProbability_Callback(hObject, eventdata, handles)
 % --- Executes during object creation, after setting all properties.
 function slideSelectionProbability_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to slideSelectionProbability (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-% --- Executes on slider movement.
-function slideSelectionFraction_Callback(hObject, eventdata, handles)
-% hObject    handle to slideSelectionFraction (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
-
-% --- Executes during object creation, after setting all properties.
-function slideSelectionFraction_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slideSelectionFraction (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -634,6 +527,86 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
+% --- Executes on slider movement.
+function slideMutationFraction_Callback(hObject, eventdata, handles)
+% hObject    handle to slideMutationFraction (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function slideMutationFraction_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slideMutationFraction (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+function inputMutationCountValue_Callback(hObject, eventdata, handles)
+% hObject    handle to inputMutationCountValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of inputMutationCountValue as text
+%        str2double(get(hObject,'String')) returns contents of inputMutationCountValue as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function inputMutationCountValue_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to inputMutationCountValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in checkEpigeneticSmoothingOfFinalPopulation.
+function checkEpigeneticSmoothingOfFinalPopulation_Callback(hObject, eventdata, handles)
+% hObject    handle to checkEpigeneticSmoothingOfFinalPopulation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkEpigeneticSmoothingOfFinalPopulation
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                               OUTPUT PLOTS                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+function inputPlotIndividualRowValue_Callback(hObject, eventdata, handles)
+% hObject    handle to inputPlotIndividualRowValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of inputPlotIndividualRowValue as text
+%        str2double(get(hObject,'String')) returns contents of inputPlotIndividualRowValue as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function inputPlotIndividualRowValue_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to inputPlotIndividualRowValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
 % --- Executes on button press in checkIndividualPlot.
 function checkIndividualPlot_Callback(hObject, eventdata, handles)
 % hObject    handle to checkIndividualPlot (see GCBO)
@@ -641,6 +614,15 @@ function checkIndividualPlot_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkIndividualPlot
+
+
+% --- Executes on button press in checkIndividualFitnessTradeoffPlot.
+function checkIndividualFitnessTradeoffPlot_Callback(hObject, eventdata, handles)
+% hObject    handle to checkIndividualFitnessTradeoffPlot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkIndividualFitnessTradeoffPlot
 
 
 % --- Executes on button press in checkPopulationParetoFrontierPlot.
@@ -659,6 +641,48 @@ function checkPopulationEvolutionaryConvergencePlot_Callback(hObject, eventdata,
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkPopulationEvolutionaryConvergencePlot
+
+
+
+
+
+
+
+
+
+% --------------------------------------------------------------------
+function fileSystemParameters_Callback(hObject, eventdata, handles)
+% hObject    handle to fileSystemParameters (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function problemSpecificationParameters_Callback(hObject, eventdata, handles)
+% hObject    handle to problemSpecificationParameters (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function Untitled_2_Callback(hObject, eventdata, handles)
+% hObject    handle to inputSearchDomainFilepath (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function fileSystemParametersContext_Callback(hObject, eventdata, handles)
+% hObject    handle to fileSystemParametersContext (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushbutton2.
+function pushbutton2_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
 
 % --------------------------------------------------------------------
@@ -690,8 +714,8 @@ function crossoverParameters_Callback(hObject, eventdata, handles)
 
 
 % --------------------------------------------------------------------
-function mutatoinParameters_Callback(hObject, eventdata, handles)
-% hObject    handle to mutatoinParameters (see GCBO)
+function mutationParameters_Callback(hObject, eventdata, handles)
+% hObject    handle to mutationParameters (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -794,43 +818,11 @@ function selectionProbability_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on button press in checkIndividualFitnessTradeoffPlot.
-function checkIndividualFitnessTradeoffPlot_Callback(hObject, eventdata, handles)
-% hObject    handle to checkIndividualFitnessTradeoffPlot (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkIndividualFitnessTradeoffPlot
-
-
 % --------------------------------------------------------------------
 function outputPlotParameters_Callback(hObject, eventdata, handles)
 % hObject    handle to outputPlotParameters (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-
-
-function inputPlotIndividualRowValue_Callback(hObject, eventdata, handles)
-% hObject    handle to inputPlotIndividualRowValue (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of inputPlotIndividualRowValue as text
-%        str2double(get(hObject,'String')) returns contents of inputPlotIndividualRowValue as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function inputPlotIndividualRowValue_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to inputPlotIndividualRowValue (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
 
 
 % --------------------------------------------------------------------
@@ -887,15 +879,6 @@ function individualFitnessTradeoffPlot_Callback(hObject, eventdata, handles)
 % hObject    handle to individualFitnessTradeoffPlot (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in checkEpigeneticSmoothingOfFinalPopulation.
-function checkEpigeneticSmoothingOfFinalPopulation_Callback(hObject, eventdata, handles)
-% hObject    handle to checkEpigeneticSmoothingOfFinalPopulation (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkEpigeneticSmoothingOfFinalPopulation
 
 
 % --------------------------------------------------------------------
@@ -1059,22 +1042,79 @@ function outputPlots_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on button press in browseSearchDomainFilepath.
-function browseSearchDomainFilepath_Callback(hObject, eventdata, handles)
-% hObject    handle to browseSearchDomainFilepath (see GCBO)
+
+
+
+
+
+
+
+
+% --------------------------------------------------------------------
+function Untitled_4_Callback(hObject, eventdata, handles)
+% hObject    handle to Untitled_4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on button press in browseObjectiveVariableFilepath.
-function browseObjectiveVariableFilepath_Callback(hObject, eventdata, handles)
-% hObject    handle to browseObjectiveVariableFilepath (see GCBO)
+% --- Executes on button press in checkbox1.
+function checkbox1_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox1
+
+
+% --- Executes on button press in checkbox2.
+function checkbox2_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox2
+
+
+function edit20_Callback(hObject, eventdata, handles)
+% hObject    handle to edit20 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit20 as text
+%        str2double(get(hObject,'String')) returns contents of edit20 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit20_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit20 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushbutton1.
+function pushbutton1_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on button press in browseOutputResultsDirectoryPath.
-function browseOutputResultsDirectoryPath_Callback(hObject, eventdata, handles)
-% hObject    handle to browseOutputResultsDirectoryPath (see GCBO)
+% --- Executes on button press in togglebutton3.
+function togglebutton3_Callback(hObject, eventdata, handles)
+% hObject    handle to togglebutton3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of togglebutton3
+
+
+% --------------------------------------------------------------------
+function mutationParameters_Callback(hObject, eventdata, handles)
+% hObject    handle to mutationParameters (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
