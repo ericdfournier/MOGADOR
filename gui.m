@@ -10,10 +10,11 @@ function varargout = gui(varargin)
 %      function named CALLBACK in GUI.M with the given input arguments.
 %
 %      GUI('Property','Value',...) creates a new GUI or raises the
-%      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before gui_OpeningFcn gets called.  An
-%      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to gui_OpeningFcn via varargin.
+%      existing singleton*.  Starting from the left, property value pairs 
+%      are applied to the GUI before gui_OpeningFcn gets called.  An
+%      unrecognized property name or invalid value makes property 
+%      application stop.  All inputs are passed to gui_OpeningFcn via 
+%      varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
@@ -22,7 +23,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 28-Aug-2014 14:10:48
+% Last Modified by GUIDE v2.5 29-Aug-2014 10:06:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -141,6 +142,9 @@ handles.gridMaskGeoRasterRef = tmp.gridMaskGeoRasterRef;
 
 tmp = load(handles.objectiveVariablesFilepath);
 handles.objectiveVariables = tmp.objectiveVariables;
+
+set(handles.textLoadFileSystemParametersSuccess,'String',...
+    'Success!');
     
 % Update handles structure
 
@@ -190,8 +194,9 @@ function inputSourceIndexRow_Callback(hObject, ~, handles)
 
 % Read in user input source index row
 
-handles.sourceRow = get(hObject,'String');
-
+tmp = get(hObject,'String');
+handles.sourceRow = str2double(tmp);
+ 
 % Update handles structure
 
 guidata(hObject, handles);
@@ -212,7 +217,9 @@ function inputSourceIndexColumn_Callback(hObject, ~, handles)
 
 % Read in user input source index column
 
-handles.sourceCol = get(hObject,'String');
+
+tmp = get(hObject,'String');
+handles.sourceCol = str2double(tmp);
 
 % Update handles structure
 
@@ -268,7 +275,8 @@ function inputDestinationIndexRow_Callback(hObject, ~, handles)
 
 % Read in user input destination index row
 
-handles.destinRow = get(hObject,'String');
+ tmp = get(hObject,'String');
+ handles.destinRow = str2double(tmp);
 
 % Update handles structure 
 
@@ -290,7 +298,8 @@ function inputDestinationIndexColumn_Callback(hObject, ~, handles)
 
 % Read in user input destination column
 
-handles.destinCol = get(hObject,'String');
+tmp = get(hObject,'String');
+handles.destinCol = str2double(tmp);
 
 % Update handles structure
 
@@ -313,18 +322,21 @@ function loadProblemStatementParameters_Callback(hObject, ~, handles)
 
 % Get button status
 
-loadParameterButtonStatus = get(hObject,'Value');
+loadProblemStatementButtonStatus = get(hObject,'Value');
 
-if loadParameterButtonStatus == 1
+if loadProblemStatementButtonStatus == 1
     
     % Write parameters to handle structure
     
     handles.sourceIndex = ...
-        [str2double(handles.sourceRow) str2double(handles.sourceCol)];
+        [handles.sourceRow handles.sourceCol];
     handles.destinIndex = ...
-        [str2double(handles.destinRow) str2double(handles.destinCol)];
+        [handles.destinRow handles.destinCol];
     
-elseif loadParameterButtonStatus == 0 
+    set(handles.textLoadProblemStatementParametersSuccess,'String',...
+    'Success!');
+    
+elseif loadProblemStatementButtonStatus == 0 
     
     % Clear parameters within handle structure
     
@@ -347,7 +359,9 @@ function inputIndividuals_Callback(hObject, ~, handles)
 
 % Read in the user input number of individuals in the population
 
-handles.popSize = get(hObject,'String');
+handles.populationSizeString = get(hObject,'String');
+set(handles.inputIndividuals,'String',...
+    handles.populationSizeString);
 
 % Update handles structure
 
@@ -364,24 +378,180 @@ if ispc && isequal( ...
     
 end
 
-% --- Executes on selection change in listbox1.
-function listbox1_Callback(hObject, eventdata, handles)
-% hObject    handle to listbox1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns listbox1 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from listbox1
+function inputRandomness_Callback(hObject, ~, handles)
 
+% Read in randomness coefficient
+
+handles.randomnessString = get(hObject,'String');
+set(handles.inputRandomness,'String',...
+    handles.randomnessString);
+
+% Update handles structure
+
+guidata(hObject, handles);
 
 % --- Executes during object creation, after setting all properties.
-function listbox1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to listbox1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
+function inputRandomness_CreateFcn(hObject, ~, ~)
 
-% Hint: listbox controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on selection change in selectExecutionType.
+function selectExecutionType_Callback(hObject, ~, handles)
+
+% Read in execution type selection
+
+handles.executionTypeRaw = get(hObject,'Value')-1;
+
+% Update handles structure
+
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function selectExecutionType_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in selectWalkType.
+function selectWalkType_Callback(hObject, ~, handles)
+
+% Read in walk type selection
+
+handles.walkTypeRaw = get(hObject,'Value')-1;
+
+% Update handles structure
+
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function selectWalkType_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on slider movement.
+function slideObjectiveFraction_Callback(hObject, ~, handles)
+
+% Get objective fraction slider position
+
+handles.objectiveFractionRaw = get(hObject,'Value');
+
+% Update handles structure
+
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function slideObjectiveFraction_CreateFcn(hObject, ~, ~)
+
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+function inputMinimumClusterSize_Callback(hObject, ~, handles)
+
+% Read in minimum cluster size 
+
+handles.minimumClusterSizeString = get(hObject,'String');
+
+% Update handles structure
+
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function inputMinimumClusterSize_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in initializePopulation.
+function initializePopulation_Callback(hObject, ~, handles)
+
+% Get button status
+
+initializePopulationButtonStatus = get(hObject,'Value');
+
+if initializePopulationButtonStatus == 1
+    
+    % Write parameters to handle structure
+    
+    handles.populationSize = str2double(handles.populationSizeString);
+    handles.randomness = str2double(handles.randomnessString);
+    handles.executionType = handles.executionTypeRaw;
+    handles.walkType = handles.walkTypeRaw;
+    handles.objectiveFraction = handles.objectiveFractionRaw;
+    handles.minimumClusterSize = str2double(handles.minimumClusterSizeString);
+    
+elseif initializedPopulationButtonStatus == 0 
+    
+    % Clear parameters within handle structure
+    
+    handles.populationSize = [];
+    handles.randomness = [];
+    handles.executionType = [];
+    handles.walkType = [];
+    handles.objectiveFraction = [];
+    handles.minimumClusterSize = [];
+    
+end
+
+guidata(hObject, handles);
+
+% Update handles structure
+
+guidata(hObject,handles);
+
+% Intialize Population
+
+maxGenerations = 100;
+i = 1;
+o = cell(maxGenerations,3);
+
+o{i,1} = initPopFnc(...
+    handles.populationSize,...
+    handles.sourceIndex,...
+	handles.destinIndex,...
+	handles.objectiveVariables,...
+    handles.objectiveFraction,...
+	handles.minimumClusterSize,...
+    handles.walkType,...
+    handles.randomness,...
+    handles.executionType,...
+	handles.gridMask          );
+
+o{i,2} = popFitnessFnc(...
+    o{1,1},...
+    handles.objectiveVariables,...
+    handles.gridMask          );
+
+o{i,3} = popAvgFitnessFnc(...
+    o{1,1},...
+    handles.objectiveVariables,...
+    handles.gridMask          );
+
+handles.o = o;
+
+% Update handles structure
+
+guidata(hObject, handles);
+
+% Display success message
+
+set(handles.textInitializePopulationSuccess,'String',...
+    'Success!');
+
+% Update Handles Structure
+
+guidata(hObject, handles);
+
+disp(handles);
