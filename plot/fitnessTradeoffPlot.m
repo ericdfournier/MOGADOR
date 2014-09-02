@@ -70,7 +70,7 @@ parse(P,nargin,individual,paramsStruct);
 
 indiv = individual(any(individual,1));
 gL = size(indiv,2);
-objectiveVars = paramsStruct.objectiveVars;
+objectiveVars = paramsStruct.objectiveVariables;
 oC = size(objectiveVars,3);
 rawFit = zeros(oC,gL);
 nodes = 1:1:gL;

@@ -23,7 +23,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 29-Aug-2014 10:06:02
+% Last Modified by GUIDE v2.5 02-Sep-2014 09:36:45
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -541,10 +541,6 @@ o{i,3} = popAvgFitnessFnc(...
 
 handles.o = o;
 
-% Update handles structure
-
-guidata(hObject, handles);
-
 % Display success message
 
 set(handles.textInitializePopulationSuccess,'String',...
@@ -554,4 +550,238 @@ set(handles.textInitializePopulationSuccess,'String',...
 
 guidata(hObject, handles);
 
-disp(handles);
+
+%__________________________________________________________________________
+%                     EVOLUTIONARY OPERATOR PARAMETERS
+%__________________________________________________________________________
+
+
+% --- Executes on slider movement.
+function slideSelectionFraction_Callback(hObject, ~, handles)
+
+% Get selection fraction slider position
+
+handles.selectionFractionRaw = get(hObject,'Value');
+
+% Update Handles Structure
+
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function slideSelectionFraction_CreateFcn(hObject, ~, ~)
+
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function slideSelectionProbability_Callback(hObject, ~, handles)
+
+% Get selection probability slider position
+
+handles.selectionProbabilityRaw = get(hObject,'Value');
+
+% Update Handles Structure
+
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function slideSelectionProbability_CreateFcn(hObject, ~, ~)
+
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function slideMutationFraction_Callback(hObject, ~, handles)
+
+% Get mutation fraction slider position
+
+handles.mutationFractionRaw = get(hObject,'Value');
+
+% Update Handles Structure
+
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function slideMutationFraction_CreateFcn(hObject, ~, ~)
+
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+function inputMutations_Callback(hObject, ~, handles)
+
+% Get mutation count text input string
+
+handles.mutationCountString = get(hObject,'String');
+
+% Update handles structure
+
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function inputMutations_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+function inputGenerations_Callback(hObject, ~, handles)
+
+% Get user input for maximum generations
+
+handles.maximumGenerationsString = get(hObject,'String');
+
+% Update Handles structure
+
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function inputGenerations_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in selectCrossoverType.
+function selectCrossoverType_Callback(hObject, ~, handles)
+
+% Get user input for crossover type
+
+handles.crossoverTypeRaw = get(hObject,'Value')-1;
+
+% Update handles structure
+
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function selectCrossoverType_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in generateSolution.
+function generateSolution_Callback(hObject, ~, handles)
+
+% Get button status
+
+generateSolutionButtonStatus = get(hObject,'Value');
+
+if generateSolutionButtonStatus == 1
+        
+    % Write parameters to handle structure
+    
+    handles.selectionFraction = handles.selectionFractionRaw;
+    handles.selectionProbability = handles.selectionProbabilityRaw;
+    handles.mutationFraction = handles.mutationFractionRaw;
+    handles.mutationCount = str2double(handles.mutationCountString);
+    handles.maximumGenerations = str2double(handles.maximumGenerationsString);
+    handles.crossoverType = handles.crossoverTypeRaw;
+    
+elseif generateSolutionButtonStatus == 0 
+    
+    % Clear parameters within handle structure
+    
+    handles.selectionFraction = [];
+    handles.selectionProbability = [];
+    handles.mutationFraction = [];
+    handles.mutationCount = [];
+    handles.maximumGenerations = [];
+    handles.crossoverType = [];
+    
+end
+
+% Get initial population
+
+o = handles.o;
+
+% Set MOGADOR Loop start parameters
+
+i = 1;
+convergence = 0;
+
+% Enter MOGADOR Loop
+
+while convergence == 0
+    
+    currentPopulation = o{i,1};
+    averageFitnessHistory = [o{1:i,3}];
+        
+    if i <= 2
+        
+        convergence = 0;
+        convergenceRate = 0;
+        
+    elseif i == handles.maximumGenerations
+        
+        break;
+    
+    else
+        
+        convergenceAbsolute = fix(diff(averageFitnessHistory,1));
+        convergenceRate = fix(diff(averageFitnessHistory,2));
+        convergence = convergenceRate(i-2) <= 1E-10 ;
+        
+    end
+
+    selection = popSelectionFnc(...
+        currentPopulation,...
+        handles.selectionFraction,...
+        handles.selectionProbability,...
+        handles.objectiveVariables,...
+        handles.gridMask          );
+    
+    crossover = popCrossoverFnc(...
+        selection,...
+        handles.populationSize,...
+        handles.sourceIndex,...
+        handles.destinIndex,...
+        handles.crossoverType,...
+        handles.gridMask          );
+    
+    mutation = popMutationFnc(...
+        crossover,...
+        handles.mutationFraction,...
+        handles.mutationCount,...
+        handles.randomness,...
+        handles.gridMask          );
+    
+    fitness = popFitnessFnc(...
+        mutation,...
+        handles.objectiveVariables,...
+        handles.gridMask          );
+    
+    avgfitness = popAvgFitnessFnc(...
+        mutation,...
+        handles.objectiveVariables,...
+        handles.gridMask          );
+    
+    o{i+1,1} = mutation;
+    o{i+1,2} = fitness;
+    o{i+1,3} = avgfitness;
+    
+    disp(['*Generation: ',num2str(i),'*']);
+   
+    i = i+1;
+        
+end
+
+handles.o = o;
+
+% Display success message
+
+set(handles.textGenerateSolutionSuccess,'String',...
+    'Success!');
+
+% Update Handles Structure
+
+guidata(hObject, handles);

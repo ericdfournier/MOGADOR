@@ -184,6 +184,7 @@ end
 
 sourceMask = zeros(gS);
 sourceMask(sourceIndex(1,1),sourceIndex(1,2)) = 1;
+sourceDistMask = bwdist(sourceMask);
 
 %% Generate Walks from Base Points Selected Using Distance Band Masks
 
