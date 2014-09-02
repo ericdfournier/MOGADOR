@@ -27,7 +27,7 @@ p.destinIndex = [220 200];
 
 %% Selection Parameters
 
-p.selectionFraction = 0.5;
+p.selectionFraction = 0.41;
 p.selectionProbability = 1; 
 
 %% Mutation Parameters

@@ -23,7 +23,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 02-Sep-2014 09:36:45
+% Last Modified by GUIDE v2.5 02-Sep-2014 15:39:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -448,6 +448,23 @@ handles.objectiveFractionRaw = get(hObject,'Value');
 
 guidata(hObject, handles);
 
+% Set current value string
+
+if handles.objectiveFractionRaw < 0.1
+
+    set(handles.textObjectiveFractionValue,'String',...
+        num2str(handles.objectiveFractionRaw,1));
+else 
+    
+    set(handles.textObjectiveFractionValue,'String',...
+        num2str(handles.objectiveFractionRaw,2));
+    
+end
+
+% Update handle structure
+
+guidata(hObject, handles);
+
 % --- Executes during object creation, after setting all properties.
 function slideObjectiveFraction_CreateFcn(hObject, ~, ~)
 
@@ -567,6 +584,23 @@ handles.selectionFractionRaw = get(hObject,'Value');
 
 guidata(hObject, handles);
 
+% Set current value string
+
+if handles.selectionFractionRaw < 0.1
+
+    set(handles.textSelectionFractionValue,'String',...
+        num2str(handles.selectionFractionRaw,1));
+else 
+    
+    set(handles.textSelectionFractionValue,'String',...
+        num2str(handles.selectionFractionRaw,2));
+    
+end
+
+% Update handle structure
+
+guidata(hObject, handles);
+
 % --- Executes during object creation, after setting all properties.
 function slideSelectionFraction_CreateFcn(hObject, ~, ~)
 
@@ -586,6 +620,23 @@ handles.selectionProbabilityRaw = get(hObject,'Value');
 
 guidata(hObject, handles);
 
+% Set current value string
+
+if handles.selectionProbabilityRaw < 0.1
+
+    set(handles.textSelectionProbabilityValue,'String',...
+        num2str(handles.selectionProbabilityRaw,1));
+else 
+    
+    set(handles.textSelectionProbabilityValue,'String',...
+        num2str(handles.selectionProbabilityRaw,2));
+    
+end
+
+% Update handle structure
+
+guidata(hObject, handles);
+
 % --- Executes during object creation, after setting all properties.
 function slideSelectionProbability_CreateFcn(hObject, ~, ~)
 
@@ -602,6 +653,23 @@ function slideMutationFraction_Callback(hObject, ~, handles)
 handles.mutationFractionRaw = get(hObject,'Value');
 
 % Update Handles Structure
+
+guidata(hObject, handles);
+
+% Set current value string
+
+if handles.mutationFractionRaw < 0.1
+
+    set(handles.textMutationFractionValue,'String',...
+        num2str(handles.mutationFractionRaw,1));
+else 
+    
+    set(handles.textMutationFractionValue,'String',...
+        num2str(handles.mutationFractionRaw,2));
+    
+end
+
+% Update handle structure
 
 guidata(hObject, handles);
 
@@ -700,82 +768,33 @@ elseif generateSolutionButtonStatus == 0
     
 end
 
+% Update handles structure
+
+guidata(hObject,handles);
+
+disp(handles);
+
 % Get initial population
 
-o = handles.o;
+inputPopCell = handles.o;
 
 % Set MOGADOR Loop start parameters
 
-i = 1;
-convergence = 0;
-
-% Enter MOGADOR Loop
-
-while convergence == 0
-    
-    currentPopulation = o{i,1};
-    averageFitnessHistory = [o{1:i,3}];
-        
-    if i <= 2
-        
-        convergence = 0;
-        convergenceRate = 0;
-        
-    elseif i == handles.maximumGenerations
-        
-        break;
-    
-    else
-        
-        convergenceAbsolute = fix(diff(averageFitnessHistory,1));
-        convergenceRate = fix(diff(averageFitnessHistory,2));
-        convergence = convergenceRate(i-2) <= 1E-10 ;
-        
-    end
-
-    selection = popSelectionFnc(...
-        currentPopulation,...
-        handles.selectionFraction,...
-        handles.selectionProbability,...
-        handles.objectiveVariables,...
-        handles.gridMask          );
-    
-    crossover = popCrossoverFnc(...
-        selection,...
-        handles.populationSize,...
-        handles.sourceIndex,...
-        handles.destinIndex,...
-        handles.crossoverType,...
-        handles.gridMask          );
-    
-    mutation = popMutationFnc(...
-        crossover,...
-        handles.mutationFraction,...
-        handles.mutationCount,...
-        handles.randomness,...
-        handles.gridMask          );
-    
-    fitness = popFitnessFnc(...
-        mutation,...
-        handles.objectiveVariables,...
-        handles.gridMask          );
-    
-    avgfitness = popAvgFitnessFnc(...
-        mutation,...
-        handles.objectiveVariables,...
-        handles.gridMask          );
-    
-    o{i+1,1} = mutation;
-    o{i+1,2} = fitness;
-    o{i+1,3} = avgfitness;
-    
-    disp(['*Generation: ',num2str(i),'*']);
-   
-    i = i+1;
-        
-end
-
-handles.o = o;
+outputPopCell= mogadorFnc(    inputPopCell, ...
+                              handles.sourceIndex, ...
+                              handles.destinIndex, ...
+                              handles.populationSize,...
+                              handles.maximumGenerations, ...
+                              handles.selectionFraction, ...
+                              handles.selectionProbability, ...
+                              handles.crossoverType, ...
+                              handles.mutationFraction, ...
+                              handles.mutationCount, ...
+                              handles.randomness, ...
+                              handles.objectiveVariables, ...
+                              handles.gridMask );
+                                
+handles.o = outputPopCell;        
 
 % Display success message
 
@@ -785,3 +804,22 @@ set(handles.textGenerateSolutionSuccess,'String',...
 % Update Handles Structure
 
 guidata(hObject, handles);
+
+
+%__________________________________________________________________________
+%                            OUTPUT PARAMETERS
+%__________________________________________________________________________
+
+
+% --- Executes on button press in generateOutputPlots.
+function generateOutputPlots_Callback(hObject, eventdata, handles)
+% hObject    handle to generateOutputPlots (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in writeSolutionDataToFile.
+function writeSolutionDataToFile_Callback(hObject, eventdata, handles)
+% hObject    handle to writeSolutionDataToFile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)

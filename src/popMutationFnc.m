@@ -1,6 +1,6 @@
 function [ outputPop ] = popMutationFnc(    inputPop,...
-                                            fraction,...
-                                            mutations,...
+                                            mutationFraction,...
+                                            mutationCount,...
                                             randomness,...
                                             gridMask )
 
@@ -25,16 +25,16 @@ function [ outputPop ] = popMutationFnc(    inputPop,...
 %
 % INPUTS:
 %
-%   individual =    [1 x m] array of index values listing the connected 
+%   inputPop =    [1 x m] array of index values listing the connected 
 %                   grid cells forming a pathway from a specified source to
 %                   a specified target destination given the constraints of
 %                   a specified study region
 %
-%   fraction =      [r] scalar indicating the fraction (ranging from 0 to 
+%   mutationFraction = [r] scalar indicating the fraction (ranging from 0 to 
 %                   1) of the input that will be subject to the mutation 
 %                   process 
 %   
-%   mutations =     [s] scalar indicating the number of multi-point
+%   mutationCount = [s] scalar indicating the number of multi-point
 %                   mutations to be processed for each individual within 
 %                   the input population
 %
@@ -99,23 +99,41 @@ addRequired(P,'gridMask',@(x)...
     ismatrix(x) &&...
     ~isempty(x));
 
-parse(P,nargin,nargout,inputPop,fraction,mutations,randomness,gridMask);
+parse(P,nargin,nargout,inputPop,mutationFraction,mutationCount,...
+    randomness,gridMask);
 
 %% Iteration Parameters
 
 popSize = size(inputPop,1);
 gL = size(inputPop,2);
-mF = floor(fraction*popSize);
-mS = randomsample(1:1:popSize,mF);
-mutPop = inputPop(mS,:);
-outputPop = zeros(mF,gL);
+mF = floor(mutationFraction*popSize);
+mutSum = 0;
+mL = zeros(popSize,1);
+
+while mutSum <= mF
+    
+    mI = datasample(1:1:popSize,1);
+    mL(mI) = 1;
+    mutSum = sum(mL);
+    
+end
+
+outputPop = zeros(popSize,gL);
 
 %% Compute Mutations
 
-for i = 1:mF
+for i = 1:popSize
     
-    outputPop(i,:) = multiMutationFnc(mutPop(i,:),mutations,randomness,...
-        gridMask);
+    if mL(i) == 1
+        
+        outputPop(i,:) = multiMutationFnc(inputPop(i,:),mutationCount,...
+            randomness,gridMask);
+        
+    else
+        
+        outputPop(i,:) = inputPop(i,:);
+        
+    end
     
 end
 

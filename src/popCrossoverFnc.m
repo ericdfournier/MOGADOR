@@ -24,7 +24,7 @@ function [ outputPop ] = popCrossoverFnc(   selection,...
 %
 % INPUTS:
 %
-%   inputPop =      [n x m] array where each row represents a set of index 
+%   selection =     [r x s] array where each row represents a set of index 
 %                   values listing the connected grid cells forming a 
 %                   pathway from a specified source to a specified target 
 %                   destination given the constraints of a specified study 
@@ -135,7 +135,6 @@ sS = size(selection,1);
 gL = size(selection,2);
 outputPop = zeros(pS,gL);
 popCount = 0;
-h = pS/2;
 
 %% Generate Parent Couplings and Compute Crossover
 
