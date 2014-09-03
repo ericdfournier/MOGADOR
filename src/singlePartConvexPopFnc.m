@@ -143,7 +143,7 @@ switch eT
             outputPop(i,:) = pseudoRandomWalkFnc(sourceIndex,...
                 destinIndex,randomness,gridMask);
             
-            disp(i);
+            disp(['*Individual: ',num2str(i),'*']);
             
         end
     

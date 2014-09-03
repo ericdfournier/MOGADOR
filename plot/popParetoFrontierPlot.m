@@ -79,8 +79,7 @@ parse(P,nargin,popCell,popIndex,paramsStruct);
 
 %% Function Parameters
 
-modelFit = paramsStruct.modelFit;
-objectiveIndices = paramsStruct.objectiveIndices;
+iC = size(paramsStruct.objectiveVariables,3);
 
 %% Compute Basis Fitness
 
@@ -96,27 +95,18 @@ basisFitness = fitnessFnc(...
 
 %% Switch Case
 
-iC = numel(objectiveIndices);
-
 if iC < 2 || iC > 3
 
-    error('There must be either 2 or 3 objective indices');
+    switchCase = 0;
    
-elseif iC == 2 && modelFit == 0
+elseif iC == 2
     
     switchCase = 1;
     
-elseif iC == 2 && modelFit == 1
+elseif iC == 3
     
     switchCase = 2;
     
-elseif iC == 3 && modelFit == 0
-    
-    switchCase = 3;
-    
-elseif iC == 3 && modelFit == 1
-    
-    switchCase = 4;
     
 end
 
@@ -124,50 +114,35 @@ end
 
 switch switchCase
     
-    case 1 % Two Dimensional Pareto Frontier Plot with No Fit
+    case 0 % 
         
-        hold on
-        plotHandle = scatter(...
-            popCell{popIndex,2}(:,objectiveIndices(1,1)),...
-            popCell{popIndex,2}(:,objectiveIndices(1,2)),...
-            'ko');
-        scatter(...
-            basisFitness(objectiveIndices(1,1)),...
-            basisFitness(objectiveIndices(1,2)),...
-            'co');
-        hold off
-        set(gca,'YDir','reverse','XDir','reverse');
-        axis tight square
-        grid on
-        legend('Observed Data','Basis Solution');
-        xlabel(paramsStruct.objectiveNames(1,1));
-        ylabel(paramsStruct.objectiveNames(1,2));
-        title('Pareto Frontier Plot');
+        warning(['No Pareto Frontier Plot Can be Generated ', ...
+        'for this Number of Objective Variables'])
         
-    case 2 % Two Dimensional Pareto Frontier Plot with Polynomial Fit
+    case 1 % Two Dimensional Pareto Frontier Plot with Polynomial Fit
         
         [fitObject, goodnessParams] = fit(...
-            popCell{popIndex,2}(:,objectiveIndices(1,1)),...
-            popCell{popIndex,2}(:,objectiveIndices(1,2)),...
+            popCell{popIndex,2}(:,1),...
+            popCell{popIndex,2}(:,2),...
             'poly2');
         
         hold on
         plotHandle = scatter(...
-            popCell{popIndex,2}(:,objectiveIndices(1,1)),...
-            popCell{popIndex,2}(:,objectiveIndices(1,2)),...
+            popCell{popIndex,2}(:,1),...
+            popCell{popIndex,2}(:,2),...
             'ko');
         plot(fitObject);
         scatter(...
-            basisFitness(objectiveIndices(1,1)),...
-            basisFitness(objectiveIndices(1,2)),...
+            basisFitness(1),...
+            basisFitness(2),...
             'co');
         hold off
         set(gca,'YDir','reverse','XDir','reverse');
         axis tight square
         grid on
         legend('Observed Data','Basis Solution','Fit Curve');
-        xlabel(paramsStruct.objectiveNames(1,1));
-        ylabel(paramsStruct.objectiveNames(1,2));
+        xlabel('Objective 1');
+        ylabel('Objective 2');
         title('Pareto Frontier Plot');
         
         disp('Fit Parameters:')
@@ -175,48 +150,24 @@ switch switchCase
         disp('Goodness of Fit Parameters:');
         disp(goodnessParams);
         
-    case 3 % Three Dimensional Pareto Surface Plot with No Fit
-        
-        hold on
-        plotHandle = scatter3(...
-            popCell{popIndex,2}(:,objectiveIndices(1,1)),...
-            popCell{popIndex,2}(:,objectiveIndices(1,2)),...
-            popCell{popIndex,2}(:,objectiveIndices(1,3)),...
-            'ko');
-        scatter3(...
-            basisFitness(objectiveIndices(1,1)),...
-            basisFitness(objectiveIndices(1,2)),...
-            basisFitness(objectiveIndices(1,3)),...
-            'co');
-        hold off
-        set(gca,'YDir','reverse','XDir','reverse','ZDir','reverse');
-        axis tight square
-        grid on
-        colorbar();
-        legend('Observed Data','Basis Solution');
-        xlabel(paramsStruct.objectiveNames(1,1));
-        ylabel(paramsStruct.objectiveNames(1,2));
-        zlabel(paramsStruct.objectiveNames(1,3));
-        title('Pareto Frontier Plot');
-        
-    case 4 % Three Dimensional Pareto Surface Plot with Polynomial Fit
+    case 2 % Three Dimensional Pareto Surface Plot with Polynomial Fit
         
         [fitObject, goodnessParams] = fit(...
-            [popCell{popIndex,2}(:,objectiveIndices(1,1)),...
-            popCell{popIndex,2}(:,objectiveIndices(1,2))],...
-            popCell{popIndex,2}(:,objectiveIndices(1,3)),...
+            [popCell{popIndex,2}(:,1),...
+            popCell{popIndex,2}(:,2)],...
+            popCell{popIndex,2}(:,3),...
             'poly22');
         
         hold on
         plotHandle = scatter3(...
-            popCell{popIndex,2}(:,objectiveIndices(1,1)),...
-            popCell{popIndex,2}(:,objectiveIndices(1,2)),...
-            popCell{popIndex,2}(:,objectiveIndices(1,3)),...
+            popCell{popIndex,2}(:,1),...
+            popCell{popIndex,2}(:,2),...
+            popCell{popIndex,2}(:,3),...
             'ko');
         scatter3(...    
-            basisFitness(objectiveIndices(1,1)),...
-            basisFitness(objectiveIndices(1,2)),...
-            basisFitness(objectiveIndices(1,3)),...
+            basisFitness(1),...
+            basisFitness(2),...
+            basisFitness(3),...
             'co'); 
         plot(fitObject);
         hold off
@@ -225,9 +176,9 @@ switch switchCase
         grid on
         colorbar();
         legend('Observed Data','Basis Solution','Fit Plane');
-        xlabel(paramsStruct.objectiveNames(1,1));
-        ylabel(paramsStruct.objectiveNames(1,2));
-        zlabel(paramsStruct.objectiveNames(1,3));
+        xlabel('Objective 1');
+        ylabel('Objective 2');
+        zlabel('Objective 3');
         title('Pareto Frontier Plot');
         
         disp('Fit Parameters:');

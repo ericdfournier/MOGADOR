@@ -1,21 +1,21 @@
-function [ sourceIndex ] = getSourceIndexFnc(   gridMaskGeoRasterRef, ...
+function [ destinIndex ] = getDestinIndexFnc(   gridMaskGeoRasterRef, ...
                                                 gridMask )
-% getSourceIndexFnc.m Function which prompts the user to manually select the
-% location of the source index which will be used to initiate the MOGADOR
-% corridor location procedure
+% getDestinIndexFnc.m Function which prompts the user to manually select the
+% location of the destination index which will be used to initiate the 
+% MOGADOR corridor location procedure
 %
 % DESCRIPTION:
 %
 %   Function which provides the user with a map of the gridMask region and
 %   prompts the user to manually click on the map to generate the row
-%   column indices of the source location to be used in a following
+%   column indices of the destination location to be used in a following
 %   corridor location procedure. 
 % 
 %   Warning: minimal error checking is performed.
 %
 % SYNTAX:
 %
-%   [ sourceIndex ] =  getSourceIndexFnc(   gridMaskGeoRasterRef, ...
+%   [ destinIndex ] =  getDestinIndexFnc(   gridMaskGeoRasterRef, ...
 %                                           gridMask );
 %
 % INPUTS: 
@@ -30,9 +30,9 @@ function [ sourceIndex ] = getSourceIndexFnc(   gridMaskGeoRasterRef, ...
 %
 % OUTPUTS:
 %
-%   sourceIndex =       [1 x 2] row vector containing the row column
-%                       indices of the source location with respect to the 
-%                       gridMask data layer described by the 
+%   destinIndex =       [1 x 2] row vector containing the row column
+%                       indices of the destination location with respect to
+%                       the gridMask data layer described by the 
 %                       gridMaskGeoRasterRef object
 %
 % EXAMPLES:
@@ -74,17 +74,17 @@ gS = gridMaskGeoRasterRef.RasterSize;
 fig1 = figure();
 
 usamap(gridMaskGeoRasterRef.Latlim,gridMaskGeoRasterRef.Lonlim);
-title(gca,'Select Source Location');
+title(gca,'Select Destination Location');
 geoshow(gridMask, gridMaskGeoRasterRef);
-[sourceLat, sourceLon] = inputm(1);
+[destinLat, destinLon] = inputm(1);
 close(fig1);
 
 %% Generate Source Index Value
 
 indices = 1:1:(gS(1,1)*gS(1,2));
 indexMask = reshape(indices,gS);
-indexVal = ltln2val(indexMask,gridMaskGeoRasterRef,sourceLat,sourceLon);
+indexVal = ltln2val(indexMask,gridMaskGeoRasterRef,destinLat,destinLon);
 [rowInd, colInd] = find(indexMask == indexVal);
-sourceIndex = [rowInd colInd];
+destinIndex = [rowInd colInd];
 
 end

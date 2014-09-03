@@ -177,13 +177,6 @@ while convergence == 0
         objectiveVariables,...
         gridMask          );
     
-    disp(size(selection));
-    disp(populationSize);
-    disp(sourceIndex);
-    disp(destinIndex);
-    disp(crossoverType);
-    disp(size(gridMask));
-    
     crossover = popCrossoverFnc(...
         selection,...
         populationSize,...

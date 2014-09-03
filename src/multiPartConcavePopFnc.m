@@ -210,7 +210,7 @@ switch eT
                 randomness,...
                 gridMask);
             
-            disp(i);
+            disp(['*Individual: ',num2str(i),'*']);
             
         end
         

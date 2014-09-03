@@ -63,23 +63,6 @@ addRequired(P,'paramsStruct',@(x)...
     
 parse(P,nargin,popCell,paramsStruct);
 
-%% Function Parameters
-
-concave = paramsStruct.concave;
-modelFit = paramsStruct.modelFit;
-avgFitness = [popCell{:,3}]';
-gN = (1:size(avgFitness,1))';
-
-if modelFit == 0 && concave == 0
-    switchCase = 0;
-elseif modelFit == 0 && concave == 1
-    switchCase = 1;
-elseif modelFit == 1 && concave == 0
-    switchCase = 2;
-elseif modelFit == 1 && concave == 1
-    switchCase = 3;
-end
-
 %% Compute Basis Fitness
 
 basisSolution = euclShortestWalkFnc(...
@@ -87,39 +70,23 @@ basisSolution = euclShortestWalkFnc(...
     paramsStruct.destinIndex,...
     paramsStruct.gridMask);
 
+concave = ~all(paramsStruct.gridMask(basisSolution));
+
 basisAverageFitness = sum(fitnessFnc(...
     basisSolution,...
     paramsStruct.objectiveVariables,...
     paramsStruct.gridMask),2);
 
+%% Function Parameters
+
+avgFitness = [popCell{:,3}]';
+gN = (1:size(avgFitness,1))';
+
 %% Switch Case
 
-switch switchCase
-    
+switch concave
+        
     case 0
-        
-        hold on
-        plotHandle = scatter(gN, avgFitness,'ko');
-        plot(gN,repmat(basisAverageFitness, [size(gN,1), 1]),'co-');
-        hold off
-        axis tight square
-        grid on
-        title(' Convergence Plot');
-        xlabel('Population Generation #');
-        ylabel('Population Mean Fitness');
-        legend('Populations','Basis Solution');
-        
-    case 1
-        
-        plotHandle = scatter(gN, avgFitness,'ko');
-        axis tight square
-        grid on
-        title(' Convergence Plot');
-        xlabel('Population Generation #');
-        ylabel('Population Mean Fitness');
-        legend('Populations');
-        
-    case 2
         
         [fitObject, goodnessParams] = fit(gN, avgFitness,'exp2');
         
@@ -140,7 +107,7 @@ switch switchCase
         disp('Goodness of Fit Parameters:');
         disp(goodnessParams);
         
-    case 3
+    case 1
         
         [fitObject, goodnessParams] = fit(gN, avgFitness,'exp2');
         

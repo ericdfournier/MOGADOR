@@ -92,6 +92,5 @@ grid on
 xlabel('Along Path Location');
 ylabel('Objective Value');
 title('Individual Fitness Tradeoff Plot'); 
-legend(paramsStruct.objectiveNames);
 
 end

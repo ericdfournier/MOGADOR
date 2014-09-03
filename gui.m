@@ -23,7 +23,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 02-Sep-2014 15:39:38
+% Last Modified by GUIDE v2.5 03-Sep-2014 10:59:24
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -132,16 +132,34 @@ guidata(hObject, handles);
 % --- Executes on button press in loadFileSystemParameters.
 function loadFileSystemParameters_Callback(hObject, ~, handles)
 
-% Load user selected filepaths
+% Get button status
 
-tmp = load(handles.gridMaskFilepath);        
-handles.gridMask = tmp.gridMask;
+loadFileSystemParametersButtonStatus = get(hObject,'Value');
+
+if loadFileSystemParametersButtonStatus == 1
+
+    % Load user selected filepaths
     
-tmp = load(handles.gridMaskGeoRasterReferenceFilepath);
-handles.gridMaskGeoRasterRef = tmp.gridMaskGeoRasterRef;
+    tmp = load(handles.gridMaskFilepath);
+    handles.gridMask = tmp.gridMask;
+    
+    tmp = load(handles.gridMaskGeoRasterReferenceFilepath);
+    handles.gridMaskGeoRasterRef = tmp.gridMaskGeoRasterRef;
+    
+    tmp = load(handles.objectiveVariablesFilepath);
+    handles.objectiveVariables = tmp.objectiveVariables;
 
-tmp = load(handles.objectiveVariablesFilepath);
-handles.objectiveVariables = tmp.objectiveVariables;
+else
+    
+    % Clear variables
+    
+    handles.gridMask = [];
+    handles.gridMaskGeoRasterRef = [];
+    handles.objectiveVariables = [];
+    
+end
+
+% Display success message
 
 set(handles.textLoadFileSystemParametersSuccess,'String',...
     'Success!');
@@ -149,6 +167,8 @@ set(handles.textLoadFileSystemParametersSuccess,'String',...
 % Update handles structure
 
 guidata(hObject, handles);
+
+disp(size(handles.objectiveVariables));
 
 
 %__________________________________________________________________________
@@ -248,7 +268,7 @@ selectLocationButtonStatus = get(hObject,'Value');
 
 if selectLocationButtonStatus == 1
     
-    tmp = getSourceIndexFnc( ...
+    tmp = getDestinIndexFnc( ...
         handles.gridMaskGeoRasterRef, ...
         handles.gridMask );
     handles.destinRow = tmp(1,1);
@@ -333,9 +353,6 @@ if loadProblemStatementButtonStatus == 1
     handles.destinIndex = ...
         [handles.destinRow handles.destinCol];
     
-    set(handles.textLoadProblemStatementParametersSuccess,'String',...
-    'Success!');
-    
 elseif loadProblemStatementButtonStatus == 0 
     
     % Clear parameters within handle structure
@@ -344,6 +361,11 @@ elseif loadProblemStatementButtonStatus == 0
     handles.destinIndex = [];
     
 end
+
+% Display Success message
+
+set(handles.textLoadProblemStatementParametersSuccess,'String',...
+    'Success!');
 
 % Update handles structure
 
@@ -772,8 +794,6 @@ end
 
 guidata(hObject,handles);
 
-disp(handles);
-
 % Get initial population
 
 inputPopCell = handles.o;
@@ -812,14 +832,59 @@ guidata(hObject, handles);
 
 
 % --- Executes on button press in generateOutputPlots.
-function generateOutputPlots_Callback(hObject, eventdata, handles)
-% hObject    handle to generateOutputPlots (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+function generateOutputPlots_Callback(hObject, ~, handles)
+
+generateOutputPlotButtonStatus = get(hObject,'Value');
+
+if generateOutputPlotButtonStatus == 1
+    
+    finalOutputPlot(handles.o,handles);
+    
+else 
+    
+end
+
+% Display success message
+
+set(handles.textGenerateOutputPlotsSuccess,'String',...
+    'Success!');
+
+% Update Handles structure
+
+guidata(hObject, handles);
 
 
-% --- Executes on button press in writeSolutionDataToFile.
-function writeSolutionDataToFile_Callback(hObject, eventdata, handles)
-% hObject    handle to writeSolutionDataToFile (see GCBO)
+% --- Executes on button press in saveSolution.
+function saveSolution_Callback(hObject, ~, handles)
+
+saveSolutionButtonStatus = get(hObject,'Value');
+
+if saveSolutionButtonStatus == 1
+    
+    outputData = handles.o;
+    
+    destinDirectory = uigetdir;
+    timeStampString = datestr(now,30);
+    save([destinDirectory,'/MOGADOR_OUTPUT_',timeStampString,'.mat'],...
+        'outputData');
+    
+else
+    
+end
+
+% Display success message
+
+set(handles.textSaveSolutionSuccess,'String',...
+    'Success!');
+
+% Update Handles structure
+
+guidata(hObject, handles);
+    
+
+
+% --------------------------------------------------------------------
+function inputParametersContext_Callback(hObject, eventdata, handles)
+% hObject    handle to inputParametersContext (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
