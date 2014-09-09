@@ -23,7 +23,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 03-Sep-2014 10:59:24
+% Last Modified by GUIDE v2.5 05-Sep-2014 08:55:43
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,6 +59,25 @@ function gui_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for gui
 handles.output = hObject;
+
+% Write Population Initialization Defaults
+
+handles.populationSizeString = '100';
+handles.maximumGenerationsString = '20';
+handles.randomnessString = '2';
+handles.executionTypeRaw = 0;
+handles.walkTypeRaw = 0;
+handles.objectiveFractionRaw = 0.2;
+handles.minimumClusterSizeString = '5';
+
+% Write default evolutionary parameters
+
+handles.selectionFractionRaw = 0.4;
+handles.selectionProbabilityRaw = 0.9;
+handles.mutationFractionRaw = 0.2;
+handles.mutationCountString = '1';
+handles.crossoverTypeRaw = 0;
+
 
 % Update handles structure
 guidata(hObject, handles);
@@ -137,6 +156,12 @@ function loadFileSystemParameters_Callback(hObject, ~, handles)
 loadFileSystemParametersButtonStatus = get(hObject,'Value');
 
 if loadFileSystemParametersButtonStatus == 1
+    
+    % Clear message status
+
+    set(handles.loadFileSystemParameters,'ForegroundColor',[0 0 0]);
+    set(handles.loadFileSystemParameters,'FontWeight','normal');
+    guidata(hObject,handles);
 
     % Load user selected filepaths
     
@@ -148,27 +173,17 @@ if loadFileSystemParametersButtonStatus == 1
     
     tmp = load(handles.objectiveVariablesFilepath);
     handles.objectiveVariables = tmp.objectiveVariables;
-
-else
-    
-    % Clear variables
-    
-    handles.gridMask = [];
-    handles.gridMaskGeoRasterRef = [];
-    handles.objectiveVariables = [];
     
 end
 
 % Display success message
 
-set(handles.textLoadFileSystemParametersSuccess,'String',...
-    'Success!');
-    
+set(handles.loadFileSystemParameters,'ForegroundColor',[0 0.498 0]);
+set(handles.loadFileSystemParameters,'FontWeight','bold');
+
 % Update handles structure
 
 guidata(hObject, handles);
-
-disp(size(handles.objectiveVariables));
 
 
 %__________________________________________________________________________
@@ -197,11 +212,6 @@ if selectLocationButtonStatus == 1
         num2str(handles.sourceRow));
     set(handles.inputSourceIndexColumn,'String',...
         num2str(handles.sourceCol));
-
-elseif selectLocationButtonStatus == 0
-    
-    handles.sourceRow = [];
-    handles.sourceCol = [];
     
 end
 
@@ -279,11 +289,6 @@ if selectLocationButtonStatus == 1
     set(handles.inputDestinationIndexColumn,'String',...
         num2str(handles.destinCol));
     
-elseif selectLocationButtonStatus == 0
-    
-    handles.destinRow = [];
-    handles.destinCol = [];
-    
 end
 
 % Update handles structure
@@ -344,28 +349,29 @@ function loadProblemStatementParameters_Callback(hObject, ~, handles)
 
 loadProblemStatementButtonStatus = get(hObject,'Value');
 
+% Write user input parameters
+
 if loadProblemStatementButtonStatus == 1
+    
+    % Clear message
+
+    set(handles.loadProblemStatementParameters,'ForegroundColor',[0 0 0]);
+    set(handles.loadProblemStatementParameters,'FontWeight','normal');
+    guidata(hObject,handles);
     
     % Write parameters to handle structure
     
     handles.sourceIndex = ...
         [handles.sourceRow handles.sourceCol];
     handles.destinIndex = ...
-        [handles.destinRow handles.destinCol];
-    
-elseif loadProblemStatementButtonStatus == 0 
-    
-    % Clear parameters within handle structure
-    
-    handles.sourceIndex = [];
-    handles.destinIndex = [];
-    
+        [handles.destinRow handles.destinCol];    
+
 end
 
 % Display Success message
 
-set(handles.textLoadProblemStatementParametersSuccess,'String',...
-    'Success!');
+set(handles.loadProblemStatementParameters,'ForegroundColor',[0 0.498 0]);
+set(handles.loadProblemStatementParameters,'FontWeight','bold');
 
 % Update handles structure
 
@@ -399,6 +405,25 @@ if ispc && isequal( ...
     set(hObject,'BackgroundColor','white');
     
 end
+
+
+function inputGenerations_Callback(hObject, ~, handles)
+
+% Get user input for maximum generations
+
+handles.maximumGenerationsString = get(hObject,'String');
+
+% Update Handles structure
+
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function inputGenerations_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
 
 
 function inputRandomness_Callback(hObject, ~, handles)
@@ -516,35 +541,33 @@ end
 % --- Executes on button press in initializePopulation.
 function initializePopulation_Callback(hObject, ~, handles)
 
+% Update handles structure
+
+guidata(hObject, handles);
+
 % Get button status
 
 initializePopulationButtonStatus = get(hObject,'Value');
 
 if initializePopulationButtonStatus == 1
     
+    % Clear success message
+
+    set(handles.initializePopulation,'ForegroundColor',[0 0 0]);
+    set(handles.initializePopulation,'FontWeight','normal');
+    guidata(hObject,handles);
+    
     % Write parameters to handle structure
     
     handles.populationSize = str2double(handles.populationSizeString);
+    handles.maximumGenerations = str2double(handles.maximumGenerationsString);
     handles.randomness = str2double(handles.randomnessString);
     handles.executionType = handles.executionTypeRaw;
     handles.walkType = handles.walkTypeRaw;
     handles.objectiveFraction = handles.objectiveFractionRaw;
     handles.minimumClusterSize = str2double(handles.minimumClusterSizeString);
     
-elseif initializedPopulationButtonStatus == 0 
-    
-    % Clear parameters within handle structure
-    
-    handles.populationSize = [];
-    handles.randomness = [];
-    handles.executionType = [];
-    handles.walkType = [];
-    handles.objectiveFraction = [];
-    handles.minimumClusterSize = [];
-    
 end
-
-guidata(hObject, handles);
 
 % Update handles structure
 
@@ -552,9 +575,8 @@ guidata(hObject,handles);
 
 % Intialize Population
 
-maxGenerations = 100;
 i = 1;
-o = cell(maxGenerations,3);
+o = cell(handles.maximumGenerations,3);
 
 o{i,1} = initPopFnc(...
     handles.populationSize,...
@@ -582,8 +604,8 @@ handles.o = o;
 
 % Display success message
 
-set(handles.textInitializePopulationSuccess,'String',...
-    'Success!');
+set(handles.initializePopulation,'ForegroundColor',[0 0.498 0]);
+set(handles.initializePopulation,'FontWeight','bold');
 
 % Update Handles Structure
 
@@ -721,24 +743,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-function inputGenerations_Callback(hObject, ~, handles)
-
-% Get user input for maximum generations
-
-handles.maximumGenerationsString = get(hObject,'String');
-
-% Update Handles structure
-
-guidata(hObject, handles);
-
-% --- Executes during object creation, after setting all properties.
-function inputGenerations_CreateFcn(hObject, ~, ~)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
 % --- Executes on selection change in selectCrossoverType.
 function selectCrossoverType_Callback(hObject, ~, handles)
 
@@ -767,6 +771,12 @@ function generateSolution_Callback(hObject, ~, handles)
 generateSolutionButtonStatus = get(hObject,'Value');
 
 if generateSolutionButtonStatus == 1
+    
+    % Display success message
+
+    set(handles.generateSolution,'ForegroundColor',[0 0 0]);
+    set(handles.generateSolution,'FontWeight','normal');
+    guidata(hObject,handles);
         
     % Write parameters to handle structure
     
@@ -774,19 +784,8 @@ if generateSolutionButtonStatus == 1
     handles.selectionProbability = handles.selectionProbabilityRaw;
     handles.mutationFraction = handles.mutationFractionRaw;
     handles.mutationCount = str2double(handles.mutationCountString);
-    handles.maximumGenerations = str2double(handles.maximumGenerationsString);
     handles.crossoverType = handles.crossoverTypeRaw;
-    
-elseif generateSolutionButtonStatus == 0 
-    
-    % Clear parameters within handle structure
-    
-    handles.selectionFraction = [];
-    handles.selectionProbability = [];
-    handles.mutationFraction = [];
-    handles.mutationCount = [];
-    handles.maximumGenerations = [];
-    handles.crossoverType = [];
+    handles.o(2:end,:) = [];
     
 end
 
@@ -818,8 +817,8 @@ handles.o = outputPopCell;
 
 % Display success message
 
-set(handles.textGenerateSolutionSuccess,'String',...
-    'Success!');
+set(handles.generateSolution,'ForegroundColor',[0 0.498 0]);
+set(handles.generateSolution,'FontWeight','bold');
 
 % Update Handles Structure
 
@@ -846,8 +845,8 @@ end
 
 % Display success message
 
-set(handles.textGenerateOutputPlotsSuccess,'String',...
-    'Success!');
+set(handles.generateOutputPlots,'ForegroundColor',[0 0.498 0]);
+set(handles.generateOutputPlots,'FontWeight','bold');
 
 % Update Handles structure
 
@@ -862,7 +861,6 @@ saveSolutionButtonStatus = get(hObject,'Value');
 if saveSolutionButtonStatus == 1
     
     outputData = handles.o;
-    
     destinDirectory = uigetdir;
     timeStampString = datestr(now,30);
     save([destinDirectory,'/MOGADOR_OUTPUT_',timeStampString,'.mat'],...
@@ -874,17 +872,44 @@ end
 
 % Display success message
 
-set(handles.textSaveSolutionSuccess,'String',...
-    'Success!');
+set(handles.saveSolution,'ForegroundColor',[0 0.498 0]);
+set(handles.saveSolution,'FontWeight','bold');
 
 % Update Handles structure
 
 guidata(hObject, handles);
     
 
+% --- Executes on button press in saveParameters.
+function saveParameters_Callback(hObject, ~, handles)
 
-% --------------------------------------------------------------------
-function inputParametersContext_Callback(hObject, eventdata, handles)
-% hObject    handle to inputParametersContext (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+saveParametersButtonStatus = get(hObject,'Value');
+
+if saveParametersButtonStatus == 1
+    
+    % Extract all parameters
+    
+    runtimeParameters = handles;
+    
+    % Wipe selected parameters
+    
+    runtimeParameters.o{2:end,:} = [];
+    disp(runtimeParameters.o);
+    
+    % Write parameters to file
+    
+    destinDirectory = uigetdir;
+    timeStampString = datestr(now,30);
+    save([destinDirectory,'/MOGADOR_PARAMETERS_',timeStampString,'.mat'],...
+        'runtimeParameters');
+    
+end
+
+% Display Success Message
+
+set(handles.saveParameters,'ForegroundColor',[0 0.498 0]);
+set(handles.saveParameters,'FontWeight','bold');
+
+% Update Handles structure
+
+guidata(hObject, handles);
