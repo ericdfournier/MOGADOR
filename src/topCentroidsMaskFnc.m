@@ -120,14 +120,14 @@ parse(P,nargin,nargout,objectiveVars,objectiveFrac,minClusterSize,...
 %% Function Parameters
 
 gS = size(gridMask);
-oC = size(objectiveVars);
+oC = size(objectiveVars,3);
 
 %% Compute Aggregate Objective Scores and Mask Out Top Fraction
 
 rowLen = gS(1,1).*gS(1,2);
-topCentroidsInd = cell(oC(1,3),1);
+topCentroidsInd = cell(oC,1);
 
-for i = 1:oC(1,3)
+for i = 1:oC
     
     % Extract Top Objective Variable Fraction Mask
     

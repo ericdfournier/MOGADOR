@@ -27,14 +27,14 @@ $ unzip MOGADOR.zip
 ### PLATFORM
 
 - MATLAB Version: 8.1.0.604 (R2013a)
-- Operating System: Mac OS X  Version: 10.9.1 Build: 13B42 
-- Java Version: Java 1.6.0_65-b14-462-11M4609 with Apple Inc. Java HotSpot(TM) 64-Bit Server VM mixed mode
 
 ### DEPENDENCIES
 
 - Image Processing Toolbox                              Version 8.2
 - Mapping Toolbox                                       Version 3.7
 - Statistics Toolbox                                    Version 8.2
+
+- Note: The GUI elements have been developed for use in a Mac OS X environment
 
 ### REFERENCES
 
