@@ -43,7 +43,7 @@ p.maxGenerations = 100;
 
 %% Randomly Generate Objective Variables
 
-p.objectiveVars = randi(p.objectiveMax,[size(gridMask) p.objectiveCount]);
+p.objectiveVariables = randi(p.objectiveMax,[size(gridMask) p.objectiveCount]);
 
 %% Plotting Function Optional Arguments
 
