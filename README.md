@@ -1,7 +1,8 @@
 #MOGADOR
 
-Generate good solutions to multi-objective corridor location problems.
-For more read the documentation at: www.ericdfournier.com/MOGADOR
+MOGADOR is genetic algorithm that can be used to generate good solutions to multi-objective corridor location problems. Within this repository, the algorithm has been implmented in the MATLAB intepreted programming environment for ease of use and inspection. It should primarily be considered of value in a teaching/learning context due to its single threaded execution and modest runtime performance. A newer, faster, and fully parallelized version of the algorithm has been implemented by the author using the Go programming language. This version should should be preferred for use in all serious real world corridor planning applications. 
+
+The Go version of the algorithm is hosted at: github.com/ericdfournier/corridor 
 
 ## INSTALLATION
 
